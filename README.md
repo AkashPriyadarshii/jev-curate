@@ -1,7 +1,7 @@
 <!--
-Title: jev-curate — High-Throughput Synthetic & Pretraining Dataset Sifter Powered by TypeSafe AI (Jev)
-Description: Stream, filter, and curate millions of rows of synthetic reasoning and fine-tuning datasets in Parquet and JSONL format at 1,500+ rows/sec using TypeSafe AI's Jev System One decision engine.
-Keywords: typesafe ai, jev, dataset curation, synthetic data, llm fine-tuning, parquet, polars, pyarrow, rlcd, rust, python
+Title: jev-curate — High-Throughput Synthetic & Pretraining Dataset Sifter Powered by TypeSafe AI (Jev System One)
+Description: High-throughput synthetic & pretraining dataset curation pipeline in Rust & Python powered by TypeSafe AI's Jev model (api.typesafe.ai). Stream, filter, and score millions of Parquet and JSONL rows at 1,500+ records/sec using Jev System One typed decisions (Choice, Score, Noul), speculative fan-out, and calibrated post-training reasoning rubrics.
+Keywords: typesafe ai, type safe ai, jev, api.typesafe.ai, jev-1.13.0, jev-latest, system one, choice, score, noul, dataset curation, synthetic data filtering, pretraining datasets, post-training, fine-tuning, rlcd, reasoning models, parquet, arrow, polars, pyarrow, pyo3, rust, jsonl, llm evaluation, speculative fan-out
 -->
 
 <div align="center">
@@ -147,4 +147,6 @@ jev-curate/
 
 ---
 
-*Built with high-performance Rust for the TypeSafe AI System One ecosystem.*
+*Built with high-performance Rust for the TypeSafe AI System One (Jev) ecosystem.*
+
+*Keywords: TypeSafe AI, Jev, api.typesafe.ai, System One, Choice, Score, Noul, dataset curation, synthetic data filtering, pretraining datasets, Parquet streaming, arrow, rust.*
