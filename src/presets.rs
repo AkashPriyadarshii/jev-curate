@@ -140,7 +140,7 @@ impl PresetConfig {
                     "2": "Partial implementation with obvious bugs",
                     "3": "Working implementation with minimal edge case handling",
                     "4": "Clean, idiomatic code with error handling",
-                    "5": "Production-grade, robust, fully typed, self-contained implementation"
+                    "5": "Production-grade, fully typed, battle-tested implementation"
                 })),
             },
         );

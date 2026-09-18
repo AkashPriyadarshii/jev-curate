@@ -86,11 +86,9 @@ rejected_df.write_parquet("rejected.parquet")
 |---|:---:|---|
 | `<INPUT_PATH>` | *Required* | Path to input `.parquet` or `.jsonl` file. |
 | `--preset` | `reasoning-math` | Pre-built rubric (`reasoning-math`, `anti-sycophancy`, `code-correctness`). |
-| `--config` | `None` | Optional path to custom `curate.yaml` rule file. |
-| `--out` | `./curated/` | Destination folder for `clean.parquet` and `rejected.parquet`. |
+| `--out` | `./curated/` | Destination folder for `clean.jsonl` and `rejected.jsonl`. |
 | `--concurrency` | `32` | Worker concurrency (adaptive token bucket prevents 429 rate limits). |
-| `--batch-size` | `4` | Rows packed per speculative fan-out API payload. |
-| `--max-tokens` | `8000` | Hard row ceiling to prevent context rot per TypeSafe skill standards. |
+| `--dry-run` | `false` | Offline evaluation simulation with host pre-filtering and zero API calls. |
 
 ---
 
