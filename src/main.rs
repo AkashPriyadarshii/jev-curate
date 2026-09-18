@@ -165,14 +165,14 @@ async fn main() -> anyhow::Result<()> {
             }
             drop(tx);
 
-            let mut clean_records = Vec::new();
-            let mut rejected_records = Vec::new();
+            use jev_curate::parquet_io::DatasetWriter;
+            let mut writer = DatasetWriter::new(&out)?;
 
             while let Some((passed, raw, reasons)) = rx.recv().await {
                 if passed {
-                    clean_records.push(raw);
+                    writer.write_clean_record(&raw)?;
                 } else {
-                    rejected_records.push((raw, reasons));
+                    writer.write_rejected_record(&raw, &reasons)?;
                 }
             }
 
@@ -180,13 +180,11 @@ async fn main() -> anyhow::Result<()> {
                 let _ = t.await;
             }
 
+            writer.flush()?;
             pb.finish_with_message("Done!");
 
             let clean_path = out.join("clean.jsonl");
             let rejected_path = out.join("rejected.jsonl");
-
-            DatasetReader::write_clean_jsonl(&clean_path, &clean_records)?;
-            DatasetReader::write_rejected_jsonl(&rejected_path, &rejected_records)?;
 
             let p = passed_count.load(Ordering::Relaxed);
             let r = rejected_count.load(Ordering::Relaxed);

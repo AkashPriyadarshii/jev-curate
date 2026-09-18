@@ -141,3 +141,74 @@ impl DatasetReader {
     }
 }
 
+/// Streaming dataset writer that writes directly to disk with buffered I/O, avoiding in-memory Vec accumulation.
+pub struct DatasetWriter {
+    clean: std::io::BufWriter<File>,
+    rejected: std::io::BufWriter<File>,
+}
+
+impl DatasetWriter {
+    pub fn new<P: AsRef<Path>>(out_dir: P) -> Result<Self> {
+        let clean_path = out_dir.as_ref().join("clean.jsonl");
+        let rejected_path = out_dir.as_ref().join("rejected.jsonl");
+
+        let clean_file = File::create(&clean_path)
+            .with_context(|| format!("Failed to create clean dataset file {}", clean_path.display()))?;
+        let rejected_file = File::create(&rejected_path)
+            .with_context(|| format!("Failed to create rejected log file {}", rejected_path.display()))?;
+
+        Ok(Self {
+            clean: std::io::BufWriter::new(clean_file),
+            rejected: std::io::BufWriter::new(rejected_file),
+        })
+    }
+
+    pub fn write_clean_record(&mut self, record: &str) -> Result<()> {
+        writeln!(self.clean, "{}", record)?;
+        Ok(())
+    }
+
+    pub fn write_rejected_record(&mut self, record: &str, reasons: &[String]) -> Result<()> {
+        let obj = serde_json::json!({
+            "record": record,
+            "rejection_reasons": reasons
+        });
+        writeln!(self.rejected, "{}", obj)?;
+        Ok(())
+    }
+
+    pub fn flush(&mut self) -> Result<()> {
+        self.clean.flush()?;
+        self.rejected.flush()?;
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_dataset_writer_streams_clean_and_rejected_to_disk() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let mut writer = DatasetWriter::new(temp_dir.path()).unwrap();
+
+        writer.write_clean_record("{\"text\": \"valid clean record\"}").unwrap();
+        writer.write_rejected_record(
+            "{\"text\": \"corrupt record\"}",
+            &["Reason 1".to_string(), "Reason 2".to_string()],
+        ).unwrap();
+        writer.flush().unwrap();
+
+        let clean_records = DatasetReader::read_jsonl(temp_dir.path().join("clean.jsonl")).unwrap();
+        assert_eq!(clean_records.len(), 1);
+        assert_eq!(clean_records[0].0, "valid clean record");
+
+        let rej_content = std::fs::read_to_string(temp_dir.path().join("rejected.jsonl")).unwrap();
+        assert!(rej_content.contains("Reason 1"));
+        assert!(rej_content.contains("Reason 2"));
+    }
+}
+
+
+
