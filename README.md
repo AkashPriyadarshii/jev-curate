@@ -143,7 +143,7 @@ jev-curate/
 * [GitHub](https://github.com/AkashPriyadarshii) &bull; [Portfolio](https://akashpriyadarshi.vercel.app) &bull; [LinkedIn](https://linkedin.com/in/akash-priyadarshi-1aa51b37a) &bull; [Resume](https://akashpriyadarshii.github.io/Resume/)
 
 ### Social
-* [X / Twitter](https://x.com/Akash__ydv001) &bull; [Threads](https://www.threads.com/@free_dev2026) &bull; [Instagram](https://www.instagram.com/akash.priyadarshii/) &bull; [Reddit](https://reddit.com/user/DragonfruitWeak2801)
+* [X / Twitter](https://x.com/Akash__ydv001) &bull; [Threads](https://www.threads.net/@akash.priyadarshii) &bull; [Instagram](https://www.instagram.com/akash.priyadarshii/) &bull; [Reddit](https://reddit.com/user/DragonfruitWeak2801)
 
 ---
 
