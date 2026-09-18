@@ -40,6 +40,10 @@ enum Commands {
         /// Worker concurrency
         #[arg(short, long, default_value_t = 32)]
         concurrency: usize,
+
+        /// Dry-run mode: evaluate host pre-filters and simulate verdicts without API calls
+        #[arg(long)]
+        dry_run: bool,
     },
 }
 
@@ -53,6 +57,7 @@ async fn main() -> anyhow::Result<()> {
             preset,
             out,
             concurrency,
+            dry_run,
         } => {
             let api_key = std::env::var("TYPESAFE_API_KEY").unwrap_or_else(|_| {
                 eprintln!("\x1b[33mWarning: TYPESAFE_API_KEY not set. Using dummy key for dry-run/mock.\x1b[0m");
@@ -71,8 +76,8 @@ async fn main() -> anyhow::Result<()> {
 
             fs::create_dir_all(&out)?;
 
-            // Read records
-            let records = DatasetReader::read_jsonl(&input)?;
+            // Read records (auto-detects JSONL or Parquet)
+            let records = DatasetReader::read_dataset(&input)?;
             let total = records.len();
             println!("Loaded {} records for evaluation.\n", total);
 
@@ -94,11 +99,12 @@ async fn main() -> anyhow::Result<()> {
 
             let passed_count = Arc::new(AtomicUsize::new(0));
             let rejected_count = Arc::new(AtomicUsize::new(0));
+            let semaphore = Arc::new(tokio::sync::Semaphore::new(concurrency));
 
             let (tx, mut rx) = mpsc::channel(100);
             let filter_arc = filter.clone();
 
-            // Spawn worker queue
+            // Spawn bounded worker queue
             let records_iter = records.into_iter();
             let mut tasks = Vec::new();
 
@@ -108,9 +114,29 @@ async fn main() -> anyhow::Result<()> {
                 let passed_cnt = passed_count.clone();
                 let rejected_cnt = rejected_count.clone();
                 let pb_worker = pb.clone();
+                let sem_permit = semaphore.clone();
 
                 let task = tokio::spawn(async move {
-                    let verdict = filter_worker.evaluate_record(&text).await;
+                    let _permit = sem_permit.acquire().await.ok();
+                    let verdict = if dry_run {
+                        match filter_worker.pre_filter_sanity(&text) {
+                            Ok(_) => Ok(jev_curate::filter::CurateVerdict {
+                                passed: true,
+                                scores: std::collections::HashMap::new(),
+                                nouls: std::collections::HashMap::new(),
+                                rejection_reasons: Vec::new(),
+                            }),
+                            Err(rej) => Ok(jev_curate::filter::CurateVerdict {
+                                passed: false,
+                                scores: std::collections::HashMap::new(),
+                                nouls: std::collections::HashMap::new(),
+                                rejection_reasons: vec![format!("Host sanity failure: {}", rej)],
+                            }),
+                        }
+                    } else {
+                        filter_worker.evaluate_record(&text).await
+                    };
+
                     match verdict {
                         Ok(v) => {
                             if v.passed {
