@@ -1,0 +1,40 @@
+[package]
+name = "jev-curate"
+version = "0.1.0"
+edition = "2021"
+authors = ["Akash Priyadarshi <272530059+AkashPriyadarshii@users.noreply.github.com>"]
+description = "High-Throughput Synthetic & Pretraining Dataset Sifter Powered by TypeSafe AI (Jev)"
+license = "MIT"
+repository = "https://github.com/AkashPriyadarshii/jev-curate"
+readme = "README.md"
+keywords = ["typesafe-ai", "jev", "dataset", "parquet", "curation"]
+categories = ["command-line-utilities", "development-tools"]
+
+[lib]
+name = "jev_curate"
+crate-type = ["rlib"]
+
+[[bin]]
+name = "jev-curate"
+path = "src/main.rs"
+
+[features]
+default = []
+python = ["dep:pyo3"]
+
+[dependencies]
+tokio = { version = "1.38", features = ["full"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+clap = { version = "4.5", features = ["derive"] }
+indicatif = "0.17"
+thiserror = "1.0"
+anyhow = "1.0"
+arrow = { version = "53.0", features = ["prettyprint"] }
+parquet = { version = "53.0", features = ["arrow"] }
+pyo3 = { version = "0.22", features = ["extension-module"], optional = true }
+
+[dev-dependencies]
+tempfile = "3.10"
+wiremock = "0.6"
