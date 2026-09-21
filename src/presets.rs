@@ -19,6 +19,7 @@ pub struct PresetConfig {
     pub questions: HashMap<String, JevQuestionConfig>,
     pub min_scores: HashMap<String, f64>,
     pub reject_nouls: HashMap<String, f64>, // reject if Noul probability >= threshold
+    pub min_confidence: f64, // reject any verdict below this answer confidence
 }
 
 impl PresetConfig {
@@ -73,6 +74,7 @@ impl PresetConfig {
             questions,
             min_scores,
             reject_nouls,
+            min_confidence: 0.5,
         }
     }
 
@@ -113,6 +115,7 @@ impl PresetConfig {
             questions,
             min_scores,
             reject_nouls,
+            min_confidence: 0.5,
         }
     }
 
@@ -157,6 +160,7 @@ impl PresetConfig {
             questions,
             min_scores,
             reject_nouls,
+            min_confidence: 0.5,
         }
     }
 }
