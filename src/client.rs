@@ -31,10 +31,8 @@ struct JevRequest<'a> {
 /// Response payload received from TypeSafe AI.
 #[derive(Debug, Deserialize)]
 struct JevResponse {
-    #[serde(default)]
     answers: HashMap<String, JevQuestionResult>,
     #[serde(default)]
-    #[allow(dead_code)]
     error: Option<String>,
 }
 
@@ -97,6 +95,14 @@ impl JevClient {
                         .json()
                         .await
                         .context("Failed to parse Jev response JSON")?;
+                    if let Some(err) = jev_res.error {
+                        anyhow::bail!("Jev returned error: {}", err);
+                    }
+                    for key in questions.keys() {
+                        if !jev_res.answers.contains_key(key) {
+                            anyhow::bail!("Jev response missing answer for '{}'", key);
+                        }
+                    }
                     return Ok(jev_res.answers);
                 }
                 Ok(res) if res.status() == reqwest::StatusCode::TOO_MANY_REQUESTS => {

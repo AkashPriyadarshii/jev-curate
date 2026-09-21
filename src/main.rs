@@ -59,10 +59,13 @@ async fn main() -> anyhow::Result<()> {
             concurrency,
             dry_run,
         } => {
-            let api_key = std::env::var("TYPESAFE_API_KEY").unwrap_or_else(|_| {
-                eprintln!("\x1b[33mWarning: TYPESAFE_API_KEY not set. Using dummy key for dry-run/mock.\x1b[0m");
-                "dummy".to_string()
-            });
+            let api_key = match std::env::var("TYPESAFE_API_KEY") {
+                Ok(k) if !k.trim().is_empty() => k,
+                _ if dry_run => "dummy".to_string(),
+                _ => {
+                    anyhow::bail!("TYPESAFE_API_KEY not set. Refusing non-dry-run without a key.");
+                }
+            };
 
             let preset_cfg = PresetConfig::from_name(&preset).ok_or_else(|| {
                 anyhow::anyhow!("Unknown preset '{}'. Available: reasoning-math, anti-sycophancy, code-correctness", preset)
