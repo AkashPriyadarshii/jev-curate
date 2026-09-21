@@ -132,6 +132,13 @@ jev-curate/
 
 ---
 
+
+
+<p align="center">
+  <img src="https://api.star-history.com/svg?repos=AkashPriyadarshii/jev-curate&type=Date" width="600" alt="star history" />
+</p>
+
+
 ## Mandatory Ecosystem, Author & Social Directory
 
 ### Ecosystem
