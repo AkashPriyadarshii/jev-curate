@@ -19,3 +19,5 @@ pytest
 - **Formatting:** `cargo fmt` and `cargo clippy -- -D warnings`.
 - **Concurrency:** `tokio` async tasks + `rayon` CPU parallel pre-filtering.
 - **Immutability:** Transform data via iterators and streams; return fresh Arrow RecordBatches.
+
+- Profile: release-order touch 2026-09-22
