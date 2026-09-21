@@ -21,6 +21,8 @@ By **[Akash Priyadarshi](https://github.com/AkashPriyadarshii)**
 
 </div>
 
+[![stars](https://img.shields.io/github/stars/AkashPriyadarshii/jev-curate?style=flat-square&label=stars)](https://github.com/AkashPriyadarshii/jev-curate/stargazers) [![crates.io](https://img.shields.io/crates/v/jev-curate?style=flat-square)](https://crates.io/crates/jev-curate) [![downloads](https://img.shields.io/crates/d/jev-curate?style=flat-square)](https://crates.io/crates/jev-curate) [![release](https://img.shields.io/github/v/release/AkashPriyadarshii/jev-curate?style=flat-square&label=release)](https://github.com/AkashPriyadarshii/jev-curate/releases)
+
 ---
 
 ## Why `jev-curate`?
