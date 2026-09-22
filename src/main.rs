@@ -44,6 +44,10 @@ enum Commands {
         /// Dry-run mode: evaluate host pre-filters and simulate verdicts without API calls
         #[arg(long)]
         dry_run: bool,
+
+        /// Custom API endpoint URL for offline mock testing (or set TYPESAFE_ENDPOINT env var)
+        #[arg(long)]
+        endpoint: Option<String>,
     },
 }
 
@@ -58,10 +62,12 @@ async fn main() -> anyhow::Result<()> {
             out,
             concurrency,
             dry_run,
+            endpoint,
         } => {
+            let effective_endpoint = endpoint.or_else(|| std::env::var("TYPESAFE_ENDPOINT").ok());
             let api_key = match std::env::var("TYPESAFE_API_KEY") {
                 Ok(k) if !k.trim().is_empty() => k,
-                _ if dry_run => "dummy".to_string(),
+                _ if dry_run || effective_endpoint.is_some() => "dummy".to_string(),
                 _ => {
                     anyhow::bail!("TYPESAFE_API_KEY not set. Refusing non-dry-run without a key.");
                 }
@@ -76,6 +82,9 @@ async fn main() -> anyhow::Result<()> {
             println!("Preset:      {} ({})", preset_cfg.name, preset_cfg.description);
             println!("Output Dir:  {}", out.display());
             println!("Concurrency: {}", concurrency);
+            if let Some(ref ep) = effective_endpoint {
+                println!("Endpoint:    {}", ep);
+            }
 
             fs::create_dir_all(&out)?;
 
@@ -89,7 +98,10 @@ async fn main() -> anyhow::Result<()> {
                 return Ok(());
             }
 
-            let client = JevClient::new(api_key);
+            let mut client = JevClient::new(api_key);
+            if let Some(ep) = effective_endpoint {
+                client = client.with_endpoint(ep);
+            }
             let filter = Arc::new(CurateFilter::new(client, preset_cfg));
 
             let pb = ProgressBar::new(total as u64);

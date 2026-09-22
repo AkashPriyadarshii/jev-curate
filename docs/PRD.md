@@ -9,7 +9,7 @@ Fine-tuning and post-training teams (evaluating synthetic reasoning traces, inst
 - Synthetic data generation pipelines requiring high-throughput, low-cost verification.
 
 ## 3. Core Value Proposition
-- **High Throughput:** 1,500+ records/sec per worker node.
+- **High Throughput:** 20 records/sec per single worker node (TypeSafe 1,200 req/min ceiling); 1,500+ records/sec cluster target.
 - **Ultra-Low Cost:** $0.042/Mtok input tokens with zero output token fees.
 - **Calibrated Mathematical Signals:** Receives probabilistic Noul and Score signals directly from TypeSafe AI's Jev model.
 - **Dual Distribution:** Single-binary Rust CLI (`cargo install jev-curate`) + Python library (`pip install jev-curate`).
