@@ -7,10 +7,6 @@
         { "key": "X-Frame-Options", "value": "DENY" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
       ]
-    },
-    {
-      "source": "/(.*\\.(?:png|svg|jpg|jpeg|ico|css|js|woff2))$",
-      "headers": [ { "key": "Cache-Control", "value": "public, max-age=604800, immutable" } ]
     }
   ],
   "trailingSlash": false
