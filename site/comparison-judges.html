@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<!--
+Title: jev-curate vs custom judge scripts - comparison
+Description: jev-curate vs hand-rolled judge scripts and manual labeling for dataset quality. Verdict schema, reusability, and threshold control compared.
+Keywords: jev-curate vs judge scripts, dataset quality pipeline, manual labeling vs automated, Jev preset rubrics, streaming data sifter
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Comparison: jev-curate vs custom judge scripts and manual labeling</title>
+  <meta name="description" content="jev-curate vs hand-rolled judge scripts and manual labeling for dataset quality. Verdict schema, reusability, and threshold control compared.">
+  <meta property="og:title" content="jev-curate vs your own judge script">
+  <meta property="og:description" content="Both filter data. One you write and maintain, one ships with presets, typed verdicts, and dry runs.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jev-curate.vercel.app/comparison-judges.html">
+  <meta property="og:image" content="https://jev-curate.vercel.app/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://jev-curate.vercel.app/og.png">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://jev-curate.vercel.app/comparison-judges.html">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "name": "Breadcrumb",
+      "itemListElement": [
+        {
+          "@context": "https://schema.org",
+          "@type": "ListItem",
+          "position": 1,
+          "name": "jev-curate",
+          "item": "https://jev-curate.vercel.app/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Comparison",
+          "item": "https://jev-curate.vercel.app/comparison.html"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "ListItem",
+          "position": 3,
+          "name": "vs custom judge scripts",
+          "item": "https://jev-curate.vercel.app/comparison-judges.html"
+        }
+      ]
+    }
+  ]
+}</script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html">jev-curate<sup>beta</sup></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="index.html">Home</a>
+      <a href="benchmarks.html">Benchmarks</a>
+      <a href="what-is-jev.html">What is Jev</a>
+      <a href="comparison.html" aria-current="page">Comparison</a>
+      <a href="use-cases.html">Use cases</a>
+      <a href="glossary.html">Glossary</a>
+    </nav>
+    <a class="btn btn-primary nav-cta" href="https://github.com/AkashPriyadarshii/jev-curate">Star on GitHub</a>
+  </header>
+
+  <main id="top">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html">Home</a> <span>/</span> <a href="comparison.html">Comparison</a> <span>/</span> <span>vs judge scripts</span>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">The build-or-buy question</p>
+        <h1>jev-curate vs custom judge scripts and manual labeling</h1>
+        <p class="lead">Most teams filter training data with a script they wrote: a prompt template, a loop, a JSON blob of grades. This page compares that approach to the preset pipeline, and says plainly when the hand-rolled script is the right answer.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#table">The comparison</a>
+          <a class="btn btn-ghost" href="index.html#quickstart">Quickstart</a>
+        </div>
+      </div>
+      <div class="terminal" aria-label="Judge script versus preset pipeline">
+        <div class="terminal-bar"><span class="t-dot"></span><span>your loop vs one command</span></div>
+        <pre>custom:  for row in rows:
+           prompt = template.format(row)
+           text = llm(prompt)
+           grade = parse(text)        # fragile
+curate:  jev-curate -p reasoning-math -i set.jsonl --dry-run</pre>
+      </div>
+    </section>
+
+    <section class="why" id="table">
+      <h2>Side by side</h2>
+      <table class="bench-table" aria-label="Comparison table">
+        <thead>
+          <tr><th>Axis</th><th>Hand-rolled judge script</th><th>jev-curate</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Rubric</td><td>Prompt template you maintain</td><td>Checked-in preset, same questions every row</td></tr>
+          <tr><td>Verdict parsing</td><td>You write the parser</td><td>Typed Choice, Score, Noul answers</td></tr>
+          <tr><td>Check before spend</td><td>Only by reading code</td><td>--dry-run reports keep and reject counts</td></tr>
+          <tr><td>Row streaming</td><td>You handle batches and resume</td><td>Built-in streaming reader, Parquet and JSONL</td></tr>
+          <tr><td>Throttling</td><td>Your sleep loop or library</td><td>Adaptive token bucket matching provider limits</td></tr>
+          <tr><td>Output shape</td><td>Whatever you designed</td><td>clean.jsonl and rejected.jsonl with verdicts</td></tr>
+          <tr><td>Cost of trying</td><td>Days</td><td>Minutes to a dry run</td></tr>
+        </tbody>
+      </table>
+      <p class="section-lead">The honest difference is where the complexity lives. A judge script concentrates all the risk in code you own: prompt drift, parse failures, missing resume logic, throttling bugs. jev-curate moves that risk into a binary with tests, typed outputs, and a dry run that tells you the keep count before a single token is spent.</p>
+    </section>
+
+    <section class="presets">
+      <h2>When the hand-rolled script still wins</h2>
+      <p class="section-lead">Three cases. First, exotic input formats: if your data lives behind an API, in a private store, or as custom objects, the streaming reader does not know it. Wrap the rows to JSONL first, then sift. Second, rubrics that change per row: presets assume a stable judgment across a batch. Third, non-Jev judges: if your team is committed to a specific frontier model for judging, jev-curate is not the wrapper for that model; it is the wrapper for Jev.</p>
+      <p class="section-lead">The middle ground is the common one: route with jev-curate, escalate the edge cases to a heavier judge. The <code>Choice</code> answers exist for exactly that, a fast typed decision on which rows deserve the expensive pass.</p>
+
+      <h2 class="steps-heading">Manual labeling, scored honestly</h2>
+      <p class="section-lead">Against human annotation, the tool does not compete on quality of judgment. It competes on coverage and consistency. A labeler reads a row, judges with one model of quality, and drifts with fatigue. The preset asks the same questions to every row with the same thresholds, and the dry run shows the drop rate before the batch starts. The workflow that pays is presets for the wide pass, humans for the narrow slice the presets cannot agree on.</p>
+    </section>
+
+    <section class="cta">
+      <h2>Compare it on your own batch</h2>
+      <div class="cta-actions">
+        <a class="btn btn-primary" href="https://github.com/AkashPriyadarshii/jev-curate">Install the CLI</a>
+        <a class="btn btn-ghost" href="comparison.html">The chat-window comparison</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-site-nav">
+        <h3>Site</h3>
+        <a href="index.html">Home</a>
+        <a href="benchmarks.html">Benchmarks</a>
+        <a href="what-is-jev.html">What is Jev</a>
+        <a href="comparison.html">Comparison</a>
+        <a href="use-cases.html">Use cases</a>
+        <a href="glossary.html">Glossary</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy</a>
+      </div>
+      <div class="footer-ecosystem">
+        <h3>Ecosystem</h3>
+        <a href="https://github.com/AkashPriyadarshii/jev-seo">jev-seo</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-superpowers">jev-superpowers</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-curate">jev-curate</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-git">jev-git</a>
+        <a href="https://github.com/AkashPriyadarshii/tdlib-android">tdlib-android</a>
+        <a href="https://github.com/AkashPriyadarshii/kharcha">kharcha</a>
+      </div>
+      <div class="footer-author">
+        <h3>Author</h3>
+        <a href="https://github.com/AkashPriyadarshii">GitHub</a>
+        <a href="https://akashpriyadarshi.vercel.app">Portfolio</a>
+        <a href="https://linkedin.com/in/akash-priyadarshi-1aa51b37a">LinkedIn</a>
+        <a href="https://akashpriyadarshii.github.io/Resume/">Resume</a>
+      </div>
+      <div class="footer-social">
+        <h3>Social</h3>
+        <a href="https://x.com/Akash__ydv001">X / Twitter</a>
+        <a href="https://www.threads.net/@akash.priyadarshii">Threads</a>
+        <a href="https://www.instagram.com/akash.priyadarshii/">Instagram</a>
+        <a href="https://reddit.com/user/DragonfruitWeak2801">Reddit</a>
+      </div>
+    </div>
+    <p class="footer-close">jev-curate, the high-throughput dataset sifter. Judgment by TypeSafe Jev, streaming in Rust.</p>
+  </footer>
+</body>
+</html>

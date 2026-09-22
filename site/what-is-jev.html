@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<!--
+Title: What is TypeSafe Jev - the System One decision model
+Description: What is TypeSafe Jev, what is Jev AI, who is Jev. The System One decision model behind jev-curate: typed Choice, Score and Noul answers, pricing, endpoint.
+Keywords: what is jev, what is jev ai, who is jev, TypeSafe Jev System One, Jev decision model, typed decisions, Choice Score Noul
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What is TypeSafe Jev? The System One decision model - jev-curate</title>
+  <meta name="description" content="What is TypeSafe Jev, what is Jev AI, who is Jev. The System One decision model behind jev-curate: typed Choice, Score and Noul answers, pricing, endpoint.">
+  <meta property="og:title" content="What is TypeSafe Jev?">
+  <meta property="og:description" content="The System One decision model behind jev-curate: typed Choice, Score and Noul answers, priced for batch use.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jev-curate.vercel.app/what-is-jev.html">
+  <meta property="og:image" content="https://jev-curate.vercel.app/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://jev-curate.vercel.app/og.png">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://jev-curate.vercel.app/what-is-jev.html">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@context": "https://schema.org",
+          "@type": "Question",
+          "name": "What is Jev AI?",
+          "acceptedAnswer": {
+            "@context": "https://schema.org",
+            "@type": "Answer",
+            "text": "Jev AI is TypeSafe AI's System One decision model. It answers typed questions with Choice, Score or Noul outputs instead of free text, and is served from the api.typesafe.ai/v1/systemone endpoint. Names that bounce around the ecosystem, such as jev-latest, identify the model version."
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Question",
+          "name": "Who is Jev?",
+          "acceptedAnswer": {
+            "@context": "https://schema.org",
+            "@type": "Answer",
+            "text": "Jev is not a person. It is the name of a large decision model made by TypeSafe AI for agents: System One judgment, typed answers, no chatbot prose."
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Question",
+          "name": "What is jev short for?",
+          "acceptedAnswer": {
+            "@context": "https://schema.org",
+            "@type": "Answer",
+            "text": "Jev stands for nothing in the project docs; it is the product name of TypeSafe AI's System One decision model. Nearby spellings like jev-latest name the model version."
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Question",
+          "name": "How does Jev relate to jev-curate?",
+          "acceptedAnswer": {
+            "@context": "https://schema.org",
+            "@type": "Answer",
+            "text": "jev-curate is an open source Rust sifter that sends each dataset row to Jev as structured state, reads the typed verdict back (Choice, Score, Noul), and routes the row to clean.jsonl or rejected.jsonl."
+          }
+        }
+      ]
+    }
+  ]
+}</script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html">jev-curate<sup>beta</sup></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="index.html">Home</a>
+      <a href="benchmarks.html">Benchmarks</a>
+      <a href="what-is-jev.html" aria-current="page">What is Jev</a>
+      <a href="comparison.html">Comparison</a>
+      <a href="use-cases.html">Use cases</a>
+      <a href="glossary.html">Glossary</a>
+    </nav>
+    <a class="btn btn-primary nav-cta" href="https://github.com/AkashPriyadarshii/jev-curate">Star on GitHub</a>
+  </header>
+
+  <main id="top">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html">Home</a> <span>/</span> <span>What is TypeSafe Jev</span>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">The model behind the sifter</p>
+        <h1>What is TypeSafe Jev?</h1>
+        <p class="lead">Jev is a System One decision model from TypeSafe AI. "System One" means it answers typed questions fast, with a structured verdict, instead of generating prose. It is the engine that scores every row jev-curate pours through it.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#answers">The three answer types</a>
+          <a class="btn btn-ghost" href="https://docs.typesafe.ai">TypeSafe docs</a>
+        </div>
+        <p class="hero-note">Pricing: <code>0.042 USD per million input tokens</code>, output unmetered. Endpoint <code>https://api.typesafe.ai/v1/systemone</code>.</p>
+      </div>
+      <div class="terminal" aria-label="A Jev request and typed response">
+        <div class="terminal-bar"><span class="t-dot"></span><span>POST /v1/systemone - model jev-latest</span></div>
+        <pre>{ "state": "let f(x) = x^2 ...",
+  "questions": [
+    "Does this chain of thought entail the answer?",
+    "Rate reasoning depth." ] }
+
+answers:
+  noul 0.05   (circular reasoning)
+  score 4.8   (reasoning depth, conf 0.95)</pre>
+      </div>
+    </section>
+
+    <section class="why" id="answers">
+      <h2>The three answer types</h2>
+      <p class="section-lead">Jev does not chat. It returns one of three typed shapes, and the caller decides what to build on top: thresholds, routes, or gates.</p>
+      <table class="bench-table" aria-label="Jev answer types">
+        <thead>
+          <tr><th>Type</th><th>Shape</th><th>What it is for</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Choice</td><td>one option + confidence</td><td>routing, classification, gating to a heavier eval</td></tr>
+          <tr><td>Score</td><td>1 to 5 + confidence</td><td>ratings: quality, depth, relevance</td></tr>
+          <tr><td>Noul</td><td>calibrated probability</td><td>odds of a property: circular logic, dishonesty, breakage</td></tr>
+        </tbody>
+      </table>
+      <p class="section-lead">Every preset in jev-curate is a bundle of such questions. The <code>reasoning-math</code> preset asks whether the chain of thought entails the answer and how deep the reasoning is. The <code>anti-sycophancy</code> preset asks rated honesty questions. The <code>code-correctness</code> preset asks whether the program is sound. None of them ask for an essay, because no preset needs one.</p>
+    </section>
+
+    <section class="presets">
+      <h2>Built for batch, priced for batch</h2>
+      <p class="section-lead">The model profile makes the batch economics clear. Input costs 0.042 USD per million tokens, output is unmetered, and throughput sits near 250k tokens per second with 1,200 requests per minute. TypeSafe's own workflow benchmarks claim 193.6x faster and 444.6x cheaper than chat-style judging on System One tasks. That is why jev-curate can afford to evaluate every row instead of a sample: the verdict is nearly free.</p>
+      <p class="section-lead">The client respects those limits with a token bucket. Measured locally against a mock server, one node sustains 24.0 rows per second; the <a href="benchmarks.html">benchmark page</a> explains the number and the arithmetic behind scaling it to the 1,500 rows/sec cluster target.</p>
+      <p class="section-lead">If you came from a forum post asking "what is jev ai", the honest one-liner is: TypeSafe AI's model for typed decisions, and this site's tool is one consumer of it. The <a href="glossary.html">glossary</a> defines every term, and the <a href="use-cases.html">use case</a> pages show the workflows.</p>
+    </section>
+
+    <section class="cta">
+      <h2>Jev clear, meet the tool</h2>
+      <div class="cta-actions">
+        <a class="btn btn-primary" href="index.html#quickstart">Six step quickstart</a>
+        <a class="btn btn-ghost" href="https://github.com/AkashPriyadarshii/jev-curate">Star the repo</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-site-nav">
+        <h3>Site</h3>
+        <a href="index.html">Home</a>
+        <a href="benchmarks.html">Benchmarks</a>
+        <a href="what-is-jev.html">What is Jev</a>
+        <a href="comparison.html">Comparison</a>
+        <a href="comparison-judges.html">vs judge scripts</a>
+        <a href="use-cases.html">Use cases</a>
+        <a href="glossary.html">Glossary</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy</a>
+      </div>
+      <div class="footer-ecosystem">
+        <h3>Ecosystem</h3>
+        <a href="https://github.com/AkashPriyadarshii/jev-seo">jev-seo</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-superpowers">jev-superpowers</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-curate">jev-curate</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-git">jev-git</a>
+        <a href="https://github.com/AkashPriyadarshii/tdlib-android">tdlib-android</a>
+        <a href="https://github.com/AkashPriyadarshii/kharcha">kharcha</a>
+      </div>
+      <div class="footer-author">
+        <h3>Author</h3>
+        <a href="https://github.com/AkashPriyadarshii">GitHub</a>
+        <a href="https://akashpriyadarshi.vercel.app">Portfolio</a>
+        <a href="https://linkedin.com/in/akash-priyadarshi-1aa51b37a">LinkedIn</a>
+        <a href="https://akashpriyadarshii.github.io/Resume/">Resume</a>
+      </div>
+      <div class="footer-social">
+        <h3>Social</h3>
+        <a href="https://x.com/Akash__ydv001">X / Twitter</a>
+        <a href="https://www.threads.net/@akash.priyadarshii">Threads</a>
+        <a href="https://www.instagram.com/akash.priyadarshii/">Instagram</a>
+        <a href="https://reddit.com/user/DragonfruitWeak2801">Reddit</a>
+      </div>
+    </div>
+    <p class="footer-close">jev-curate, the high-throughput dataset sifter. Judgment by TypeSafe Jev, streaming in Rust.</p>
+  </footer>
+</body>
+</html>
