@@ -435,6 +435,9 @@ h2 {
 
 /* responsive */
 
+/* mobile nav hidden on desktop always */
+#mobile-nav { display: none !important; }
+
 /* hamburger button — hidden on desktop */
 .nav-toggle {
   display: none;
@@ -471,7 +474,7 @@ h2 {
     border-top: 1px solid var(--grey-2);
     padding: 12px 0;
   }
-  .nav-links.open { display: flex; }
+  #mobile-nav.open { display: flex !important; }
   .nav-links a { padding: 10px 0; font-size: 16px; min-height: 44px; display: flex; align-items: center; }
   .nav-cta { display: none; }
 
