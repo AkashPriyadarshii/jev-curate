@@ -8,6 +8,12 @@
   --grey-2: #dedede;
   --grey-3: #c4c4c4;
   --grey-4: #abbab9;
+  /* spoke-page vars — aliased so site-header bg/fg resolve */
+  --bg: var(--substrate);
+  --fg: var(--ink);
+  /* spacing scale for author-slab */
+  --space-5: 20px;
+  --space-8: 40px;
   --display: "LisaTerminal Paper 2X3Y Medium", "Book Antiqua", Georgia, serif;
   --body: "Die Grotesk C Regular", Candara, "Segoe UI", sans-serif;
   --mono: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
@@ -188,6 +194,8 @@ code, pre {
   padding: 22px;
   overflow-x: auto;
   line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
 .terminal code { color: var(--substrate); }
@@ -308,6 +316,9 @@ h2 {
   width: 100%;
   margin-top: 40px;
   border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .flag-table th {
@@ -339,8 +350,8 @@ h2 {
   border-top: 1px solid var(--grey-2);
   background: var(--grey-4);
   max-width: none;
-  padding-left: calc((100% - 1200px) / 2 + 100px);
-  padding-right: calc((100% - 1200px) / 2 + 100px);
+  padding-left: clamp(24px, 8vw, calc((100% - 1200px) / 2 + 100px));
+  padding-right: clamp(24px, 8vw, calc((100% - 1200px) / 2 + 100px));
 }
 
 .stat-row {
@@ -423,17 +434,95 @@ h2 {
 }
 
 /* responsive */
+
+/* hamburger button — hidden on desktop */
+.nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.nav-toggle span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--ink);
+  margin: 5px 0;
+  transition: transform 200ms var(--ease), opacity 150ms var(--ease);
+}
+/* open state — X */
+.nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
 @media (max-width: 960px) {
-  .nav { padding: 15px 30px; }
-  .nav-links, .nav-cta { display: none; }
-  .hero { grid-template-columns: 1fr; padding: 60px 30px; gap: 40px; }
-  .hero h1 { font-size: 48px; }
-  section { padding: 60px 30px; }
-  .cost { padding: 60px 30px; }
-  .reason-list li, .preset-row { grid-template-columns: 1fr; gap: 10px; }
-  .stat-row { grid-template-columns: repeat(2, 1fr); gap: 30px; }
-  .footer { padding: 50px 30px 30px; }
-  .footer-grid { grid-template-columns: 1fr; gap: 40px; }
+  /* ---- nav ---- */
+  .nav { padding: 15px 24px; flex-wrap: wrap; }
+  .nav-toggle { display: flex; flex-direction: column; justify-content: center; }
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    margin-left: 0;
+    border-top: 1px solid var(--grey-2);
+    padding: 12px 0;
+  }
+  .nav-links.open { display: flex; }
+  .nav-links a { padding: 10px 0; font-size: 16px; min-height: 44px; display: flex; align-items: center; }
+  .nav-cta { display: none; }
+
+  /* ---- site-header (spoke pages) ---- */
+  .site-header { padding: 12px 24px; flex-wrap: wrap; gap: 10px; }
+  .site-nav { display: none; }
+  .breadcrumb { padding: 14px 24px 0; }
+
+  /* ---- hero ---- */
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 60px 24px 40px;
+    gap: 36px;
+  }
+  .hero h1 { font-size: clamp(32px, 8vw, 48px); }
+
+  /* ---- sections ---- */
+  section { padding: 60px 24px; }
+  .cost { padding: 60px 24px; }
+
+  /* ---- reason-list / preset-row ---- */
+  .reason-list li {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .preset-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .preset-row .check {
+    text-align: left;
+  }
+
+  /* ---- stats ---- */
+  .stat-row { grid-template-columns: repeat(2, 1fr); gap: 28px; }
+
+  /* ---- footer ---- */
+  .footer { padding: 48px 24px 28px; }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 36px; }
+}
+
+/* small phones — 480px and below */
+@media (max-width: 480px) {
+  .hero h1 { font-size: clamp(26px, 9vw, 36px); }
+  .stat-num { font-size: 36px; }
+  .stat-row { grid-template-columns: 1fr 1fr; gap: 20px; }
+  .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+  .cta h2 { font-size: 32px; }
+  h2 { font-size: clamp(26px, 7vw, 40px); }
+  .hero-actions { flex-direction: column; gap: 10px; }
+  .cta-actions { flex-direction: column; gap: 10px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
