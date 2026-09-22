@@ -286,6 +286,11 @@ h2 {
 
 .code-block code { color: var(--substrate); }
 
+.code-block pre {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .copy-btn {
   position: absolute;
   top: 10px;
@@ -708,6 +713,9 @@ h2 {
   border-collapse: collapse;
   margin: 24px 0;
   font-size: 15px;
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .bench-table th, .bench-table td {
   border: 1px solid var(--grey-3);
