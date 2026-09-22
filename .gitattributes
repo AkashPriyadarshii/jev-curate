@@ -1,0 +1,10 @@
+# Normalize line endings; Rust uses LF, Windows checkouts get CRLF where needed
+* text=auto
+
+# Keep the deployed marketing site out of GitHub language stats
+site/*.html linguist-documentation
+site/*.css  linguist-documentation
+site/*.js   linguist-documentation
+
+# Generated screenshots and binaries never tracked as source
+site/shot-*.png linguist-generated
