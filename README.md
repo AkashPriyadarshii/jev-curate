@@ -1,6 +1,6 @@
 <!--
 Title: jev-curate — High-Throughput Synthetic & Pretraining Dataset Sifter Powered by TypeSafe AI (Jev System One)
-Description: High-throughput synthetic & pretraining dataset curation pipeline in Rust & Python powered by TypeSafe AI's Jev model (api.typesafe.ai). Stream, filter, and score millions of Parquet and JSONL rows at 1,500+ records/sec using Jev System One typed decisions (Choice, Score, Noul), speculative fan-out, and calibrated post-training reasoning rubrics.
+Description: High-throughput synthetic & pretraining dataset curation pipeline in Rust & Python powered by TypeSafe AI's Jev model (api.typesafe.ai). Stream, filter, and score millions of Parquet and JSONL rows targeting 1,500+ records/sec using Jev System One typed decisions (Choice, Score, Noul), speculative fan-out, and calibrated post-training reasoning rubrics.
 Keywords: typesafe ai, type safe ai, jev, api.typesafe.ai, jev-1.13.0, jev-latest, system one, choice, score, noul, dataset curation, synthetic data filtering, pretraining datasets, post-training, fine-tuning, rlcd, reasoning models, parquet, arrow, polars, pyarrow, pyo3, rust, jsonl, llm evaluation, speculative fan-out
 -->
 
@@ -10,7 +10,6 @@ Keywords: typesafe ai, type safe ai, jev, api.typesafe.ai, jev-1.13.0, jev-lates
 
 **High-Throughput Synthetic & Pretraining Dataset Sifter Powered by TypeSafe AI (Jev)**
 
-[![Crates.io](https://img.shields.io/crates/v/jev-curate.svg?style=flat-square)](https://crates.io/crates/jev-curate)
 [![PyPI](https://img.shields.io/pypi/v/jev-curate.svg?style=flat-square)](https://pypi.org/project/jev-curate/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![TypeSafe AI](https://img.shields.io/badge/Model-Jev--1.13.0-indigo.svg?style=flat-square)](https://typesafe.ai)
@@ -33,8 +32,8 @@ Cleaning 10M to 1B rows of synthetic reasoning data, instruction tuning pairs, o
 * **Context rot from uncompressed inputs:** Naively feeding raw data into LLMs causes decision accuracy to crater while burning money on boilerplate text.
 
 `jev-curate` solves this by piping Apache Arrow and Parquet streams through **TypeSafe AI's Jev model** (`jev-1.13.0`):
-* **1,500+ rows/sec throughput:** Evaluates rows in multi-threaded batches using Jev's speculative parallel fan-out.
-* **~$4.20 per 100M tokens:** Jev charges $0.042/Mtok for input with zero output token fees—over 100x cheaper than GPT-4o-mini and 700x cheaper than Claude 3.5 Sonnet.
+* **Targets 1,500+ rows/sec:** Evaluates rows in multi-threaded batches over Jev's speculative parallel fan-out (250k tok/sec rate limit) — no per-row HTTP round-trips.
+* **~$4.20 per 100M tokens:** Jev bills $0.042/Mtok for input, zero for output. TypeSafe benchmarks System One workflows **444.6x cheaper and 193.6x faster** than generative LLMs ([source](https://typesafe.ai)).
 * **Mathematical calibration:** Receives calibrated probabilities (`Noul`), ordinal rubrics (`Score` 1–5), and categorical choices (`Choice`), eliminating generative text slop.
 * **Zero Rewriting:** Emits clean records verbatim without rewriting or altering mathematical formulas.
 
@@ -57,26 +56,21 @@ jev-curate filter train.parquet \
   --concurrency 32
 ```
 
-### Python (PyO3 + Polars / PyArrow)
+### Python API
+PyO3 bindings (build from source with the `python` cargo feature):
 ```bash
-pip install jev-curate
+git clone https://github.com/AkashPriyadarshii/jev-curate
+cd jev-curate
+maturin develop   # python feature auto-enabled via pyproject.toml
 ```
 
 ```python
-import polars as pl
-from jev_curate import JevCurator
+from jev_curate import PyJevCurator
 
-df = pl.read_parquet("synthetic_data.parquet")
-
-curator = JevCurator(
-    preset="reasoning-math",
-    concurrency=32,
-)
-
-clean_df, rejected_df = curator.sift(df)
-clean_df.write_parquet("clean.parquet")
-rejected_df.write_parquet("rejected.parquet")
+curator = PyJevCurator(api_key="your-api-key", preset="reasoning-math")
 ```
+
+`PyJevCurator` currently wraps the same filter pipeline as the CLI (see `src/filter.rs`); constructor-only for now. Use the CLI for row-level sifting.
 
 ---
 
@@ -87,10 +81,10 @@ rejected_df.write_parquet("rejected.parquet")
 | Flag | Default | Description |
 |---|:---:|---|
 | `<INPUT_PATH>` | *Required* | Path to input `.parquet` or `.jsonl` file. |
-| `--preset` | `reasoning-math` | Pre-built rubric (`reasoning-math`, `anti-sycophancy`, `code-correctness`). |
-| `--out` | `./curated/` | Destination folder for `clean.jsonl` and `rejected.jsonl`. |
-| `--concurrency` | `32` | Worker concurrency (adaptive token bucket prevents 429 rate limits). |
-| `--dry-run` | `false` | Offline evaluation simulation with host pre-filtering and zero API calls. |
+| `-p, --preset` | `reasoning-math` | Pre-built rubric (`reasoning-math`, `anti-sycophancy`, `code-correctness`). |
+| `-o, --out` | `./curated/` | Destination folder for `clean.jsonl` and `rejected.jsonl`. |
+| `-c, --concurrency` | `32` | Worker concurrency (adaptive token bucket prevents 429 rate limits). |
+| `--dry-run` | `false` | Offline evaluation simulation with host pre-filtering and zero API calls (no `TYPESAFE_API_KEY` needed). |
 
 ---
 
@@ -104,11 +98,27 @@ rejected_df.write_parquet("rejected.parquet")
 
 ---
 
+## Build & Test
+
+```bash
+# Rust core
+cargo build --release
+cargo test
+
+# Python bindings (via maturin)
+maturin develop
+pytest
+```
+
+All tests run against an in-process mock server — no live API credits in CI.
+
+---
+
 ## Architecture
 
 ```
 jev-curate/
-├── Cargo.toml                 # Rust core manifest (arrow, parquet, pyo3, tokio)
+├── Cargo.toml                 # Rust core manifest (arrow, parquet, tokio, pyo3, clap, reqwest, serde)
 ├── pyproject.toml             # Maturin Python package manifest
 ├── src/
 │   ├── lib.rs                 # PyO3 module bindings & crate entry
@@ -142,8 +152,10 @@ jev-curate/
 ## Mandatory Ecosystem, Author & Social Directory
 
 ### Ecosystem
-* [`design-genius`](https://github.com/AkashPriyadarshii/design-genius)
-* [`akash-design-engineering`](https://github.com/AkashPriyadarshii/akash-design-engineering)
+* [`jev-seo`](https://github.com/AkashPriyadarshii/jev-seo)
+* [`jev-superpowers`](https://github.com/AkashPriyadarshii/jev-superpowers)
+* [`jev-curate`](https://github.com/AkashPriyadarshii/jev-curate)
+* [`jev-git`](https://github.com/AkashPriyadarshii/jev-git)
 * [`tdlib-android`](https://github.com/AkashPriyadarshii/tdlib-android)
 * [`kharcha`](https://github.com/AkashPriyadarshii/kharcha)
 
