@@ -10,6 +10,8 @@ Keywords: typesafe ai, type safe ai, jev, api.typesafe.ai, jev-1.13.0, jev-lates
 
 **High-Throughput Synthetic & Pretraining Dataset Sifter Powered by TypeSafe AI (Jev)**
 
+**Live:** [jev-curate.vercel.app](https://jev-curate.vercel.app) — measured **24.0 rows/sec** single-node (mock bench, `examples/bench_mock.rs`), 1,500+ cluster target
+
 [![PyPI](https://img.shields.io/pypi/v/jev-curate.svg?style=flat-square)](https://pypi.org/project/jev-curate/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![TypeSafe AI](https://img.shields.io/badge/Model-Jev--1.13.0-indigo.svg?style=flat-square)](https://typesafe.ai)
