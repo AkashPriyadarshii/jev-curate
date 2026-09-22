@@ -8,10 +8,10 @@ Keywords: jev-curate privacy, dataset sifter privacy, Jev endpoint data, no anal
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Privacy - jev-curate: no cookies, no analytics, no stored data</title>
-  <meta name="description" content="Privacy statement for the jev-curate website. What data the site collects. Nothing, plus what the CLI sends to the Jev endpoint.">
+  <title>Privacy - jev-curate: no cookies, privacy-friendly analytics, no stored data</title>
+  <meta name="description" content="Privacy statement for the jev-curate website. What data the site collects. Cookieless aggregate analytics, plus what the CLI sends to the Jev endpoint.">
   <meta property="og:title" content="Privacy">
-  <meta property="og:description" content="This site runs no analytics and stores no data. What the CLI sends to the Jev endpoint is stated here.">
+  <meta property="og:description" content="This site uses cookieless aggregate analytics and stores no personal data. What the CLI sends to the Jev endpoint is stated here.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://jev-curate.vercel.app/privacy.html">
   <meta property="og:image" content="https://jev-curate.vercel.app/og.png">
@@ -29,6 +29,7 @@ Keywords: jev-curate privacy, dataset sifter privacy, Jev endpoint data, no anal
   "url": "https://jev-curate.vercel.app/privacy.html",
   "dateModified": "2026-09-21"
 }</script>
+  <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
   <header class="site-header">
@@ -53,7 +54,7 @@ Keywords: jev-curate privacy, dataset sifter privacy, Jev endpoint data, no anal
       <div class="hero-copy">
         <p class="eyebrow">Short on purpose</p>
         <h1>Privacy</h1>
-        <p class="lead">This website does not run analytics, does not set cookies, and does not store your data. It is static files served from Vercel with a GitHub Pages mirror. The only private data involved is what you choose to send to the Jev endpoint when you run the CLI yourself.</p>
+        <p class="lead">This website uses privacy-friendly, cookieless Vercel Web Analytics to measure aggregate pageviews without storing personal data or tracking across sites. It is static files served from Vercel with a GitHub Pages mirror. The only private data involved is what you choose to send to the Jev endpoint when you run the CLI yourself.</p>
         <div class="hero-actions">
           <a class="btn btn-primary" href="#cli">What the CLI sends</a>
           <a class="btn btn-ghost" href="https://github.com/AkashPriyadarshii/jev-curate">The repository</a>
@@ -61,7 +62,7 @@ Keywords: jev-curate privacy, dataset sifter privacy, Jev endpoint data, no anal
       </div>
       <div class="terminal" aria-label="Privacy summary">
         <div class="terminal-bar"><span class="t-dot"></span><span>privacy --audit</span></div>
-        <pre>{ "site": "no analytics, no cookies",
+        <pre>{ "site": "cookieless aggregate metrics",
   "cli": "rows sent only to api.typesafe.ai",
   "scope": "per request, fan-out batches",
   "storage": "clean.jsonl / rejected.jsonl, local" }</pre>
