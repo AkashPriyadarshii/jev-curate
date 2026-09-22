@@ -1,7 +1,7 @@
 {
   "headers": [
     {
-      "source": "/(.*)",
+      "source": "/(^(?!.*\\.(?:png|svg|jpg|jpeg|ico)$).*)",
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "X-Frame-Options", "value": "DENY" },
@@ -9,7 +9,7 @@
       ]
     },
     {
-      "source": "/(.*\.(png|svg|jpg|ico))",
+      "source": "/(.*\\.(?:png|svg|jpg|jpeg|ico))$",
       "headers": [ { "key": "Cache-Control", "value": "public, max-age=604800, immutable" } ]
     }
   ],
