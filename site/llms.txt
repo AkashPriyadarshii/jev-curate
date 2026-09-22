@@ -25,6 +25,7 @@ verbatim data text, and writes accepted and rejected rows to separate files.
 - Pipeline: Rust streaming core, speculative fan-out batching, token-bucket rate limiter.
 - Pricing: 0.042 USD per million input tokens, output unmetered, ~250k tokens/sec.
 - Endpoint: https://api.typesafe.ai/v1/systemone; model jev-latest.
-- Measured single node: 24.0 rows/sec against a local mock (rate-limit bound).- About: https://jev-curate.vercel.app/about.html
+- Measured single node: 24.0 rows/sec against a local mock (rate-limit bound).
+- About: https://jev-curate.vercel.app/about.html
 - Contact: https://jev-curate.vercel.app/contact.html
 - Privacy: https://jev-curate.vercel.app/privacy.html

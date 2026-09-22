@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <!--
 Title: Privacy - jev-curate
-Description: Privacy statement for the jev-curate website. What data the site collects. Nothing, plus what the CLI sends to the Jev endpoint.
+Description: Privacy statement for the jev-curate website. What data the site collects: cookieless aggregate pageviews, plus what the CLI sends to the Jev endpoint.
 Keywords: jev-curate privacy, dataset sifter privacy, Jev endpoint data, no analytics site
 -->
 <html lang="en">
@@ -39,6 +39,7 @@ Keywords: jev-curate privacy, dataset sifter privacy, Jev endpoint data, no anal
       <a href="benchmarks.html">Benchmarks</a>
       <a href="what-is-jev.html">What is Jev</a>
       <a href="comparison.html">Comparison</a>
+      <a href="comparison-judges.html">vs judge scripts</a>
       <a href="use-cases.html">Use cases</a>
       <a href="glossary.html">Glossary</a>
     </nav>
@@ -60,7 +61,7 @@ Keywords: jev-curate privacy, dataset sifter privacy, Jev endpoint data, no anal
 
   <main id="top">
     <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="index.html">Home</a> <span>/</span> <span>Privacy</span>
+      <a href="index.html">Home</a> <span aria-hidden="true">/</span> <span>Privacy</span>
     </nav>
 
     <section class="hero">
@@ -84,7 +85,7 @@ Keywords: jev-curate privacy, dataset sifter privacy, Jev endpoint data, no anal
 
     <section class="why" id="cli">
       <h2>Website</h2>
-      <p class="section-lead">Static pages, no JavaScript trackers. The only third party is the hosting provider's standard logs. The asset requests are the pages, the stylesheet, the icon, and one script that drives the terminal animation and the reduced-motion guard. Nothing leaves the page except the browser's normal loading requests.</p>
+      <p class="section-lead">Static pages plus two scripts: the menu and copy helper, and Vercel Web Analytics, which counts aggregate pageviews without cookies or cross-site tracking. No personal data is stored. The only third party is the hosting provider's standard serving logs.</p>
     </section>
 
     <section class="presets">
@@ -148,5 +149,7 @@ Keywords: jev-curate privacy, dataset sifter privacy, Jev endpoint data, no anal
     </div>
     <p class="footer-close">jev-curate, the high-throughput dataset sifter. Judgment by TypeSafe Jev, streaming in Rust.</p>
   </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>

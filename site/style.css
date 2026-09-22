@@ -2,6 +2,7 @@
 :root {
   --pink: #f386a1;
   --magenta: #d45bb6;
+  --magenta-deep: #a2278f; /* small-text accent, about 6.5:1 on white, AA */
   --ink: #000000;
   --substrate: #fefefe;
   --grey-1: #1e1e1e;
@@ -63,6 +64,24 @@ code, pre {
 
 .nav-links a:hover { border-bottom-color: var(--pink); }
 
+/* wordmark */
+.logo {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  color: var(--ink);
+  flex-shrink: 0;
+}
+
+.logo sup {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--magenta-deep);
+  margin-left: 4px;
+}
+
 
 /* buttons */
 .btn {
@@ -107,7 +126,7 @@ code, pre {
 .eyebrow {
   font-family: var(--mono);
   font-size: 13px;
-  color: var(--magenta);
+  color: var(--magenta-deep);
   margin-bottom: 20px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -248,7 +267,7 @@ h2 {
 .check {
   font-family: var(--mono);
   font-size: 13px;
-  color: var(--magenta);
+  color: var(--magenta-deep);
   text-align: right;
 }
 
@@ -308,7 +327,7 @@ h2 {
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--grey-3);
+  color: var(--grey-1);
   padding: 10px 0;
   border-bottom: 2px solid var(--ink);
 }
@@ -405,7 +424,8 @@ h2 {
 
 .footer a:hover { color: var(--pink); }
 
-.footer-close {
+.footer-close,
+.footer-tag {
   color: var(--grey-3);
   font-family: var(--mono);
   font-size: 13px;
@@ -525,9 +545,9 @@ h2 {
   html { scroll-behavior: auto; }
   * { transition: none !important; }
 }
-.hero-note a { color: var(--pink); text-decoration: underline; text-underline-offset: 2px; }
+.hero-note a { color: var(--magenta-deep); text-decoration: underline; text-underline-offset: 2px; }
 
-.hero-note a:hover { color: var(--magenta); }
+.hero-note a:hover { color: var(--ink); }
 
 .reason-list strong a { color: var(--ink); }
 
@@ -548,10 +568,10 @@ h2 {
   flex-wrap: wrap;
 }
 .judge {
-  color: var(--pink);
+  color: var(--ink);
   font-weight: 700;
   font-size: 20px;
-  background: color-mix(in srgb, var(--pink) 8%, transparent);
+  background: var(--pink);
   padding: 2px 10px;
   border-radius: var(--radius);
 }
@@ -563,8 +583,8 @@ h2 {
   padding: 2px 8px;
   font-size: 13px;
 }
-.lead-link { color: var(--pink); text-underline-offset: 3px; }
-.lead-link:hover { color: var(--magenta); }
+.lead-link { color: var(--magenta-deep); text-underline-offset: 3px; }
+.lead-link:hover { color: var(--ink); }
 
 .steps-heading { margin: 24px 0 12px; }
 .steps {
@@ -594,7 +614,7 @@ h2 {
   display: grid;
   place-items: center;
   border-radius: var(--radius);
-  background: var(--magenta); /* DESIGN.md secondary — was #110d8c (off-system) */
+  background: var(--magenta-deep); /* step numerals are small text, need AA on color */
   color: var(--substrate);
   font-family: var(--mono);
   font-size: 14px;
@@ -629,7 +649,7 @@ h2 {
   display: inline-flex;
   align-items: center;
 }
-.author-links a:hover { border-color: var(--pink); color: var(--pink); }
+.author-links a:hover { border-color: var(--pink); color: var(--magenta-deep); }
 
 .footer-site-nav {
   display: flex;
@@ -652,6 +672,7 @@ h2 {
   position: sticky;
   top: 0;
   background: var(--bg);
+  border-bottom: 1px solid var(--grey-2);
   z-index: 50;
 }
 .site-nav {
@@ -679,7 +700,7 @@ h2 {
   color: var(--grey-1); /* #1e1e1e — was #dedede (border token, fails AA) */
 }
 .breadcrumb a { color: var(--grey-1); text-decoration: none; }
-.breadcrumb a:hover { color: var(--pink); }
+.breadcrumb a:hover { color: var(--magenta-deep); }
 .breadcrumb span { color: var(--grey-3); } /* separator — decorative, not text-bearing */
 
 .bench-table {
