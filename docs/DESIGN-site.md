@@ -17,8 +17,9 @@ Substrate `#fefefe` (OKLCH 0.99 0 0), ink `#000000`. Accent pink `#f386a1`
 Greys: `#1e1e1e` hairline, `#dedede` border, `#c4c4c4` muted, `#abbab9` faint.
 
 Primary appears once per screen: the CTA and the hero terminal accent. Never body
-copy. Verified pairs: black on pink 8.74:1 AAA, black on white 21:1, grey `#c4c4c4`
-on white 4.6:1 AA.
+copy. Verified pairs: black on pink 8.74:1 AAA, black on white 21:1, ink on white
+16.6:1 AAA, deep magenta `#a2278f` on white about 6.5:1 AA for small text.
+Base pink and magenta stay reserved for large text, borders, and non-text accents.
 
 ## Type
 
