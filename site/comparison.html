@@ -13,41 +13,47 @@ Keywords: jev-curate comparison, dataset judging vs chat, GPT judge alternative,
   <meta property="og:title" content="jev-curate vs prompt-in-a-chat judging">
   <meta property="og:description" content="Both call an LLM. One returns prose, the other returns typed verdicts at pipeline scale.">
   <meta property="og:type" content="website">
+  <meta property="og:image" content="https://jev-curate.vercel.app/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://jev-curate.vercel.app/og.png">
   <meta property="og:url" content="https://jev-curate.vercel.app/comparison.html">
   <meta name="twitter:card" content="summary">
   <meta name="robots" content="index, follow">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="canonical" href="https://jev-curate.vercel.app/comparison.html">
   <link rel="stylesheet" href="style.css">
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "BreadcrumbList",
-        "name": "Breadcrumb",
-        "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "jev-curate", "item": "https://jev-curate.vercel.app/" },
-          { "@type": "ListItem", "position": 2, "name": "Comparison", "item": "https://jev-curate.vercel.app/comparison.html" }
-        ]
-      },
-      {
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "Is jev-curate a replacement for judging data in a chat window?",
-            "acceptedAnswer": { "@type": "Answer", "text": "It replaces the manual loop for bulk work. Chat judging suits one-off eyeballing of a few rows. jev-curate applies the same model to every row, writes keep and reject files, and never rewrites the verbatim data text." }
-          },
-          {
-            "@type": "Question",
-            "name": "What does jev-curate cost compared to chat-based judging?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Jev input costs 0.042 USD per million tokens and output is unmetered. A chat session pays for generated prose on every turn; jev-curate pays for the row once, with batched fan-out questions." }
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@context": "https://schema.org",
+          "@type": "Question",
+          "name": "Is jev-curate a replacement for judging data in a chat window?",
+          "acceptedAnswer": {
+            "@context": "https://schema.org",
+            "@type": "Answer",
+            "text": "It replaces the manual loop for bulk work. Chat judging suits one-off eyeballing of a few rows. jev-curate applies the same model to every row, writes keep and reject files, and never rewrites the verbatim data text."
           }
-        ]
-      }
-    ]
-  }
-  </script>
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Question",
+          "name": "What does jev-curate cost compared to chat-based judging?",
+          "acceptedAnswer": {
+            "@context": "https://schema.org",
+            "@type": "Answer",
+            "text": "Jev input costs 0.042 USD per million tokens and output is unmetered. A chat session pays for generated prose on every turn; jev-curate pays for the row once, with batched fan-out questions."
+          }
+        }
+      ]
+    }
+  ]
+}</script>
 </head>
 <!-- impeccable-disable em-dash-overuse: CLI flags like --dry-run are not em-dashes -->
 <body>
@@ -56,6 +62,7 @@ Keywords: jev-curate comparison, dataset judging vs chat, GPT judge alternative,
     <nav class="site-nav" aria-label="Site">
       <a href="index.html">Home</a>
       <a href="benchmarks.html">Benchmarks</a>
+      <a href="what-is-jev.html">What is Jev</a>
       <a href="comparison.html" aria-current="page">Comparison</a>
       <a href="glossary.html">Glossary</a>
       <a href="use-cases.html">Use cases</a>
@@ -127,6 +134,11 @@ curate:  {"has_circular_reasoning": noul 0.05,
       <p class="section-lead">None of this argues that chat judging is useless. It argues that it is a different tool, for inspection before you commit to a rubric. The rows you save as a rubric example in a chat thread become the rows you route with a preset.</p>
     </section>
 
+    <section class="why">
+      <h2>The second comparison</h2>
+      <p class="section-lead">Hand-rolled judge scripts and manual labeling are the other incumbent. The <a href="comparison-judges.html">versioned comparison</a> walks through what you write, what you maintain, and where presets and typed verdicts change the math.</p>
+    </section>
+
     <section class="cta">
       <h2>Bring a real batch, not a paste</h2>
       <div class="cta-actions">
@@ -142,9 +154,13 @@ curate:  {"has_circular_reasoning": noul 0.05,
         <h3>Site</h3>
         <a href="index.html">Home</a>
         <a href="benchmarks.html">Benchmarks</a>
+        <a href="what-is-jev.html">What is Jev</a>
         <a href="comparison.html">Comparison</a>
         <a href="glossary.html">Glossary</a>
         <a href="use-cases.html">Use cases</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy</a>
       </div>
       <div class="footer-ecosystem">
         <h3>Ecosystem</h3>

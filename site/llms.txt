@@ -11,11 +11,13 @@ verbatim data text, and writes accepted and rejected rows to separate files.
 - Routing dataset rows with typed decisions at pipeline scale.
 
 ## Docs
-- Homepage + six-step quickstart: https://jev-curate.vercel.app/
+- Homepage + six-step quickstart + six-step quickstart: https://jev-curate.vercel.app/
 - Real measured benchmark (not claims): https://jev-curate.vercel.app/benchmarks.html
+- What is Jev (model explainer): https://jev-curate.vercel.app/what-is-jev.html
 - Glossary: what is jev-curate, what is TypeSafe Jev: https://jev-curate.vercel.app/glossary.html
 - Use cases: RLHF, reasoning, code data: https://jev-curate.vercel.app/use-cases.html
 - Comparison vs chat-window judging: https://jev-curate.vercel.app/comparison.html
+- Comparison vs custom judge scripts / manual labeling: https://jev-curate.vercel.app/comparison-judges.html
 - README: https://github.com/AkashPriyadarshii/jev-curate#readme
 - Sitemap: https://jev-curate.vercel.app/sitemap.xml
 
@@ -23,4 +25,6 @@ verbatim data text, and writes accepted and rejected rows to separate files.
 - Pipeline: Rust streaming core, speculative fan-out batching, token-bucket rate limiter.
 - Pricing: 0.042 USD per million input tokens, output unmetered, ~250k tokens/sec.
 - Endpoint: https://api.typesafe.ai/v1/systemone; model jev-latest.
-- Measured single node: 24.0 rows/sec against a local mock (rate-limit bound).
+- Measured single node: 24.0 rows/sec against a local mock (rate-limit bound).- About: https://jev-curate.vercel.app/about.html
+- Contact: https://jev-curate.vercel.app/contact.html
+- Privacy: https://jev-curate.vercel.app/privacy.html

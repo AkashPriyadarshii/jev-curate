@@ -13,37 +13,43 @@ Keywords: jev-curate benchmark, jev rows per second, TypeSafe Jev throughput, da
   <meta property="og:title" content="jev-curate benchmarks - measured, not claimed">
   <meta property="og:description" content="Real rows/sec numbers from a reproducible mock-server benchmark of the jev-curate Rust pipeline.">
   <meta property="og:type" content="website">
+  <meta property="og:image" content="https://jev-curate.vercel.app/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://jev-curate.vercel.app/og.png">
   <meta property="og:url" content="https://jev-curate.vercel.app/benchmarks.html">
   <meta name="twitter:card" content="summary">
   <meta name="robots" content="index, follow">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="canonical" href="https://jev-curate.vercel.app/benchmarks.html">
   <link rel="stylesheet" href="style.css">
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "BreadcrumbList",
-        "name": "Breadcrumb",
-        "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "jev-curate", "item": "https://jev-curate.vercel.app/" },
-          { "@type": "ListItem", "position": 2, "name": "Benchmarks", "item": "https://jev-curate.vercel.app/benchmarks.html" }
-        ]
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "jev-curate",
+      "operatingSystem": "Linux, macOS, Windows",
+      "applicationCategory": "DeveloperApplication",
+      "offers": {
+        "@context": "https://schema.org",
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
       },
-      {
-        "@type": "SoftwareApplication",
-        "name": "jev-curate",
-        "operatingSystem": "Linux, macOS, Windows",
-        "applicationCategory": "DeveloperApplication",
-        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-        "description": "Streaming dataset sifter powered by TypeSafe Jev. Measures 24.0 rows/sec in an in-process mock benchmark on a 4-core machine.",
-        "url": "https://jev-curate.vercel.app/benchmarks.html",
-        "codeRepository": "https://github.com/AkashPriyadarshii/jev-curate",
-        "author": { "@type": "Person", "name": "Akash Priyadarshi", "url": "https://github.com/AkashPriyadarshii" }
+      "description": "Streaming dataset sifter powered by TypeSafe Jev. Measures 24.0 rows/sec in an in-process mock benchmark on a 4-core machine.",
+      "url": "https://jev-curate.vercel.app/benchmarks.html",
+      "codeRepository": "https://github.com/AkashPriyadarshii/jev-curate",
+      "author": {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Akash Priyadarshi",
+        "url": "https://github.com/AkashPriyadarshii"
       }
-    ]
-  }
-  </script>
+    }
+  ]
+}</script>
 </head>
 <body>
   <header class="site-header">
@@ -144,9 +150,13 @@ note: client rate limiter defaults to 20 req/sec
         <h3>Site</h3>
         <a href="index.html">Home</a>
         <a href="benchmarks.html">Benchmarks</a>
+      <a href="what-is-jev.html">What is Jev</a>
         <a href="comparison.html">Comparison</a>
         <a href="glossary.html">Glossary</a>
         <a href="use-cases.html">Use cases</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy</a>
       </div>
       <div class="footer-ecosystem">
         <h3>Ecosystem</h3>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<!--
+Title: About jev-curate - the project and the author
+Description: What jev-curate is, what it is not, and who builds it. Project status, non-goals, tech stack, and the author behind the Jev tooling family.
+Keywords: about jev-curate, jev-curate project, Akash Priyadarshi, Jev ecosystem tools, dataset sifter project
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About jev-curate: the project, the stack, the author</title>
+  <meta name="description" content="What jev-curate is, what it is not, and who builds it. Project status, non-goals, tech stack, and the author behind the Jev tooling family.">
+  <meta property="og:title" content="About jev-curate">
+  <meta property="og:description" content="A small Rust sifter for large datasets, an honest status, and the person building it.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jev-curate.vercel.app/about.html">
+  <meta property="og:image" content="https://jev-curate.vercel.app/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://jev-curate.vercel.app/og.png">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://jev-curate.vercel.app/about.html">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Akash Priyadarshi",
+      "url": "https://github.com/AkashPriyadarshii",
+      "jobTitle": "Software engineer",
+      "address": {
+        "@context": "https://schema.org",
+        "@type": "PostalAddress",
+        "addressLocality": "Patna",
+        "addressRegion": "Bihar",
+        "addressCountry": "IN"
+      },
+      "sameAs": [
+        "https://github.com/AkashPriyadarshii",
+        "https://akashpriyadarshi.vercel.app",
+        "https://linkedin.com/in/akash-priyadarshi-1aa51b37a"
+      ]
+    }
+  ]
+}</script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html">jev-curate<sup>beta</sup></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="index.html">Home</a>
+      <a href="benchmarks.html">Benchmarks</a>
+      <a href="what-is-jev.html">What is Jev</a>
+      <a href="comparison.html">Comparison</a>
+      <a href="use-cases.html">Use cases</a>
+      <a href="glossary.html">Glossary</a>
+    </nav>
+    <a class="btn btn-primary nav-cta" href="https://github.com/AkashPriyadarshii/jev-curate">Star on GitHub</a>
+  </header>
+
+  <main id="top">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html">Home</a> <span>/</span> <span>About</span>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Project status: beta, honest about it</p>
+        <h1>About jev-curate</h1>
+        <p class="lead">jev-curate is a Rust CLI that streams Parquet and JSONL rows through TypeSafe Jev judgments and writes accepted and rejected rows to two files. This page states what the project is, what it refuses to become, and who maintains it.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="index.html#quickstart">Try it</a>
+          <a class="btn btn-ghost" href="https://github.com/AkashPriyadarshii/jev-curate">The repository</a>
+        </div>
+      </div>
+      <div class="terminal" aria-label="Project facts">
+        <div class="terminal-bar"><span class="t-dot"></span><span>about --json</span></div>
+        <pre>{ "status": "beta",
+  "language": "Rust",
+  "io": ["parquet", "jsonl"],
+  "engine": "TypeSafe Jev (jev-latest)",
+  "measured": "24.0 rows/sec, mock bench",
+  "target": "1,500+ rows/sec, cluster" }</pre>
+      </div>
+    </section>
+
+    <section class="why">
+      <h2>What it is</h2>
+      <p class="section-lead">A streaming filter. The core is a Rust multi-threaded pipeline with a token bucket rate limiter, speculative fan-out on the client, and a mock-server test suite so CI never burns live credits. The CLI, the client, the presets, and the Parquet IO are all in one crate with tests. Python bindings exist behind a feature flag and are early; the CLI is the supported surface today.</p>
+    </section>
+
+    <section class="presets">
+      <h2>What it is not</h2>
+      <p class="section-lead">It is not a rewriter. Rows pass through verbatim; the tool keeps or rejects, never edits. It is not a general LLM wrapper: it targets the Jev endpoint and its typed answers. It is not a dataset storage platform, a viewer, or an orchestration layer. Those live outside the non-goals of the repository and this site will not grow into them.</p>
+    </section>
+
+    <section class="why">
+      <h2>Who builds it</h2>
+      <p class="section-lead">Akash Priyadarshi, a software engineer in Patna, Bihar, India. Maintainer of the Jev tooling family: jev-seo for search visibility work, jev-git for commit gates, jev-superpowers for agent workflows, and this sifter. The footer on every page carries the full ecosystem, the author links, and the social profiles.</p>
+      <div class="author-links">
+        <a href="https://github.com/AkashPriyadarshii">GitHub</a>
+        <a href="https://akashpriyadarshi.vercel.app">Portfolio</a>
+        <a href="https://linkedin.com/in/akash-priyadarshi-1aa51b37a">LinkedIn</a>
+        <a href="https://akashpriyadarshii.github.io/Resume/">Resume</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </section>
+
+    <section class="cta">
+      <h2>Numbers come from the repo, not this page</h2>
+      <div class="cta-actions">
+        <a class="btn btn-primary" href="benchmarks.html">Read the benchmark</a>
+        <a class="btn btn-ghost" href="https://github.com/AkashPriyadarshii/jev-curate">Star the repo</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-site-nav">
+        <h3>Site</h3>
+        <a href="index.html">Home</a>
+        <a href="benchmarks.html">Benchmarks</a>
+        <a href="what-is-jev.html">What is Jev</a>
+        <a href="comparison.html">Comparison</a>
+        <a href="comparison-judges.html">vs judge scripts</a>
+        <a href="use-cases.html">Use cases</a>
+        <a href="glossary.html">Glossary</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy</a>
+      </div>
+      <div class="footer-ecosystem">
+        <h3>Ecosystem</h3>
+        <a href="https://github.com/AkashPriyadarshii/jev-seo">jev-seo</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-superpowers">jev-superpowers</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-curate">jev-curate</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-git">jev-git</a>
+        <a href="https://github.com/AkashPriyadarshii/tdlib-android">tdlib-android</a>
+        <a href="https://github.com/AkashPriyadarshii/kharcha">kharcha</a>
+      </div>
+      <div class="footer-author">
+        <h3>Author</h3>
+        <a href="https://github.com/AkashPriyadarshii">GitHub</a>
+        <a href="https://akashpriyadarshi.vercel.app">Portfolio</a>
+        <a href="https://linkedin.com/in/akash-priyadarshi-1aa51b37a">LinkedIn</a>
+        <a href="https://akashpriyadarshii.github.io/Resume/">Resume</a>
+      </div>
+      <div class="footer-social">
+        <h3>Social</h3>
+        <a href="https://x.com/Akash__ydv001">X / Twitter</a>
+        <a href="https://www.threads.net/@akash.priyadarshii">Threads</a>
+        <a href="https://www.instagram.com/akash.priyadarshii/">Instagram</a>
+        <a href="https://reddit.com/user/DragonfruitWeak2801">Reddit</a>
+      </div>
+    </div>
+    <p class="footer-close">jev-curate, the high-throughput dataset sifter. Judgment by TypeSafe Jev, streaming in Rust.</p>
+  </footer>
+</body>
+</html>

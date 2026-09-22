@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<!--
+Title: Privacy - jev-curate
+Description: Privacy statement for the jev-curate website. What data the site collects. Nothing, plus what the CLI sends to the Jev endpoint.
+Keywords: jev-curate privacy, dataset sifter privacy, Jev endpoint data, no analytics site
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy - jev-curate</title>
+  <meta name="description" content="Privacy statement for the jev-curate website. What data the site collects. Nothing, plus what the CLI sends to the Jev endpoint.">
+  <meta property="og:title" content="Privacy">
+  <meta property="og:description" content="This site runs no analytics and stores no data. What the CLI sends to the Jev endpoint is stated here.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jev-curate.vercel.app/privacy.html">
+  <meta property="og:image" content="https://jev-curate.vercel.app/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://jev-curate.vercel.app/og.png">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://jev-curate.vercel.app/privacy.html">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Privacy",
+  "url": "https://jev-curate.vercel.app/privacy.html",
+  "dateModified": "2026-09-21"
+}</script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html">jev-curate<sup>beta</sup></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="index.html">Home</a>
+      <a href="benchmarks.html">Benchmarks</a>
+      <a href="what-is-jev.html">What is Jev</a>
+      <a href="comparison.html">Comparison</a>
+      <a href="use-cases.html">Use cases</a>
+      <a href="glossary.html">Glossary</a>
+    </nav>
+    <a class="btn btn-primary nav-cta" href="https://github.com/AkashPriyadarshii/jev-curate">Star on GitHub</a>
+  </header>
+
+  <main id="top">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html">Home</a> <span>/</span> <span>Privacy</span>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Short on purpose</p>
+        <h1>Privacy</h1>
+        <p class="lead">This website does not run analytics, does not set cookies, and does not store your data. It is static files served from Vercel with a GitHub Pages mirror. The only private data involved is what you choose to send to the Jev endpoint when you run the CLI yourself.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#cli">What the CLI sends</a>
+          <a class="btn btn-ghost" href="https://github.com/AkashPriyadarshii/jev-curate">The repository</a>
+        </div>
+      </div>
+      <div class="terminal" aria-label="Privacy summary">
+        <div class="terminal-bar"><span class="t-dot"></span><span>privacy --audit</span></div>
+        <pre>{ "site": "no analytics, no cookies",
+  "cli": "rows sent only to api.typesafe.ai",
+  "scope": "per request, fan-out batches",
+  "storage": "clean.jsonl / rejected.jsonl, local" }</pre>
+      </div>
+    </section>
+
+    <section class="why" id="cli">
+      <h2>Website</h2>
+      <p class="section-lead">Static pages, no JavaScript trackers. The only third party is the hosting provider's standard logs. The asset requests are the pages, the stylesheet, the icon, and one script that drives the terminal animation and the reduced-motion guard. Nothing leaves the page except the browser's normal loading requests.</p>
+    </section>
+
+    <section class="presets">
+      <h2>Running the CLI</h2>
+      <p class="section-lead">The CLI sends each row to the TypeSafe endpoint as request state, wrapped in fan-out batches. What leaves your machine is the row content plus the preset's questions. The answers come back as typed verdicts; accepted rows land in clean.jsonl and rejected ones in rejected.jsonl, both written locally. Pre-filtering drops blank and padding lines before anything is sent.</p>
+      <p class="section-lead">API keys are read from the TYPESAFE_API_KEY environment variable or the CLI argument, sent as the bearer token to the endpoint, and never logged by the tool. The dry run mode performs the whole pipeline against a local mock server and sends nothing to the network.</p>
+    </section>
+
+    <section class="presets">
+      <h2>You hold the volume knob</h2>
+      <p class="section-lead">Whether a row is sensitive is your call. The tool offers no server-side storage: there is no account, no cloud upload except the endpoint request itself, and no telemetry. If the dataset is private, the same caveat that applies to any API-backed pipeline applies here: the row content reaches the model provider.</p>
+    </section>
+
+    <section class="cta">
+      <h2>Questions about this page?</h2>
+      <div class="cta-actions">
+        <a class="btn btn-primary" href="contact.html">Contact</a>
+        <a class="btn btn-ghost" href="index.html">Back home</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-site-nav">
+        <h3>Site</h3>
+        <a href="index.html">Home</a>
+        <a href="benchmarks.html">Benchmarks</a>
+        <a href="what-is-jev.html">What is Jev</a>
+        <a href="comparison.html">Comparison</a>
+        <a href="comparison-judges.html">vs judge scripts</a>
+        <a href="use-cases.html">Use cases</a>
+        <a href="glossary.html">Glossary</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy</a>
+      </div>
+      <div class="footer-ecosystem">
+        <h3>Ecosystem</h3>
+        <a href="https://github.com/AkashPriyadarshii/jev-seo">jev-seo</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-superpowers">jev-superpowers</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-curate">jev-curate</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-git">jev-git</a>
+        <a href="https://github.com/AkashPriyadarshii/tdlib-android">tdlib-android</a>
+        <a href="https://github.com/AkashPriyadarshii/kharcha">kharcha</a>
+      </div>
+      <div class="footer-author">
+        <h3>Author</h3>
+        <a href="https://github.com/AkashPriyadarshii">GitHub</a>
+        <a href="https://akashpriyadarshi.vercel.app">Portfolio</a>
+        <a href="https://linkedin.com/in/akash-priyadarshi-1aa51b37a">LinkedIn</a>
+        <a href="https://akashpriyadarshii.github.io/Resume/">Resume</a>
+      </div>
+      <div class="footer-social">
+        <h3>Social</h3>
+        <a href="https://x.com/Akash__ydv001">X / Twitter</a>
+        <a href="https://www.threads.net/@akash.priyadarshii">Threads</a>
+        <a href="https://www.instagram.com/akash.priyadarshii/">Instagram</a>
+        <a href="https://reddit.com/user/DragonfruitWeak2801">Reddit</a>
+      </div>
+    </div>
+    <p class="footer-close">jev-curate, the high-throughput dataset sifter. Judgment by TypeSafe Jev, streaming in Rust.</p>
+  </footer>
+</body>
+</html>
