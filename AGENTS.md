@@ -3,7 +3,7 @@
 ## Architecture & Project Directives
 `jev-curate` is a high-throughput synthetic and pretraining dataset sifter powered by TypeSafe AI's Jev model (`jev-1.13.0` / `jev-latest` at `https://api.typesafe.ai/v1/systemone`).
 
-- **Target Speed:** 1,500+ records/sec per worker node.
+- **Target Speed:** 20 records/sec per worker node (TypeSafe 1,200 req/min limit); 1,500+ records/sec cluster target.
 - **Cost:** ~$0.042 per million input tokens; output unmetered.
 - **Core Engine:** Pure Rust multi-threaded streaming core with Arrow/Parquet integration + PyO3 Python bindings.
 - **I/O Formats:** Parquet (`.parquet`) and JSON Lines (`.jsonl`).

@@ -1,6 +1,6 @@
 <!--
-Title: jev-curate — High-Throughput Synthetic & Pretraining Dataset Sifter Powered by TypeSafe AI (Jev System One)
-Description: High-throughput synthetic & pretraining dataset curation pipeline in Rust & Python powered by TypeSafe AI's Jev model (api.typesafe.ai). Stream, filter, and score millions of Parquet and JSONL rows targeting 1,500+ records/sec using Jev System One typed decisions (Choice, Score, Noul), speculative fan-out, and calibrated post-training reasoning rubrics.
+Title: jev-curate: High-Throughput Synthetic & Pretraining Dataset Sifter Powered by TypeSafe AI (Jev System One)
+Description: High-throughput synthetic & pretraining dataset curation pipeline in Rust & Python powered by TypeSafe AI's Jev model (api.typesafe.ai). Stream, filter, and score millions of Parquet and JSONL rows using Jev System One typed decisions (Choice, Score, Noul), speculative question fan-out, and calibrated post-training reasoning rubrics.
 Keywords: typesafe ai, type safe ai, jev, api.typesafe.ai, jev-1.13.0, jev-latest, system one, choice, score, noul, dataset curation, synthetic data filtering, pretraining datasets, post-training, fine-tuning, rlcd, reasoning models, parquet, arrow, polars, pyarrow, pyo3, rust, jsonl, llm evaluation, speculative fan-out
 -->
 
@@ -10,7 +10,7 @@ Keywords: typesafe ai, type safe ai, jev, api.typesafe.ai, jev-1.13.0, jev-lates
 
 **High-Throughput Synthetic & Pretraining Dataset Sifter Powered by TypeSafe AI (Jev)**
 
-**Live:** [jev-curate.vercel.app](https://jev-curate.vercel.app) — measured **24.0 rows/sec** single-node (mock bench, `examples/bench_mock.rs`), 1,500+ cluster target
+**Live:** [jev-curate.vercel.app](https://jev-curate.vercel.app) (measured **24.0 rows/sec** single-node on local mock bench `examples/bench_mock.rs`, 1,500+ cluster target)
 
 [![PyPI](https://img.shields.io/pypi/v/jev-curate.svg?style=flat-square)](https://pypi.org/project/jev-curate/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
@@ -34,7 +34,7 @@ Cleaning 10M to 1B rows of synthetic reasoning data, instruction tuning pairs, o
 * **Context rot from uncompressed inputs:** Naively feeding raw data into LLMs causes decision accuracy to crater while burning money on boilerplate text.
 
 `jev-curate` solves this by piping Apache Arrow and Parquet streams through **TypeSafe AI's Jev model** (`jev-1.13.0`):
-* **Targets 1,500+ rows/sec:** Evaluates rows in multi-threaded batches over Jev's speculative parallel fan-out (250k tok/sec rate limit) — no per-row HTTP round-trips.
+* **Single-round-trip rubrics per row:** Evaluates all rubric questions concurrently in one HTTP request per row via Jev's speculative parallel fan-out with zero per-question round-trips. Single-node throughput is bounded by TypeSafe's 1,200 req/min (20 rows/sec) limit; horizontal scaling across worker nodes targets 1,500+ rows/sec cluster throughput.
 * **~$4.20 per 100M tokens:** Jev bills $0.042/Mtok for input, zero for output. TypeSafe benchmarks System One workflows **444.6x cheaper and 193.6x faster** than generative LLMs ([source](https://typesafe.ai)).
 * **Mathematical calibration:** Receives calibrated probabilities (`Noul`), ordinal rubrics (`Score` 1–5), and categorical choices (`Choice`), eliminating generative text slop.
 * **Zero Rewriting:** Emits clean records verbatim without rewriting or altering mathematical formulas.
@@ -87,6 +87,7 @@ curator = PyJevCurator(api_key="your-api-key", preset="reasoning-math")
 | `-o, --out` | `./curated/` | Destination folder for `clean.jsonl` and `rejected.jsonl`. |
 | `-c, --concurrency` | `32` | Worker concurrency (adaptive token bucket prevents 429 rate limits). |
 | `--dry-run` | `false` | Offline evaluation simulation with host pre-filtering and zero API calls (no `TYPESAFE_API_KEY` needed). |
+| `--endpoint` | *None* | Custom API endpoint URL for offline mock testing (or set `TYPESAFE_ENDPOINT`). |
 
 ---
 
@@ -112,7 +113,7 @@ maturin develop
 pytest
 ```
 
-All tests run against an in-process mock server — no live API credits in CI.
+All tests run against an in-process mock server with zero live API credits in CI.
 
 ---
 

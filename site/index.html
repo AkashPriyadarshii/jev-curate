@@ -107,7 +107,7 @@
       "acceptedAnswer": {
         "@context": "https://schema.org",
         "@type": "Answer",
-        "text": "jev-curate targets 1,500+ rows per second per worker node using multi-threaded streaming with speculative fan-out batching, which batches independent judgement questions into a single API request."
+        "text": "jev-curate targets 1,500+ rows per second across a cluster (20 rows/sec per single node against TypeSafe's 1,200 req/min limit) using multi-threaded streaming with speculative fan-out batching, which batches independent judgement questions for each row into a single API request."
       }
     },
     {
