@@ -1,1 +1,18 @@
-shot-*.png
+/target
+**/*.rs.bk
+*.parquet
+.env
+.env.*
+!.env.example
+
+# Python / PyO3 artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.dylib
+dist/
+
+# Local dev snapshots
+site/shot-*.png
