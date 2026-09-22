@@ -43,30 +43,9 @@ code, pre {
   font-size: 13px;
 }
 
-/* nav */
-.nav {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  gap: 30px;
-  padding: 20px 100px;
-  background: var(--substrate);
-  border-bottom: 1px solid var(--grey-2);
-  transition: background 200ms var(--ease);
-}
+/* .nav / .wordmark / .nav-links — removed: index.html uses .site-header structure now */
 
-.wordmark {
-  font-family: var(--display);
-  font-size: 22px;
-  font-weight: 500;
-  text-decoration: none;
-  letter-spacing: -0.02em;
-}
-
-.wordmark .dot { color: var(--pink); }
-
+/* nav-links: only kept for mobile drawer open-state geometry (addressed by #mobile-nav id) */
 .nav-links {
   display: flex;
   gap: 25px;
@@ -84,7 +63,6 @@ code, pre {
 
 .nav-links a:hover { border-bottom-color: var(--pink); }
 
-.nav-cta { margin-left: 30px; }
 
 /* buttons */
 .btn {
@@ -160,7 +138,7 @@ code, pre {
 .hero-note {
   font-family: var(--mono);
   font-size: 13px;
-  color: var(--grey-3);
+  color: var(--grey-1); /* #1e1e1e on #fefefe = 17.5:1 AAA — DESIGN.md muted text */
 }
 
 /* terminal */
@@ -299,9 +277,11 @@ h2 {
   border-radius: var(--radius);
   font-family: var(--mono);
   font-size: 12px;
-  padding: 4px 10px;
+  padding: 12px 12px; /* min 44px tall touch target (12+12+~20line = 44px) */
+  min-height: 44px;
   cursor: pointer;
   transition: color 200ms var(--ease), border-color 200ms var(--ease);
+  line-height: 1;
 }
 
 .copy-btn:hover { color: var(--pink); border-color: var(--pink); }
@@ -461,6 +441,19 @@ h2 {
 .nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
 .nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
+/* ---- mid tablet: 960–1100px gap fix (M1/M2/M3) ---- */
+@media (max-width: 1100px) {
+  .nav { padding: 20px 40px; }
+  .site-header { padding: 16px 40px; }
+  .hero { padding: 80px 40px 80px; }
+  section { padding: 80px 40px; }
+  .cost { padding: 80px 40px; }
+  .breadcrumb { padding: 20px 40px 0; }
+  .footer { padding: 60px 40px 40px; }
+  /* M3: reason-list 220px fixed column hurts at tablet — collapse to 2-col auto */
+  .reason-list li { grid-template-columns: minmax(160px, 200px) 1fr; gap: 30px; }
+}
+
 @media (max-width: 960px) {
   /* ---- nav ---- */
   .nav { padding: 15px 24px; flex-wrap: wrap; }
@@ -532,9 +525,9 @@ h2 {
   html { scroll-behavior: auto; }
   * { transition: none !important; }
 }
-.hero-note a { color: var(--grey-3); text-decoration: underline; }
+.hero-note a { color: var(--pink); text-decoration: underline; text-underline-offset: 2px; }
 
-.hero-note a:hover { color: var(--pink); }
+.hero-note a:hover { color: var(--magenta); }
 
 .reason-list strong a { color: var(--ink); }
 
@@ -564,7 +557,7 @@ h2 {
 }
 .judge-dim { color: var(--grey-1); }
 .judge-line {
-  color: var(--grey-2);
+  color: var(--grey-1); /* #1e1e1e on #fefefe = 17.5:1 AAA — was #dedede which is border-only token */
   border: 1px solid var(--grey-3);
   border-radius: var(--radius);
   padding: 2px 8px;
@@ -601,8 +594,8 @@ h2 {
   display: grid;
   place-items: center;
   border-radius: var(--radius);
-  background: #110d8c;
-  color: #fff;
+  background: var(--magenta); /* DESIGN.md secondary — was #110d8c (off-system) */
+  color: var(--substrate);
   font-family: var(--mono);
   font-size: 14px;
 }
@@ -629,9 +622,12 @@ h2 {
 .author-links a {
   border: 1px solid var(--grey-3);
   border-radius: var(--radius);
-  padding: 6px 12px;
+  padding: 12px 16px; /* 44px tap target: 12+12+20lineheight */
+  min-height: 44px;
   font-size: 14px;
   background: var(--bg);
+  display: inline-flex;
+  align-items: center;
 }
 .author-links a:hover { border-color: var(--pink); color: var(--pink); }
 
@@ -680,11 +676,11 @@ h2 {
   padding: 20px 100px 0;
   font-size: 14px;
   font-family: var(--mono);
-  color: var(--grey-2);
+  color: var(--grey-1); /* #1e1e1e — was #dedede (border token, fails AA) */
 }
 .breadcrumb a { color: var(--grey-1); text-decoration: none; }
 .breadcrumb a:hover { color: var(--pink); }
-.breadcrumb span { color: var(--grey-3); }
+.breadcrumb span { color: var(--grey-3); } /* separator — decorative, not text-bearing */
 
 .bench-table {
   width: 100%;
