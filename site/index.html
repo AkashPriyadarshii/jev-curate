@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<!--
+  Title: jev-curate | high-throughput dataset sifter by TypeSafe Jev
+  Description: Curate synthetic and pretraining datasets at 1,500+ rows/sec. Rust CLI with TypeSafe Jev judgment, Parquet and JSONL, 3c per million tokens input.
+  Keywords: dataset curation, synthetic data sifting, pretraining data, Jev evaluator, Rust dataset tool, parquet jsonl, data quality filter
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>jev-curate | high-throughput dataset sifter for TypeSafe Jev</title>
+  <meta name="description" content="Curate synthetic and pretraining datasets in Rust with TypeSafe Jev judgment. Parquet and JSONL I/O, speculative fan-out, unmetered output.">
+  <meta name="keywords" content="dataset curation, synthetic data sifting, pretraining data filtering, TypeSafe Jev, Rust CLI, parquet jsonl, data quality, anti-sycophancy">
+  <meta name="author" content="Akash Priyadarshi">
+  <link rel="canonical" href="https://jev-curate.vercel.app/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jev-curate.vercel.app/">
+  <meta property="og:title" content="jev-curate | high-throughput dataset sifter for TypeSafe Jev">
+  <meta property="og:description" content="Curate synthetic and pretraining datasets with TypeSafe Jev judgment. Rust CLI, Parquet and JSONL I/O, unmetered output.">
+  <meta property="og:site_name" content="jev-curate">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="jev-curate | high-throughput dataset sifter">
+  <meta name="twitter:description" content="Curate synthetic and pretraining datasets with TypeSafe Jev. Rust CLI, Parquet and JSONL.">
+  <meta name="robots" content="index, follow">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='2' fill='%23f386a1'/%3E%3Ctext x='8' y='12' font-size='10' font-family='monospace' text-anchor='middle' fill='%23000'%3Ejc%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "jev-curate",
+        "url": "https://jev-curate.vercel.app/",
+        "description": "High-throughput dataset sifter for synthetic and pretraining datasets. Rust CLI with TypeSafe Jev judgment, Parquet and JSONL I/O, speculative fan-out batching.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Linux, macOS, Windows",
+        "softwareVersion": "0.1.0",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "author": {
+          "@type": "Person",
+          "name": "Akash Priyadarshi",
+          "url": "https://github.com/AkashPriyadarshii"
+        },
+        "codeRepository": "https://github.com/AkashPriyadarshii/jev-curate",
+        "featureList": "1,500+ rows/sec target; TypeSafe Jev evaluation; Parquet and JSONL I/O; presets: reasoning-math, anti-sycophancy, code-correctness; speculative fan-out batching; token bucket rate limiting"
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "jev-curate",
+        "url": "https://jev-curate.vercel.app/",
+        "inLanguage": "en"
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Akash Priyadarshi",
+        "url": "https://github.com/AkashPriyadarshii",
+        "jobTitle": "Software Engineer",
+        "address": { "@type": "PostalAddress", "addressLocality": "Patna, Bihar", "addressCountry": "IN" }
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is jev-curate?",
+        "acceptedAnswer": { "@type": "Answer", "text": "A Rust CLI that sifts synthetic and pretraining datasets with TypeSafe Jev judgment. It reads Parquet and JSONL, evaluates every row against a preset rubric, and writes accepted and rejected rows to separate files." }
+      },
+      {
+        "@type": "Question",
+        "name": "How fast is dataset curation with jev-curate?",
+        "acceptedAnswer": { "@type": "Answer", "text": "jev-curate targets 1,500+ rows per second per worker node using multi-threaded streaming with speculative fan-out batching, which batches independent judgement questions into a single API request." }
+      },
+      {
+        "@type": "Question",
+        "name": "What does jev-curate cost to run?",
+        "acceptedAnswer": { "@type": "Answer", "text": "TypeSafe Jev input tokens cost about $0.042 per million, about 4 dollars per 100 million, and output tokens are unmetered. TypeSafe reports System One workflows 444.6x cheaper and 193.6x faster than the baseline." }
+      },
+      {
+        "@type": "Question",
+        "name": "Which presets does jev-curate ship?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Three presets: reasoning-math for chain-of-thought correctness, anti-sycophancy for flattery that tracks the user, and code-correctness for syntax and logic errors. You can also run a dry run with no API key." }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="nav">
+    <a class="wordmark" href="#top">jev-curate<span class="dot">.</span></a>
+    <nav class="nav-links">
+      <a href="#why">Why</a>
+      <a href="#presets">Presets</a>
+      <a href="#quickstart">Quickstart</a>
+      <a href="#cost">Cost</a>
+    </nav>
+    <a class="btn btn-primary nav-cta" href="https://github.com/AkashPriyadarshii/jev-curate">Star on GitHub</a>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Rust + TypeSafe Jev judgment</p>
+        <h1>Sift synthetic and pretraining data at 1,500+ rows/sec</h1>
+        <p class="lead">jev-curate streams Parquet and JSONL at 1,500+ rows/sec through Jev evaluation, keeps rows that pass your rubric, and writes the rejects to a second file. No orchestration, no cloud account.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#quickstart">Try the CLI</a>
+          <a class="btn btn-ghost" href="https://github.com/AkashPriyadarshii/jev-curate#readme">Read the README</a>
+        </div>
+        <p class="hero-note">Output unmetered. About <a href="https://docs.typesafe.ai/models.md">$4.20 per 100M input tokens</a>.</p>
+      </div>
+      <div class="terminal" aria-label="Terminal showing a jev-curate dry run">
+        <div class="terminal-bar"><span class="t-dot"></span><span>jev-curate --dry-run</span></div>
+        <pre><code>$ jev-curate --input corpus.jsonl --preset reasoning-math --concurrency 32 --dry-run
+[info] preset: reasoning-math
+[info] concurrency: 32
+[info] dry-run: no rows sent, no credits spent
+[info] would keep 812,044 of 1,000,000 rows
+[info] would reject 187,956 rows (18.8%)</code></pre>
+      </div>
+    </section>
+
+    <section class="why" id="why">
+      <h2>LLM judges are an API call with a prompt bolted on</h2>
+      <p class="section-lead">You paste a csv into a chat window and get grades back in prose. jev-curate treats judging as a pipeline: predefined rubrics, batched questions, typed answers, two output files ready for training.</p>
+      <ul class="reason-list">
+        <li><strong>Judgment by <a href="https://typesafe.ai">TypeSafe Jev</a>.</strong> Machine-native Choice, Score and Noul questions. One state ingest per micro-batch, questions fanned into one request.</li>
+        <li><strong>No token waste.</strong> Blank and padding lines drop in Rust before the API. 8k token ceiling per row.</li>
+        <li><strong>Parquet in, Parquet out.</strong> Streaming Arrow/Parquet reader and writer. JSONL too. No pandas step in the middle.</li>
+        <li><strong>Safety rails built in.</strong> Token bucket rate limiter with 429 backoff. Dry run verifies the pipeline without spending a credit.</li>
+        <li><strong>Zero runtime dependencies.</strong> Tests run against an in-process mock server. Curate on a laptop with a Rust binary.</li>
+      </ul>
+    </section>
+
+    <section class="presets" id="presets">
+      <h2>Rubrics you can point at a file</h2>
+      <p class="section-lead">Three presets ship with the binary. Each is a Jev evaluation template, not a regex or a rewriter.</p>
+      <div class="preset-row">
+        <h3><code>reasoning-math</code></h3>
+        <p>Grades chain-of-thought correctness and arithmetic soundness. Keeps steps that actually entail the answer.</p>
+        <span class="check">keep</span>
+      </div>
+      <div class="preset-row">
+        <h3><code>anti-sycophancy</code></h3>
+        <p>Flags flattery that tracks the user instead of evidence. Common in RLHF and chat fine-tuning sets.</p>
+        <span class="check">flag</span>
+      </div>
+      <div class="preset-row">
+        <h3><code>code-correctness</code></h3>
+        <p>Detects syntax breakage, hallucinated APIs and logic slips in code generation outputs.</p>
+        <span class="check">keep</span>
+      </div>
+    </section>
+
+    <section class="quickstart" id="quickstart">
+      <h2>One command in, two files out</h2>
+      <div class="code-block">
+        <button class="copy-btn" data-copy="cargo install jev-curate">copy</button>
+        <pre><code>$ cargo install jev-curate
+$ jev-curate --input corpus.parquet --preset anti-sycophancy --out ./curated/</code></pre>
+      </div>
+      <p class="section-lead">The binary writes <code>clean.jsonl</code> with accepted rows and <code>rejected.jsonl</code> with the rest, plus structural stats. Run <code>--dry-run</code> first to see keep and reject counts before any row touches the API. Requires only a <code>TYPESAFE_API_KEY</code>.</p>
+      <table class="flag-table">
+        <thead><tr><th>Flag</th><th>Default</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td><code>-i, --input</code></td><td>required</td><td>.jsonl or .parquet input path</td></tr>
+          <tr><td><code>-p, --preset</code></td><td>reasoning-math</td><td>rubric to evaluate against</td></tr>
+          <tr><td><code>-o, --out</code></td><td>./curated/</td><td>output directory</td></tr>
+          <tr><td><code>-c, --concurrency</code></td><td>32</td><td>parallel worker count</td></tr>
+          <tr><td><code>--dry-run</code></td><td>off</td><td>count before scoring; no key needed</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="cost" id="cost">
+      <h2>Judgment at pipeline cost</h2>
+      <div class="stat-row">
+        <div class="stat">
+          <p class="stat-num">1500+</p>
+          <p class="stat-label">rows per second, per worker target</p>
+        </div>
+        <div class="stat">
+          <p class="stat-num">$0.042</p>
+          <p class="stat-label">per million input tokens</p>
+        </div>
+        <div class="stat">
+          <p class="stat-num">free</p>
+          <p class="stat-label">output tokens, unmetered</p>
+        </div>
+        <div class="stat">
+          <p class="stat-num">444.6x</p>
+          <p class="stat-label">cheaper, TypeSafe System One workflow benchmark</p>
+        </div>
+      </div>
+      <p class="cost-src">Rates from the <a href="https://typesafe.ai">TypeSafe AI</a> model docs; 444.6x figure is TypeSafe's own <a href="https://typesafe.ai">System One benchmark</a>. 1500+ is the project target, benchmark runs live in the repo.</p>
+    </section>
+
+    <section class="cta">
+      <h2>Ship better training data tonight</h2>
+      <div class="cta-actions">
+        <a class="btn btn-primary" href="https://github.com/AkashPriyadarshii/jev-curate">Star the repo</a>
+        <a class="btn btn-ghost" href="https://crates.io/crates/jev-curate">crates.io</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-ecosystem">
+        <h3>Ecosystem</h3>
+        <a href="https://github.com/AkashPriyadarshii/jev-seo">jev-seo</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-superpowers">jev-superpowers</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-curate">jev-curate</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-git">jev-git</a>
+        <a href="https://github.com/AkashPriyadarshii/tdlib-android">tdlib-android</a>
+        <a href="https://github.com/AkashPriyadarshii/kharcha">kharcha</a>
+      </div>
+      <div class="footer-author">
+        <h3>Author</h3>
+        <a href="https://github.com/AkashPriyadarshii">Akash Priyadarshi, Patna</a>
+        <a href="https://akashpriyadarshi.vercel.app">Portfolio</a>
+        <a href="https://linkedin.com/in/akash-priyadarshi-1aa51b37a">LinkedIn</a>
+        <a href="https://akashpriyadarshii.github.io/Resume/">Resume</a>
+      </div>
+      <div class="footer-social">
+        <h3>Social</h3>
+        <a href="https://x.com/Akash__ydv001">X</a>
+        <a href="https://www.threads.net/@akash.priyadarshii">Threads</a>
+        <a href="https://www.instagram.com/akash.priyadarshii">Instagram</a>
+        <a href="https://reddit.com/user/DragonfruitWeak2801">Reddit</a>
+      </div>
+    </div>
+    <p class="footer-close">jev-curate, the high-throughput dataset sifter. Judgment by TypeSafe Jev, streaming in Rust.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
