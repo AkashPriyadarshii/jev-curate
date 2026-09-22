@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<!--
+Title: jev-curate glossary - what is Jev, what is a dataset sifter
+Description: Plain-language glossary around jev-curate: TypeSafe Jev, Choice, Score and Noul verdicts, speculative fan-out, presets, dry-run, Parquet and JSONL.
+Keywords: what is jev-curate, what is TypeSafe Jev, Jev System One, Choice Score Noul, dataset sifter glossary, synthetic data filtering
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Glossary: what is jev-curate and what is TypeSafe Jev</title>
+  <meta name="description" content="Plain-language glossary around jev-curate: TypeSafe Jev, Choice, Score and Noul verdicts, speculative fan-out, presets, dry-run, Parquet and JSONL.">
+  <meta property="og:title" content="Glossary: what is jev-curate and what is Jev">
+  <meta property="og:description" content="Plain-language terms for the dataset sifter, its verdict types, and the model behind it.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jev-curate.vercel.app/glossary.html">
+  <meta name="twitter:card" content="summary">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://jev-curate.vercel.app/glossary.html">
+  <link rel="stylesheet" href="style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "name": "Breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "jev-curate", "item": "https://jev-curate.vercel.app/" },
+          { "@type": "ListItem", "position": 2, "name": "Glossary", "item": "https://jev-curate.vercel.app/glossary.html" }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is TypeSafe Jev?",
+            "acceptedAnswer": { "@type": "Answer", "text": "TypeSafe Jev is a System One decision model for AI agents. It answers typed questions with Choice, Score or Noul outputs instead of free text, and runs on the https://api.typesafe.ai/v1/systemone endpoint." }
+          },
+          {
+            "@type": "Question",
+            "name": "What is a dataset sifter?",
+            "acceptedAnswer": { "@type": "Answer", "text": "A dataset sifter streams rows from an input file, scores each row against a rubric, and writes accepted rows and rejected rows to separate output files. jev-curate is the Rust sifter for the Jev ecosystem." }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<!-- impeccable-disable em-dash-overuse: CLI flags like --dry-run are not em-dashes -->
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html">jev-curate<sup>beta</sup></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="index.html">Home</a>
+      <a href="benchmarks.html">Benchmarks</a>
+      <a href="comparison.html">Comparison</a>
+      <a href="glossary.html" aria-current="page">Glossary</a>
+      <a href="use-cases.html">Use cases</a>
+    </nav>
+    <a class="btn btn-primary nav-cta" href="https://github.com/AkashPriyadarshii/jev-curate">Star on GitHub</a>
+  </header>
+
+  <main id="top">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html">Home</a> <span>/</span> <span>Glossary</span>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">The terms, plainly</p>
+        <h1>What is jev-curate? What is Jev?</h1>
+        <p class="lead">The glossary maps every term this site uses back to something concrete: the binary, the model, the verdict types, and the file formats. If a sentence on the homepage puzzled you, it is answered here.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#terms">Read the terms</a>
+          <a class="btn btn-ghost" href="index.html">Back to homepage</a>
+        </div>
+      </div>
+      <div class="terminal" aria-label="A Jev verdict object">
+        <div class="terminal-bar"><span class="t-dot"></span><span>one row, one verdict</span></div>
+        <pre>{
+  "has_circular_reasoning": { "noul": 0.05 },
+  "reasoning_depth":         { "score": 4.8,
+                               "confidence": 0.95 }
+} -> keep</pre>
+      </div>
+    </section>
+
+    <section class="why" id="terms">
+      <h2>Core terms</h2>
+      <dl class="glossary-terms">
+        <dt>jev-curate</dt>
+        <dd>An open source Rust binary that streams dataset rows from Parquet or JSONL, scores each row with Jev, and writes accepted and rejected rows to two output files. Repo: <a href="https://github.com/AkashPriyadarshii/jev-curate">AkashPriyadarshii/jev-curate</a>.</dd>
+
+        <dt>TypeSafe Jev</dt>
+        <dd>The System One decision model behind the tool, served at <code>https://api.typesafe.ai/v1/systemone</code>. "System One" means the model answers typed questions fast and cheaply rather than generating prose. Pricing: <code>0.042 USD per million input tokens</code>, output unmetered, roughly 250k tokens per second.</dd>
+
+        <dt>Noul</dt>
+        <dd>Jev's calibrated probability answer. A Noul of 0.05 for "has_circular_reasoning" reads as a 5% chance the row contains circular logic. Presets set thresholds on these values to decide keep or reject.</dd>
+
+        <dt>Score</dt>
+        <dd>Jev's ordinal rating, 1 to 5, with a separate confidence value. The reasoning-math preset uses a reasoning depth score to keep steps that entail the answer.</dd>
+
+        <dt>Choice</dt>
+        <dd>Jev's pick from a fixed option list. Useful for routing decisions on a row, such as dataset family, error class, or whether to pass a row to a heavier eval.</dd>
+
+        <dt>Speculative fan-out</dt>
+        <dd>The client sends one row as state and all preset questions in a single request. One round trip per row instead of one per question. A 12.2x reduction in request cost at the batching layer.</dd>
+
+        <dt>Token bucket / rate limit</dt>
+        <dd>The client's adaptive limiter matching TypeSafe's 1,200 requests per minute. It refills 20 tokens per second, which is why a single node sustains about 20 rows per second. See <a href="benchmarks.html">benchmarks</a> for the measured number.</dd>
+
+        <dt>Preset</dt>
+        <dd>A bundled evaluation rubric. The three shipped presets are <code>reasoning-math</code>, <code>anti-sycophancy</code> and <code>code-correctness</code>. Each asks Jev the same questions for every row.</dd>
+
+        <dt>Dry run</dt>
+        <dd>Runs the pipeline without contacting the API. Reports the keep and reject counts you would get, so a bad threshold costs zero tokens. Run <code>--dry-run</code> before anything else.</dd>
+
+        <dt>Parquet / JSONL</dt>
+        <dd>The two supported I/O formats. Parquet for columnar datasets, JSONL for line-oriented ones. Rows stream in and out; the binary does not load the dataset into memory.</dd>
+
+        <dt>clean.jsonl / rejected.jsonl</dt>
+        <dd>The two outputs in the output folder. Accepted rows land in <code>clean.jsonl</code>, rejected rows with their verdicts land in <code>rejected.jsonl</code>, so a human reviewer can audit every drop.</dd>
+      </dl>
+    </section>
+
+    <section class="presets">
+      <h2>Why the glossary matters</h2>
+      <p class="section-lead">The ecosystem around Jev is young, and young ecosystems inherit loose vocabulary. "Sifter", "judge", "verdict", "rubric" get used interchangeably. This page fixes the terms for this project: a sifter keeps and drops rows, a judge scores them, a verdict is the typed answer, a rubric is the set of questions. Any other meaning on this site is a bug.</p>
+      <p class="section-lead">Readers who came from a forum post or an awesome list can start here, then go to <a href="use-cases.html">use cases</a> for the workflows, or the <a href="comparison.html">comparison</a> page for the chat first alternative.</p>
+    </section>
+
+    <section class="cta">
+      <h2>Terms clear, try the tool</h2>
+      <div class="cta-actions">
+        <a class="btn btn-primary" href="index.html#quickstart">Six step quickstart</a>
+        <a class="btn btn-ghost" href="https://github.com/AkashPriyadarshii/jev-curate">Star the repo</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-site-nav">
+        <h3>Site</h3>
+        <a href="index.html">Home</a>
+        <a href="benchmarks.html">Benchmarks</a>
+        <a href="comparison.html">Comparison</a>
+        <a href="glossary.html">Glossary</a>
+        <a href="use-cases.html">Use cases</a>
+      </div>
+      <div class="footer-ecosystem">
+        <h3>Ecosystem</h3>
+        <a href="https://github.com/AkashPriyadarshii/jev-seo">jev-seo</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-superpowers">jev-superpowers</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-curate">jev-curate</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-git">jev-git</a>
+        <a href="https://github.com/AkashPriyadarshii/tdlib-android">tdlib-android</a>
+        <a href="https://github.com/AkashPriyadarshii/kharcha">kharcha</a>
+      </div>
+      <div class="footer-author">
+        <h3>Author</h3>
+        <a href="https://github.com/AkashPriyadarshii">GitHub</a>
+        <a href="https://akashpriyadarshi.vercel.app">Portfolio</a>
+        <a href="https://linkedin.com/in/akash-priyadarshi-1aa51b37a">LinkedIn</a>
+        <a href="https://akashpriyadarshii.github.io/Resume/">Resume</a>
+      </div>
+      <div class="footer-social">
+        <h3>Social</h3>
+        <a href="https://x.com/Akash__ydv001">X / Twitter</a>
+        <a href="https://www.threads.net/@akash.priyadarshii">Threads</a>
+        <a href="https://www.instagram.com/akash.priyadarshii/">Instagram</a>
+        <a href="https://reddit.com/user/DragonfruitWeak2801">Reddit</a>
+      </div>
+    </div>
+    <p class="footer-tag">The dataset sifter for the TypeSafe Jev ecosystem</p>
+  </footer>
+</body>
+</html>

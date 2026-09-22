@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<!--
+Title: jev-curate use cases - RLHF, reasoning data, code quality sifting
+Description: Real workloads for jev-curate: anti-sycophancy filtering for RLHF, reasoning-set entropy control, and code-data pre-filtering, with presets and cost notes.
+Keywords: jev-curate use cases, RLHF data filtering, anti-sycophancy preset, reasoning dataset prep, code data quality, Jev dataset sifting
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Use cases: RLHF, reasoning and code data sifting - jev-curate</title>
+  <meta name="description" content="Real workloads for jev-curate: anti-sycophancy filtering for RLHF, reasoning-set entropy control, and code-data pre-filtering, with presets and cost notes.">
+  <meta property="og:title" content="jev-curate use cases for real dataset jobs">
+  <meta property="og:description" content="Three concrete workflows: RLHF honesty filtering, reasoning-set cleanup, and code-data pre-filtering.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jev-curate.vercel.app/use-cases.html">
+  <meta name="twitter:card" content="summary">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://jev-curate.vercel.app/use-cases.html">
+  <link rel="stylesheet" href="style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "name": "Breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "jev-curate", "item": "https://jev-curate.vercel.app/" },
+          { "@type": "ListItem", "position": 2, "name": "Use cases", "item": "https://jev-curate.vercel.app/use-cases.html" }
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "jev-curate",
+        "operatingSystem": "Linux, macOS, Windows",
+        "applicationCategory": "DeveloperApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Streaming dataset sifter for RLHF, reasoning and code datasets, powered by TypeSafe Jev typed judgments.",
+        "url": "https://jev-curate.vercel.app/use-cases.html",
+        "codeRepository": "https://github.com/AkashPriyadarshii/jev-curate",
+        "author": { "@type": "Person", "name": "Akash Priyadarshi", "url": "https://github.com/AkashPriyadarshii" }
+      }
+    ]
+  }
+  </script>
+</head>
+<!-- impeccable-disable em-dash-overuse: CLI flags like --dry-run are not em-dashes -->
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html">jev-curate<sup>beta</sup></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="index.html">Home</a>
+      <a href="benchmarks.html">Benchmarks</a>
+      <a href="comparison.html">Comparison</a>
+      <a href="glossary.html">Glossary</a>
+      <a href="use-cases.html" aria-current="page">Use cases</a>
+    </nav>
+    <a class="btn btn-primary nav-cta" href="https://github.com/AkashPriyadarshii/jev-curate">Star on GitHub</a>
+  </header>
+
+  <main id="top">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html">Home</a> <span>/</span> <span>Use cases</span>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Three jobs this tool already fits</p>
+        <h1>Use cases: RLHF, reasoning and code data</h1>
+        <p class="lead">Each workflow names the preset, the threshold behavior, and the expected cost shape. All three run on the same binary with the same two output files.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#rlhf">RLHF workflow</a>
+          <a class="btn btn-ghost" href="#reasoning">Reasoning workflow</a>
+        </div>
+      </div>
+      <div class="terminal" aria-label="All three presets">
+        <div class="terminal-bar"><span class="t-dot"></span><span>jev-curate -p &lt;preset&gt; -i set.jsonl</span></div>
+        <pre>presets:
+  reasoning-math     chain-of-thought correctness
+  anti-sycophancy    honesty over agreement
+  code-correctness   programs that compile and entail
+output: clean.jsonl + rejected.jsonl</pre>
+      </div>
+    </section>
+
+    <section class="why" id="rlhf">
+      <h2>RLHF: honesty over agreement</h2>
+      <p class="section-lead">Preference data drifts toward whatever the judge agrees with. Filtering with <code>anti-sycophancy</code> scores each exemplar for rated honesty before it reaches the preference pipeline. Runs where the model grovels, hedges to the prompt, or mirrors the user's tone score low on the sycophancy checks and land in <code>rejected.jsonl</code>.</p>
+      <p class="section-lead">The workflow is the same shape as every other job here: point <code>-i</code> at the mined pairs, <code>--dry-run</code> to read the reject rate, adjust the Noul threshold until the drop rate matches the critique from the human audit pass, then run the batch.</p>
+      <pre class="inline-term"><span>jev-curate -p anti-sycophancy -i pairs.jsonl -o ./curated --dry-run</span></pre>
+    </section>
+
+    <section class="presets" id="reasoning">
+      <h2>Reasoning sets: keep the steps that entail the answer</h2>
+      <p class="section-lead">Synthetic reasoning data degrades when the chain of thought is fluent but disconnected from the conclusion. The <code>reasoning-math</code> preset evaluates chain-of-thought correctness and arithmetic soundness, and keeps steps that actually entail the answer. This is the preset the <a href="benchmarks.html">benchmarked</a> row payload could not fool: circular reasoning scores a Noul of 0.05, and the row still passes on reasoning depth when it is sound.</p>
+      <p class="section-lead">One warning from the codebase: the preset never rewrites verbatim row text. It evaluates and routes. Use it to remove low-entailment rows before fine-tuning, not to patch what a generator wrote badly. For blacklisted reasoning starters such as questions that answer themselves, route those to a reject file by threshold tuning in a dry run first.</p>
+    </section>
+
+    <section class="why" id="code">
+      <h2>Code data: pre-filter before the linter</h2>
+      <p class="section-lead">Large code corpora are mostly fine and cheap to store, but training runs pay the cost of the bad rows in loss spikes. <code>code-correctness</code> scores programs on soundness before they enter a code-model mixture. Rows that fail correctness checks drop out at 0.042 USD per million input tokens, which is cheaper than a human triage pass and faster than waiting on a heavy eval sweep.</p>
+      <p class="section-lead">Because every row is evaluated with the same questions, the reject file doubles as an error-class report. Classify by the dominant failed check and you have a bug taxonomy for the generator, which is a second deliverable from the same run.</p>
+    </section>
+
+    <section class="presets">
+      <h2>Threshold tuning, in four passes</h2>
+      <p class="section-lead">Every job here follows the same four pass loop. Pass one: <code>--dry-run</code> with the preset defaults, read the reject rate. Pass two: raise or lower the Noul or Score threshold until the reject rate matches your audit sample. Pass three: inspect a slice of <code>rejected.jsonl</code> to confirm the drops are the drops you wanted, not typos or schema drift. Pass four: run the real batch. Cost shape stays flat because dry runs never touch the API and the real run pays the same 0.042 USD per million input tokens regardless of how you tune.</p>
+      <p class="section-lead">The reject file is also a report. Group <code>rejected.jsonl</code> by the dominant failed question and you get a defect taxonomy for the generator or the miner, which is the second deliverable of the job.</p>
+    </section>
+
+    <section class="cta">
+      <h2>Your dataset, one command</h2>
+      <div class="cta-actions">
+        <a class="btn btn-primary" href="index.html#quickstart">Start sifting</a>
+        <a class="btn btn-ghost" href="https://github.com/AkashPriyadarshii/jev-curate">Star the repo</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-site-nav">
+        <h3>Site</h3>
+        <a href="index.html">Home</a>
+        <a href="benchmarks.html">Benchmarks</a>
+        <a href="comparison.html">Comparison</a>
+        <a href="glossary.html">Glossary</a>
+        <a href="use-cases.html">Use cases</a>
+      </div>
+      <div class="footer-ecosystem">
+        <h3>Ecosystem</h3>
+        <a href="https://github.com/AkashPriyadarshii/jev-seo">jev-seo</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-superpowers">jev-superpowers</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-curate">jev-curate</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-git">jev-git</a>
+        <a href="https://github.com/AkashPriyadarshii/tdlib-android">tdlib-android</a>
+        <a href="https://github.com/AkashPriyadarshii/kharcha">kharcha</a>
+      </div>
+      <div class="footer-author">
+        <h3>Author</h3>
+        <a href="https://github.com/AkashPriyadarshii">GitHub</a>
+        <a href="https://akashpriyadarshi.vercel.app">Portfolio</a>
+        <a href="https://linkedin.com/in/akash-priyadarshi-1aa51b37a">LinkedIn</a>
+        <a href="https://akashpriyadarshii.github.io/Resume/">Resume</a>
+      </div>
+      <div class="footer-social">
+        <h3>Social</h3>
+        <a href="https://x.com/Akash__ydv001">X / Twitter</a>
+        <a href="https://www.threads.net/@akash.priyadarshii">Threads</a>
+        <a href="https://www.instagram.com/akash.priyadarshii/">Instagram</a>
+        <a href="https://reddit.com/user/DragonfruitWeak2801">Reddit</a>
+      </div>
+    </div>
+    <p class="footer-tag">The dataset sifter for the TypeSafe Jev ecosystem</p>
+  </footer>
+</body>
+</html>

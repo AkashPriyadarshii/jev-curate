@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<!--
+Title: jev-curate vs chat-window judging - comparison
+Description: jev-curate vs pasting rows into a chat window for quality judging. Cost, speed, verdict form, and scale differences made concrete.
+Keywords: jev-curate comparison, dataset judging vs chat, GPT judge alternative, synthetic data filtering, Jev scoring pipeline
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Comparison: jev-curate vs chat-window judging - jev-curate</title>
+  <meta name="description" content="jev-curate vs pasting rows into a chat window for quality judging. Cost, speed, verdict form, and scale differences made concrete.">
+  <meta property="og:title" content="jev-curate vs prompt-in-a-chat judging">
+  <meta property="og:description" content="Both call an LLM. One returns prose, the other returns typed verdicts at pipeline scale.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jev-curate.vercel.app/comparison.html">
+  <meta name="twitter:card" content="summary">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://jev-curate.vercel.app/comparison.html">
+  <link rel="stylesheet" href="style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "name": "Breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "jev-curate", "item": "https://jev-curate.vercel.app/" },
+          { "@type": "ListItem", "position": 2, "name": "Comparison", "item": "https://jev-curate.vercel.app/comparison.html" }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is jev-curate a replacement for judging data in a chat window?",
+            "acceptedAnswer": { "@type": "Answer", "text": "It replaces the manual loop for bulk work. Chat judging suits one-off eyeballing of a few rows. jev-curate applies the same model to every row, writes keep and reject files, and never rewrites the verbatim data text." }
+          },
+          {
+            "@type": "Question",
+            "name": "What does jev-curate cost compared to chat-based judging?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Jev input costs 0.042 USD per million tokens and output is unmetered. A chat session pays for generated prose on every turn; jev-curate pays for the row once, with batched fan-out questions." }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<!-- impeccable-disable em-dash-overuse: CLI flags like --dry-run are not em-dashes -->
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html">jev-curate<sup>beta</sup></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="index.html">Home</a>
+      <a href="benchmarks.html">Benchmarks</a>
+      <a href="comparison.html" aria-current="page">Comparison</a>
+      <a href="glossary.html">Glossary</a>
+      <a href="use-cases.html">Use cases</a>
+    </nav>
+    <a class="btn btn-primary nav-cta" href="https://github.com/AkashPriyadarshii/jev-curate">Star on GitHub</a>
+  </header>
+
+  <main id="top">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html">Home</a> <span>/</span> <span>Comparison</span>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Source: README claims neither side can earn</p>
+        <h1>jev-curate vs judging by chat prompt</h1>
+        <p class="lead">Both workflows call a language model to grade data. The difference is what comes back: a prose paragraph you read and act on, or a typed verdict the pipeline acts on. This page compares them on the axes that matter at dataset scale.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="use-cases.html">See use cases</a>
+          <a class="btn btn-ghost" href="https://github.com/AkashPriyadarshii/jev-curate#readme">Read the README</a>
+        </div>
+      </div>
+      <div class="terminal" aria-label="Chat verdict versus typed verdict">
+        <div class="terminal-bar"><span class="t-dot"></span><span>same row, two workflows</span></div>
+        <pre>chat:    "This step is mostly sound but could
+         be clearer about the chain rule
+         application..."        (0 keep/file)
+curate:  {"has_circular_reasoning": noul 0.05,
+          "reasoning_depth": score 4.8}  -> kept</pre>
+      </div>
+    </section>
+
+    <section class="why">
+      <h2>Side by side</h2>
+      <table class="bench-table" aria-label="Comparison table">
+        <thead>
+          <tr><th>Axis</th><th>Prompt in a chat window</th><th>jev-curate</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Verdict form</td><td>Free text you re-parse</td><td>Choice, Score or Noul typed answer</td></tr>
+          <tr><td>Row coverage</td><td>What you have patience for</td><td>Every row, streaming</td></tr>
+          <tr><td>Verbatim data</td><td>Copied, pasted, often rewritten</td><td>Passed as state, never rewritten</td></tr>
+          <tr><td>Output</td><td>Chat log</td><td>clean.jsonl and rejected.jsonl</td></tr>
+          <tr><td>Cost shape</td><td>Prose billed per token</td><td>0.042 USD per million input, output unmetered</td></tr>
+          <tr><td>Repeats</td><td>Same prompt retyped per row</td><td>Preset rubrics, same questions each row</td></tr>
+          <tr><td>Check before spending</td><td>None</td><td>--dry-run reports keep and reject counts</td></tr>
+        </tbody>
+      </table>
+      <p class="section-lead">The chat flow is the incumbent workflow for most dataset work, and it is the right tool for the first dozen rows you inspect on screen. The break point is anything you plan to train on: at that size the cost is in the reshaping, not in the model call.</p>
+    </section>
+
+    <section class="presets">
+      <h2>The shorter path is the pipeline</h2>
+      <p class="section-lead">A chat judgment is an event. jev-curate makes the judgment a table: same rubric per row, same questions, typed answers written next to a keep or reject decision. When a reviewer asks why a row was dropped, the answer is an object in <code>rejected.jsonl</code>, not a scrollback.</p>
+      <p class="section-lead">That also makes the tool auditable. The three presets map to three evaluation templates, and each template asks Jev only what that job needs: math presets check entailment, anti-sycophancy checks rated honesty, code presets check correctness. No generic grade, no rewriter, no taxonomy drift between rows.</p>
+
+      <h2 class="steps-heading">When to keep using chat</h2>
+      <ul class="glossary-list">
+        <li>Exploring an unfamiliar dataset for the first time. Look at twenty rows by eye before you set a rubric.</li>
+        <li>Ad hoc questions that change every row. Presets assume a stable rubric across a batch.</li>
+        <li>Writing prose feedback as the deliverable. jev-curate returns verdicts, not paragraphs.</li>
+      </ul>
+    </section>
+
+    <section class="presets">
+      <h2>When the pipeline pays for itself</h2>
+      <p class="section-lead">The crossover is not about model quality. It is about repetition. A chat grader re-reads the prompt on every row and re-emits the justification on every row, and the grader's attention is the same scarce resource each time. jev-curate evaluates the rubric once as questions, then replays it across the batch with zero per-row prompt authoring and zero prose output to eyeball.</p>
+      <p class="section-lead">Teams that keep chat judging past that crossover are usually not paying in tokens, they are paying in drift: the prompt changes slightly between rows, the keep threshold shifts mid-batch, and nobody can rerun yesterday's filter. Presets and <code>--dry-run</code> make the filter a checked-in artifact. The same command that filtered the training set filters next month's batch.</p>
+      <p class="section-lead">None of this argues that chat judging is useless. It argues that it is a different tool, for inspection before you commit to a rubric. The rows you save as a rubric example in a chat thread become the rows you route with a preset.</p>
+    </section>
+
+    <section class="cta">
+      <h2>Bring a real batch, not a paste</h2>
+      <div class="cta-actions">
+        <a class="btn btn-primary" href="https://github.com/AkashPriyadarshii/jev-curate">Install the CLI</a>
+        <a class="btn btn-ghost" href="index.html#quickstart">Quickstart</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-site-nav">
+        <h3>Site</h3>
+        <a href="index.html">Home</a>
+        <a href="benchmarks.html">Benchmarks</a>
+        <a href="comparison.html">Comparison</a>
+        <a href="glossary.html">Glossary</a>
+        <a href="use-cases.html">Use cases</a>
+      </div>
+      <div class="footer-ecosystem">
+        <h3>Ecosystem</h3>
+        <a href="https://github.com/AkashPriyadarshii/jev-seo">jev-seo</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-superpowers">jev-superpowers</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-curate">jev-curate</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-git">jev-git</a>
+        <a href="https://github.com/AkashPriyadarshii/tdlib-android">tdlib-android</a>
+        <a href="https://github.com/AkashPriyadarshii/kharcha">kharcha</a>
+      </div>
+      <div class="footer-author">
+        <h3>Author</h3>
+        <a href="https://github.com/AkashPriyadarshii">GitHub</a>
+        <a href="https://akashpriyadarshi.vercel.app">Portfolio</a>
+        <a href="https://linkedin.com/in/akash-priyadarshi-1aa51b37a">LinkedIn</a>
+        <a href="https://akashpriyadarshii.github.io/Resume/">Resume</a>
+      </div>
+      <div class="footer-social">
+        <h3>Social</h3>
+        <a href="https://x.com/Akash__ydv001">X / Twitter</a>
+        <a href="https://www.threads.net/@akash.priyadarshii">Threads</a>
+        <a href="https://www.instagram.com/akash.priyadarshii/">Instagram</a>
+        <a href="https://reddit.com/user/DragonfruitWeak2801">Reddit</a>
+      </div>
+    </div>
+    <p class="footer-tag">The dataset sifter for the TypeSafe Jev ecosystem</p>
+  </footer>
+</body>
+</html>
