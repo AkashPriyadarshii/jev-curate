@@ -192,7 +192,7 @@ code, pre {
   overflow-x: auto;
   line-height: 1.5;
   white-space: pre-wrap;
-  word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 .terminal code { color: var(--substrate); }
