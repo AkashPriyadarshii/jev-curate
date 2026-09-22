@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<!--
+Title: jev-curate benchmarks - measured rows/sec against a local mock
+Description: Measured throughput for jev-curate, the TypeSafe Jev dataset sifter. Real numbers from a reproducible mock-server benchmark, not claims.
+Keywords: jev-curate benchmark, jev rows per second, TypeSafe Jev throughput, dataset sifter performance, jev-curate speed
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>jev-curate benchmark: 24.0 rows/sec measured</title>
+  <meta name="description" content="Measured throughput for jev-curate, the TypeSafe Jev dataset sifter. Real numbers from a reproducible mock-server benchmark, not claims.">
+  <meta property="og:title" content="jev-curate benchmarks - measured, not claimed">
+  <meta property="og:description" content="Real rows/sec numbers from a reproducible mock-server benchmark of the jev-curate Rust pipeline.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jev-curate.vercel.app/benchmarks.html">
+  <meta name="twitter:card" content="summary">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://jev-curate.vercel.app/benchmarks.html">
+  <link rel="stylesheet" href="style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "name": "Breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "jev-curate", "item": "https://jev-curate.vercel.app/" },
+          { "@type": "ListItem", "position": 2, "name": "Benchmarks", "item": "https://jev-curate.vercel.app/benchmarks.html" }
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "jev-curate",
+        "operatingSystem": "Linux, macOS, Windows",
+        "applicationCategory": "DeveloperApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Streaming dataset sifter powered by TypeSafe Jev. Measures 24.0 rows/sec in an in-process mock benchmark on a 4-core machine.",
+        "url": "https://jev-curate.vercel.app/benchmarks.html",
+        "codeRepository": "https://github.com/AkashPriyadarshii/jev-curate",
+        "author": { "@type": "Person", "name": "Akash Priyadarshi", "url": "https://github.com/AkashPriyadarshii" }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html">jev-curate<sup>beta</sup></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="index.html">Home</a>
+      <a href="benchmarks.html" aria-current="page">Benchmarks</a>
+      <a href="comparison.html">Comparison</a>
+      <a href="glossary.html">Glossary</a>
+      <a href="use-cases.html">Use cases</a>
+    </nav>
+    <a class="btn btn-primary nav-cta" href="https://github.com/AkashPriyadarshii/jev-curate">Star on GitHub</a>
+  </header>
+
+  <main id="top">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html">Home</a> <span>/</span> <span>Benchmarks</span>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Instrument, not marketing</p>
+        <h1>jev-curate benchmark: 24.0 rows/sec measured</h1>
+        <p class="lead">This page reports the numbers the repository actually measures. Run the same benchmark yourself with <code>cargo run --release --example bench_mock</code>. No network, no TypeSafe credits, nothing hidden.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="https://github.com/AkashPriyadarshii/jev-curate">Run it yourself</a>
+          <a class="btn btn-ghost" href="index.html#quickstart">Back to quickstart</a>
+        </div>
+      </div>
+      <div class="terminal" aria-label="Benchmark output">
+        <div class="terminal-bar"><span class="t-dot"></span><span>cargo run --release --example bench_mock</span></div>
+        <pre>jev-curate benchmark (mock server, no network)
+machine cores: 4
+rows: 120, concurrency 1 and 32
+sequential:    24.0 rows/sec (42 ms/row)
+concurrent 32: 24.0 rows/sec (42 ms/row)
+note: client rate limiter defaults to 20 req/sec
+      (TypeSafe 1,200 req/min policy)</pre>
+      </div>
+    </section>
+
+    <section class="why">
+      <h2>What was measured</h2>
+      <p class="section-lead">The end to end pipeline, exactly as shipped: the token bucket rate limiter, the HTTP client, and one Jev evaluation per row against an in-process wiremock server. One hundred twenty rows, run twice, on release build.</p>
+      <table class="bench-table" aria-label="Benchmark results">
+        <thead>
+          <tr><th>Run</th><th>Rows</th><th>Concurrency</th><th>Rows/sec</th><th>ms/row</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Sequential</td><td>120</td><td>1</td><td>24.0</td><td>42</td></tr>
+          <tr><td>Concurrent</td><td>120</td><td>32</td><td>24.0</td><td>42</td></tr>
+        </tbody>
+      </table>
+      <p class="section-lead">Sequential and concurrent land on the same number. That is the finding, not a rounding accident: throughput is bound by the rate limiter, not by CPU or IO.</p>
+    </section>
+
+    <section class="presets">
+      <h2>Why the ceiling is there</h2>
+      <p class="section-lead"><code>jev-curate</code> sends one fan-out request per row. Jev accepts 1,200 requests per minute, so the client's token bucket refills at 20 tokens per second. One row per token means a hard ceiling near 20 rows per second on a single worker, with short bursts above it. Measured: 24.0 rows/sec, matching a 20-token burst plus the steady refill.</p>
+      <p class="section-lead">Raising that ceiling is a batching problem, not a compute problem. Rows are independent, so the pipeline scales horizontally: at 24 rows/sec per node, the 1,500 rows/sec figure in the project target is reachable with roughly 63 worker nodes. The target did not misreport a single-node speed; this page exists so nobody has to guess which one is true.</p>
+    </section>
+
+    <section class="presets">
+      <h2>The method, so it is reproducible</h2>
+      <p class="section-lead">The bench lives at <code>examples/bench_mock.rs</code> and runs with <code>cargo run --release --example bench_mock</code>. It boots a wiremock server, mounts one canned successful response at the systemone path, and runs 120 rows twice: once with concurrency 1 and once with concurrency 32. The client is the real <code>JevClient</code> with the shipped token bucket limiter and speculative fan-out. Rows are identical payloads, which removes sampling noise and also means the number measures the pipeline, not the dataset. Budget: 120 rows at about 42 ms each, so the whole run takes roughly ten seconds.</p>
+      <p class="section-lead">Hardware for this run: an Intel Core i3-1115G4, 2 cores 4 threads, 8 GB RAM, Windows 11, release build. A faster machine will not move the reported number much, because the limiter, not the CPU, is the pinch point. What the number does not claim: it is not a public-API throughput guarantee, it is not a Parquet IO benchmark, and it does not cover a mixed dataset. It is the honest ceiling of this pipeline against a zero-latency judge, and that is enough to separate the target from the measurement.</p>
+    </section>
+
+    <section class="why">
+      <h2>Scaling, in round numbers</h2>
+      <p class="section-lead">Rows are independent, so the pipeline scales by worker count. The table is arithmetic on the measured 24.0 rows/sec per node, not a promise.</p>
+      <table class="bench-table" aria-label="Scaling arithmetic">
+        <thead>
+          <tr><th>Nodes</th><th>Expected rows/sec</th><th>Rough daily volume</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>24</td><td>2.1M</td></tr>
+          <tr><td>4</td><td>96</td><td>8.3M</td></tr>
+          <tr><td>16</td><td>384</td><td>33.2M</td></tr>
+          <tr><td>63</td><td>1,512</td><td>130M</td></tr>
+        </tbody>
+      </table>
+      <p class="section-lead">1,500 rows/sec is a cluster target and this page says so. When a single node in a real deployment lands a different number, the right move is to publish that number next to this one, not to adjust the table.</p>
+    </section>
+
+    <section class="cta">
+      <h2>Measure your own workload</h2>
+      <div class="cta-actions">
+        <a class="btn btn-primary" href="https://github.com/AkashPriyadarshii/jev-curate/blob/main/examples/bench_mock.rs">Read the bench source</a>
+        <a class="btn btn-ghost" href="https://github.com/AkashPriyadarshii/jev-curate">Star the repo</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-site-nav">
+        <h3>Site</h3>
+        <a href="index.html">Home</a>
+        <a href="benchmarks.html">Benchmarks</a>
+        <a href="comparison.html">Comparison</a>
+        <a href="glossary.html">Glossary</a>
+        <a href="use-cases.html">Use cases</a>
+      </div>
+      <div class="footer-ecosystem">
+        <h3>Ecosystem</h3>
+        <a href="https://github.com/AkashPriyadarshii/jev-seo">jev-seo</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-superpowers">jev-superpowers</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-curate">jev-curate</a>
+        <a href="https://github.com/AkashPriyadarshii/jev-git">jev-git</a>
+        <a href="https://github.com/AkashPriyadarshii/tdlib-android">tdlib-android</a>
+        <a href="https://github.com/AkashPriyadarshii/kharcha">kharcha</a>
+      </div>
+      <div class="footer-author">
+        <h3>Author</h3>
+        <a href="https://github.com/AkashPriyadarshii">GitHub</a>
+        <a href="https://akashpriyadarshi.vercel.app">Portfolio</a>
+        <a href="https://linkedin.com/in/akash-priyadarshi-1aa51b37a">LinkedIn</a>
+        <a href="https://akashpriyadarshii.github.io/Resume/">Resume</a>
+      </div>
+      <div class="footer-social">
+        <h3>Social</h3>
+        <a href="https://x.com/Akash__ydv001">X / Twitter</a>
+        <a href="https://www.threads.net/@akash.priyadarshii">Threads</a>
+        <a href="https://www.instagram.com/akash.priyadarshii/">Instagram</a>
+        <a href="https://reddit.com/user/DragonfruitWeak2801">Reddit</a>
+      </div>
+    </div>
+    <p class="footer-tag">The dataset sifter for the TypeSafe Jev ecosystem</p>
+  </footer>
+</body>
+</html>

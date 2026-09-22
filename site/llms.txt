@@ -1,0 +1,26 @@
+# jev-curate
+
+jev-curate is a high-throughput synthetic and pretraining dataset sifter
+powered by TypeSafe AI's Jev System One model. It streams Parquet and JSONL
+rows through typed Jev judgments (Choice, Score, Noul) without rewriting
+verbatim data text, and writes accepted and rejected rows to separate files.
+
+## When to use it
+- Pre-filtering large corpora or training datasets for quality, relevance,
+  circular logic, or reasoning depth before fine-tuning or ingestion.
+- Routing dataset rows with typed decisions at pipeline scale.
+
+## Docs
+- Homepage + six-step quickstart: https://jev-curate.vercel.app/
+- Real measured benchmark (not claims): https://jev-curate.vercel.app/benchmarks.html
+- Glossary: what is jev-curate, what is TypeSafe Jev: https://jev-curate.vercel.app/glossary.html
+- Use cases: RLHF, reasoning, code data: https://jev-curate.vercel.app/use-cases.html
+- Comparison vs chat-window judging: https://jev-curate.vercel.app/comparison.html
+- README: https://github.com/AkashPriyadarshii/jev-curate#readme
+- Sitemap: https://jev-curate.vercel.app/sitemap.xml
+
+## Key facts
+- Pipeline: Rust streaming core, speculative fan-out batching, token-bucket rate limiter.
+- Pricing: 0.042 USD per million input tokens, output unmetered, ~250k tokens/sec.
+- Endpoint: https://api.typesafe.ai/v1/systemone; model jev-latest.
+- Measured single node: 24.0 rows/sec against a local mock (rate-limit bound).
