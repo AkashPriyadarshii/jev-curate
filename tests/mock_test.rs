@@ -89,7 +89,7 @@ async fn test_score_below_minimum_rejected() {
                 "noul": 0.10
             },
             "reasoning_depth": {
-                "score": 2.0,
+                "score": 1.5,
                 "confidence": 0.90
             }
         }
@@ -113,7 +113,7 @@ async fn test_score_below_minimum_rejected() {
 
     assert!(!verdict.passed, "Shallow score must be rejected");
     assert_eq!(verdict.rejection_reasons.len(), 1);
-    assert!(verdict.rejection_reasons[0].contains("reasoning_depth: score 2.0 below minimum requirement 3.0"));
+    assert!(verdict.rejection_reasons[0].contains("reasoning_depth: score 1.5 below minimum requirement 2.0"));
 }
 
 #[tokio::test]

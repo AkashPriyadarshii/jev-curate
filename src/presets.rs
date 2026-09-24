@@ -52,18 +52,18 @@ impl PresetConfig {
             JevQuestionConfig {
                 question_type: "score".to_string(),
                 instructions: "Rate the mathematical and logical rigor of this explanation.".to_string(),
-                criteria: Some(serde_json::json!({
-                    "1": "Superficial, hand-wavy, or incorrect calculations",
-                    "2": "Basic answer with missing intermediate steps",
-                    "3": "Sound derivation with standard detail",
-                    "4": "Clear, comprehensive step-by-step logic",
-                    "5": "Flawless, formal, and pedagogical mathematical rigor"
-                })),
+                criteria: Some(serde_json::json!([
+                    "Superficial, hand-wavy, or incorrect calculations",
+                    "Basic answer with missing intermediate steps",
+                    "Sound derivation with standard detail",
+                    "Clear, comprehensive step-by-step logic",
+                    "Flawless, formal, and pedagogical mathematical rigor"
+                ])),
             },
         );
 
         let mut min_scores = HashMap::new();
-        min_scores.insert("reasoning_depth".to_string(), 3.0);
+        min_scores.insert("reasoning_depth".to_string(), 2.0);
 
         let mut reject_nouls = HashMap::new();
         reject_nouls.insert("has_circular_reasoning".to_string(), 0.70);
@@ -138,18 +138,18 @@ impl PresetConfig {
             JevQuestionConfig {
                 question_type: "score".to_string(),
                 instructions: "Rate the completeness, idiomacy, and correctness of this code snippet.".to_string(),
-                criteria: Some(serde_json::json!({
-                    "1": "Broken, pseudo-code, or unrunnable syntax",
-                    "2": "Partial implementation with obvious bugs",
-                    "3": "Working implementation with minimal edge case handling",
-                    "4": "Clean, idiomatic code with error handling",
-                    "5": "Production-grade, fully typed, battle-tested implementation"
-                })),
+                criteria: Some(serde_json::json!([
+                    "Broken, pseudo-code, or unrunnable syntax",
+                    "Partial implementation with obvious bugs",
+                    "Working implementation with minimal edge case handling",
+                    "Clean, idiomatic code with error handling",
+                    "Production-grade, fully typed, battle-tested implementation"
+                ])),
             },
         );
 
         let mut min_scores = HashMap::new();
-        min_scores.insert("code_quality".to_string(), 3.0);
+        min_scores.insert("code_quality".to_string(), 2.0);
 
         let mut reject_nouls = HashMap::new();
         reject_nouls.insert("has_stub_placeholders".to_string(), 0.75);
