@@ -1,7 +1,7 @@
 # Project State: jev-curate
 
 ## Current Status
-- **Phase:** Phase 2 — Core Engine & MVP v0.1.0 Complete & Verified.
+- **Phase:** Phase 2 — Core Engine & MVP v0.1.1 (beta) complete. Beta and experimental, please contribute.
 - **Next Milestone:** Custom YAML rubric loader & PyO3 maturin packaging.
 
 ## Progress Checklist

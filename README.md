@@ -10,6 +10,8 @@ Keywords: typesafe ai, type safe ai, jev, api.typesafe.ai, jev-1.13.0, jev-lates
 
 **High-Throughput Synthetic & Pretraining Dataset Sifter Powered by TypeSafe AI (Jev)**
 
+> Beta: v0.1.1 is experimental. Expect rough edges. Please contribute by opening an issue or PR.
+
 **Live:** [jev-curate.vercel.app](https://jev-curate.vercel.app) (measured **24.0 rows/sec** single-node on local mock bench `examples/bench_mock.rs`, 1,500+ cluster target)
 
 [![PyPI](https://img.shields.io/pypi/v/jev-curate?style=flat-square)](https://pypi.org/project/jev-curate/)
@@ -36,7 +38,7 @@ Cleaning 10M to 1B rows of synthetic reasoning data, instruction tuning pairs, o
 `jev-curate` solves this by piping Apache Arrow and Parquet streams through **TypeSafe AI's Jev model** (`jev-1.13.0`):
 * **Single-round-trip rubrics per row:** Evaluates all rubric questions concurrently in one HTTP request per row via Jev's speculative parallel fan-out with zero per-question round-trips. Single-node throughput is bounded by TypeSafe's 1,200 req/min (20 rows/sec) limit; horizontal scaling across worker nodes targets 1,500+ rows/sec cluster throughput.
 * **~$4.20 per 100M tokens:** Jev bills $0.042/Mtok for input, zero for output. TypeSafe benchmarks System One workflows **444.6x cheaper and 193.6x faster** than generative LLMs ([source](https://typesafe.ai)).
-* **Mathematical calibration:** Receives calibrated probabilities (`Noul`), ordinal rubrics (`Score` 1–5), and categorical choices (`Choice`), eliminating generative text slop.
+* **Mathematical calibration:** Receives calibrated probabilities (`Noul`), ordinal rubrics (`Score` on a 0 to 4 scale, sent as an ordered list), and categorical choices (`Choice`), eliminating generative text slop.
 * **Zero Rewriting:** Emits clean records verbatim without rewriting or altering mathematical formulas.
 
 ---
@@ -95,9 +97,9 @@ curator = PyJevCurator(api_key="your-api-key", preset="reasoning-math")
 
 | Preset | Primitives Evaluated | Target Problem Solved |
 |---|---|---|
-| **`reasoning-math`** | `has_circular_logic` (`Noul`)<br>`is_step_valid` (`Noul`)<br>`reasoning_depth` (`Score` 1–5) | Drops ungrounded math derivations and repetitive circular proofs. |
-| **`anti-sycophancy`** | `is_sycophantic` (`Noul`)<br>`has_robotic_filler` (`Noul`) | Eliminates "As an AI...", ungrounded flattery, and conversational filler. |
-| **`code-correctness`** | `has_unclosed_fence` (`Noul`)<br>`has_stub_placeholders` (`Noul`) | Drops incomplete code blocks and unrunnable pseudo-code mocks. |
+| **`reasoning-math`** | `has_circular_reasoning` (`Noul`)<br>`reasoning_depth` (`Score` 0-4, keep 2.0 or higher) | Drops ungrounded math derivations and repetitive circular proofs. |
+| **`anti-sycophancy`** | `is_sycophantic` (`Noul`)<br>`has_ai_disclaimer` (`Noul`) | Eliminates "As an AI...", ungrounded flattery, and conversational filler. |
+| **`code-correctness`** | `has_stub_placeholders` (`Noul`)<br>`code_quality` (`Score` 0-4, keep 2.0 or higher) | Drops incomplete code blocks and unrunnable pseudo-code mocks. |
 
 ---
 
