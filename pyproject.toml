@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "jev-curate"
-version = "0.1.0"
+version = "0.1.1"
 description = "High-Throughput Synthetic & Pretraining Dataset Sifter Powered by TypeSafe AI (Jev)"
 authors = [
     { name = "Akash Priyadarshi", email = "272530059+AkashPriyadarshii@users.noreply.github.com" }

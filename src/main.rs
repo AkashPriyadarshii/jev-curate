@@ -14,7 +14,7 @@ use tokio::sync::mpsc;
 #[command(
     name = "jev-curate",
     author = "Akash Priyadarshi",
-    version = "0.1.0",
+    version = "0.1.1",
     about = "High-Throughput Synthetic & Pretraining Dataset Sifter Powered by TypeSafe AI (Jev)"
 )]
 struct Cli {
@@ -77,7 +77,7 @@ async fn main() -> anyhow::Result<()> {
                 anyhow::anyhow!("Unknown preset '{}'. Available: reasoning-math, anti-sycophancy, code-correctness", preset)
             })?;
 
-            println!("\x1b[1;36m=== jev-curate v0.1.0 ===\x1b[0m");
+            println!("\x1b[1;36m=== jev-curate v0.1.1 (beta) ===\x1b[0m");
             println!("Input:       {}", input.display());
             println!("Preset:      {} ({})", preset_cfg.name, preset_cfg.description);
             println!("Output Dir:  {}", out.display());
