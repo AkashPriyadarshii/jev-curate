@@ -47,7 +47,7 @@ Cleaning 10M to 1B rows of synthetic reasoning data, instruction tuning pairs, o
 
 ## Quickstart
 
-### CLI (Rust Single Binary)
+### CLI (Rust Single Binary).
 ```bash
 # Install via Cargo
 cargo install jev-curate
