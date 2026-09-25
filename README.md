@@ -24,8 +24,6 @@ By **[Akash Priyadarshi](https://github.com/AkashPriyadarshii)**
 
 [Why jev-curate](#why-jev-curate) &bull; [Quickstart](#quickstart) &bull; [CLI Reference](#cli-reference) &bull; [Python API](#python-api) &bull; [Architecture](#architecture) &bull; [Non-Goals](#non-goals) &bull; [Ecosystem](#ecosystem)
 
-*Fuel the next build:* 
-
 </div>
 
 [![stars](https://img.shields.io/github/stars/AkashPriyadarshii/jev-curate?style=flat-square&label=stars)](https://github.com/AkashPriyadarshii/jev-curate/stargazers) [![crates.io](https://img.shields.io/crates/v/jev-curate?style=flat-square)](https://crates.io/crates/jev-curate) [![downloads](https://img.shields.io/crates/d/jev-curate?style=flat-square)](https://crates.io/crates/jev-curate) [![release](https://img.shields.io/github/v/release/AkashPriyadarshii/jev-curate?style=flat-square&label=release)](https://github.com/AkashPriyadarshii/jev-curate/releases)
