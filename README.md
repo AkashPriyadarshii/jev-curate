@@ -22,6 +22,8 @@ By **[Akash Priyadarshi](https://github.com/AkashPriyadarshii)**
 
 [Why jev-curate](#why-jev-curate) &bull; [Quickstart](#quickstart) &bull; [CLI Reference](#cli-reference) &bull; [Python API](#python-api) &bull; [Architecture](#architecture) &bull; [Non-Goals](#non-goals) &bull; [Ecosystem](#ecosystem)
 
+*Fuel the next build:* [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/AkashPriyadarshi)
+
 </div>
 
 [![stars](https://img.shields.io/github/stars/AkashPriyadarshii/jev-curate?style=flat-square&label=stars)](https://github.com/AkashPriyadarshii/jev-curate/stargazers) [![crates.io](https://img.shields.io/crates/v/jev-curate?style=flat-square)](https://crates.io/crates/jev-curate) [![downloads](https://img.shields.io/crates/d/jev-curate?style=flat-square)](https://crates.io/crates/jev-curate) [![release](https://img.shields.io/github/v/release/AkashPriyadarshii/jev-curate?style=flat-square&label=release)](https://github.com/AkashPriyadarshii/jev-curate/releases)
@@ -166,7 +168,7 @@ jev-curate/
 
 ### Author
 * **Akash Priyadarshi** (Patna, Bihar, India)
-* [GitHub](https://github.com/AkashPriyadarshii) &bull; [Portfolio](https://akashpriyadarshi.vercel.app) &bull; [LinkedIn](https://linkedin.com/in/akash-priyadarshi-1aa51b37a) &bull; [Resume](https://akashpriyadarshii.github.io/Resume/)
+* [GitHub](https://github.com/AkashPriyadarshii) &bull; [Portfolio](https://akashpriyadarshi.vercel.app) &bull; [LinkedIn](https://linkedin.com/in/akashpriyadarshii) &bull; [Resume](https://akashpriyadarshii.github.io/Resume/)
 
 ### Social
 * [X / Twitter](https://x.com/Akash__ydv001) &bull; [Threads](https://www.threads.net/@akash.priyadarshii) &bull; [Instagram](https://www.instagram.com/akash.priyadarshii/) &bull; [Reddit](https://reddit.com/user/akashpriyadarshi)
