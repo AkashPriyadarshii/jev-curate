@@ -8,6 +8,8 @@ Keywords: typesafe ai, type safe ai, jev, api.typesafe.ai, jev-1.13.0, jev-lates
 
 # `jev-curate`
 
+**Support:** fuel the next build — [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/AkashPriyadarshi)
+
 **High-Throughput Synthetic & Pretraining Dataset Sifter Powered by TypeSafe AI (Jev)**
 
 > Beta: v0.1.1 is experimental. Expect rough edges. Please contribute by opening an issue or PR.
@@ -22,7 +24,7 @@ By **[Akash Priyadarshi](https://github.com/AkashPriyadarshii)**
 
 [Why jev-curate](#why-jev-curate) &bull; [Quickstart](#quickstart) &bull; [CLI Reference](#cli-reference) &bull; [Python API](#python-api) &bull; [Architecture](#architecture) &bull; [Non-Goals](#non-goals) &bull; [Ecosystem](#ecosystem)
 
-*Fuel the next build:* [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/AkashPriyadarshi)
+*Fuel the next build:* 
 
 </div>
 
@@ -149,12 +151,9 @@ jev-curate/
 
 ---
 
-
-
 <p align="center">
   <img src="https://api.star-history.com/svg?repos=AkashPriyadarshii/jev-curate&type=Date" width="600" alt="star history" />
 </p>
-
 
 ## Mandatory Ecosystem, Author & Social Directory
 
