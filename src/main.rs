@@ -7,8 +7,8 @@ use jev_curate::presets::PresetConfig;
 use sha2::{Digest, Sha256};
 use std::fs;
 use std::path::PathBuf;
-use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use tokio::sync::mpsc;
 
 #[derive(Parser)]
@@ -81,7 +81,9 @@ async fn main() -> anyhow::Result<()> {
                 Ok(k) if !k.trim().is_empty() => k,
                 _ if dry_run || effective_endpoint.is_some() => "dummy".to_string(),
                 _ => {
-                    anyhow::bail!("TYPESAFE_API_KEY not set. Refusing non-dry-run without a key. Set TYPESAFE_API_KEY or use --dry-run.");
+                    anyhow::bail!(
+                        "TYPESAFE_API_KEY not set. Refusing non-dry-run without a key. Set TYPESAFE_API_KEY or use --dry-run."
+                    );
                 }
             };
 
@@ -343,7 +345,10 @@ async fn main() -> anyhow::Result<()> {
                     tok * 0.042 / 1_000_000.0
                 );
             } else {
-                println!("Estimated Cost:  ${:.5} (at $0.042/Mtok, 350 tok/row est., dry-run or no usage)", (total as f64 * 350.0 / 1_000_000.0) * 0.042);
+                println!(
+                    "Estimated Cost:  ${:.5} (at $0.042/Mtok, 350 tok/row est., dry-run or no usage)",
+                    (total as f64 * 350.0 / 1_000_000.0) * 0.042
+                );
             }
             // manifest
             let manifest = serde_json::json!({

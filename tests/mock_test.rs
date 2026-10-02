@@ -76,8 +76,10 @@ async fn test_noul_rejection_ceiling_exceeded() {
 
     assert!(!verdict.passed, "Circular reasoning must be rejected");
     assert_eq!(verdict.rejection_reasons.len(), 1);
-    assert!(verdict.rejection_reasons[0]
-        .contains("has_circular_reasoning: probability 0.95 exceeded rejection ceiling 0.70"));
+    assert!(
+        verdict.rejection_reasons[0]
+            .contains("has_circular_reasoning: probability 0.95 exceeded rejection ceiling 0.70")
+    );
 }
 
 #[tokio::test]
@@ -114,8 +116,10 @@ async fn test_score_below_minimum_rejected() {
 
     assert!(!verdict.passed, "Shallow score must be rejected");
     assert_eq!(verdict.rejection_reasons.len(), 1);
-    assert!(verdict.rejection_reasons[0]
-        .contains("reasoning_depth: score 1.5 below minimum requirement 2.0"));
+    assert!(
+        verdict.rejection_reasons[0]
+            .contains("reasoning_depth: score 1.5 below minimum requirement 2.0")
+    );
 }
 
 #[tokio::test]
@@ -151,10 +155,12 @@ async fn test_low_confidence_rejected() {
         .expect("Evaluation should complete");
 
     assert!(!verdict.passed, "Low confidence must be rejected");
-    assert!(verdict
-        .rejection_reasons
-        .iter()
-        .any(|r| r.contains("confidence 0.30 below floor 0.50")));
+    assert!(
+        verdict
+            .rejection_reasons
+            .iter()
+            .any(|r| r.contains("confidence 0.30 below floor 0.50"))
+    );
 }
 
 #[tokio::test]
@@ -216,10 +222,12 @@ async fn test_missing_answer_fails_closed() {
         .expect("Evaluation should handle missing answers safely");
 
     assert!(!verdict.passed, "Missing answers must fail closed");
-    assert!(verdict
-        .rejection_reasons
-        .iter()
-        .any(|r| r.contains("Jev evaluation failed") || r.contains("missing")));
+    assert!(
+        verdict
+            .rejection_reasons
+            .iter()
+            .any(|r| r.contains("Jev evaluation failed") || r.contains("missing"))
+    );
 }
 
 #[tokio::test]
@@ -254,8 +262,10 @@ async fn test_anti_sycophancy_preset_rejections() {
         .expect("Evaluation should complete");
 
     assert!(!verdict.passed);
-    assert!(verdict.rejection_reasons[0]
-        .contains("is_sycophantic: probability 0.85 exceeded rejection ceiling 0.65"));
+    assert!(
+        verdict.rejection_reasons[0]
+            .contains("is_sycophantic: probability 0.85 exceeded rejection ceiling 0.65")
+    );
 }
 
 #[tokio::test]
@@ -291,12 +301,16 @@ async fn test_code_correctness_preset_rejections() {
         .expect("Evaluation should complete");
 
     assert!(!verdict.passed);
-    assert!(verdict
-        .rejection_reasons
-        .iter()
-        .any(|r| r.contains("has_stub_placeholders")));
-    assert!(verdict
-        .rejection_reasons
-        .iter()
-        .any(|r| r.contains("code_quality")));
+    assert!(
+        verdict
+            .rejection_reasons
+            .iter()
+            .any(|r| r.contains("has_stub_placeholders"))
+    );
+    assert!(
+        verdict
+            .rejection_reasons
+            .iter()
+            .any(|r| r.contains("code_quality"))
+    );
 }

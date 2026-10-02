@@ -1,26 +1,26 @@
-/target
+target/
 **/*.rs.bk
 *.parquet
+*.db
+*.log
 .env
 .env.*
 !.env.example
 
-# Python / PyO3 artifacts
+# Python / PyO3
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 *.pyd
 *.dylib
+.venv/
 dist/
 build/
+out/
+node_modules/
 *.egg-info/
 
-# Test output directories
+# Test / curated outputs (generated)
 test_out/
 curated/
-
-# Strict private isolation
-.sevolve/
-brain.db
-*.db

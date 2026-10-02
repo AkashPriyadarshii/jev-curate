@@ -24,13 +24,17 @@ pytest
 |---|---|
 | `src/lib.rs` | PyO3 module interface and public Rust crate entrypoint |
 | `src/main.rs` | Standalone CLI binary (`jev-curate`) |
-| `src/client.rs` | TypeSafe AI HTTP client with speculative fan-out batching |
-| `src/filter.rs` | Pre-filtering and Jev evaluation pipeline |
-| `src/parquet_io.rs` | Batch-oriented Parquet reader and buffered JSONL writer |
-| `src/rate_limiter.rs` | Request rate limiter (20 req/sec) with auto 429 backoff |
-| `src/presets.rs` | Pre-built evaluation rubrics (math-reasoning, anti-sycophancy, code-correctness) |
+| `src/client.rs` | TypeSafe AI HTTP client (fan-out, retry, timeouts) |
+| `src/filter.rs` | Host sanity + secret scan + Jev evaluation pipeline |
+| `src/parquet_io.rs` | Parquet/JSONL reader (batch + streaming) + JSONL writer |
+| `src/rate_limiter.rs` | Token-bucket rate limiter (20 req/sec) |
+| `src/presets.rs` | Evaluation rubrics (3 presets + YAML/JSON file) |
+| `src/main.rs` | CLI — streaming pipeline, outputs, `--dry-run`/`--format`/`--model` |
 
 ## Constraints & Rules
-- **Zero Token Waste:** Ingest state once per record, run all configured questions together via multi-question fan-out.
-- **Context Rot Guard:** Enforce 8k-token maximum per row in host code; drop blank/padding lines in Rust before sending to API.
-- **₹0 Testing Budget:** Offline tests: local unit tests plus WireMock integration coverage (zero live API credits); never burn live API credits in CI.
+- **One record, one request:** All questions for a row run together via fan-out.
+- **Context guard:** Enforce 32k-char (~8k-token) ceiling; drop blank and padding lines before API.
+- **Fail-closed:** Missing answer or confidence → reject. Secrets are scanned before any call and never sent.
+- **Bounded streaming:** Records stream incrementally; never materialize the full dataset.
+- **Outputs:** `clean.jsonl` + `rejected.jsonl` + `errors.jsonl` + `audit.jsonl` + `manifest.json` in `--out`.
+- **Tests are offline:** `cargo test` uses an in-process mock, no API credits needed.

@@ -3,25 +3,27 @@
 ## 1. System Components
 
 ### A. Host-Side Sanity Filter (`src/filter.rs`)
-- Fast pre-flight check in Rust stdlib.
-- Drops blank strings and rows with repetitive whitespace padding.
-- Hard byte limit per record (`max_tokens_per_row = 8,000`).
-- Prevents context rot per TypeSafe AI skill Rule #3.
+- Drops blank rows and repetitive padding; enforces 32k-char ceiling.
 
-### B. TypeSafe AI Multi-Question Fan-Out Client (`src/client.rs`)
-- Endpoint: `POST https://api.typesafe.ai/v1/systemone`
-- Model: `jev-1.13.0`
-- One record per `state`; all configured Noul/Score/Choice questions are evaluated together in one request.
-- Ingests `state` once, runs multiple questions simultaneously via speculative fan-out.
+### B. TypeSafe AI Fan-Out Client (`src/client.rs`)
+- `POST https://api.typesafe.ai/v1/systemone` (default `jev-latest`, override via `--model`/`JEV_MODEL`).
+- One request per row, all questions together.
 
-### C. Adaptive Request Limiter (`src/rate_limiter.rs`)
-- Token-bucket algorithm capping requests at 20 requests/sec (1,200 req/min).
-- Backs off on HTTP 429 and respects `retry-after` header. Input-token-per-second quotas are not locally enforced.
+### C. Request Limiter (`src/rate_limiter.rs`)
+- Token bucket at 20 req/sec (1,200 req/min) with retry handling.
 
-### D. Parquet/Arrow Reader + Buffered JSONL Writer (`src/parquet_io.rs`)
-- Uses `arrow` and `parquet` crates.
-- Decodes `RecordBatchReader` batches and reads JSONL line-buffered; records must be yielded incrementally without materializing the full dataset into a `Vec`.
-- Copies string values from columns into owned `String`s for evaluation; writes buffered `clean.jsonl` and `rejected.jsonl` via `BufWriter`.
+### D. Reader & Writer (`src/parquet_io.rs`)
+- Incremental Parquet and JSONL reading; buffered JSONL outputs.
+- Parquet output is opt-in via `--format parquet`.
 
-### E. PyO3 Python Layer (`src/lib.rs`)
-- Exposes `PyJevCurator` class to Python. Constructor-only for now; row-level sifting uses the CLI. Intended to accept Polars/PyArrow objects via PyO3 once the batch pipeline is finalized.
+### E. Python Layer (`src/lib.rs`)
+- `PyJevCurator` exposes `filter_text` / `filter_file`.
+
+### F. CLI Pipeline (`src/main.rs`)
+- Streaming pipeline with bounded concurrency; supports `--dry-run` and resume.
+
+### G. Filter Guarantees (`src/filter.rs`)
+- Secrets scanned before API; fail-closed on missing answers or confidence.
+
+### H. Presets (`src/presets.rs`)
+- 3 built-ins or external YAML/JSON rubric file.

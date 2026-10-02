@@ -210,16 +210,15 @@ impl CurateFilter {
             if allowed.is_empty() {
                 continue;
             }
-            if let Some(ans) = answers.get(q_name) {
-                if let Some(ref ch) = ans.choice {
-                    if !allowed.contains(ch) {
-                        passed = false;
-                        rejection_reasons.push(format!(
-                            "{}: choice '{}' not in allowed {:?}, rejecting",
-                            q_name, ch, allowed
-                        ));
-                    }
-                }
+            if let Some(ans) = answers.get(q_name)
+                && let Some(ref ch) = ans.choice
+                && !allowed.contains(ch)
+            {
+                passed = false;
+                rejection_reasons.push(format!(
+                    "{}: choice '{}' not in allowed {:?}, rejecting",
+                    q_name, ch, allowed
+                ));
             }
         }
 
@@ -256,14 +255,18 @@ mod tests {
 
         assert!(filter.pre_filter_sanity("").is_err());
         assert!(filter.pre_filter_sanity("   \n\t ").is_err());
-        assert!(filter
-            .pre_filter_sanity(
-                "=========================================================================="
-            )
-            .is_err());
-        assert!(filter
-            .pre_filter_sanity("Valid mathematical reasoning step: Let x = 5.")
-            .is_ok());
+        assert!(
+            filter
+                .pre_filter_sanity(
+                    "=========================================================================="
+                )
+                .is_err()
+        );
+        assert!(
+            filter
+                .pre_filter_sanity("Valid mathematical reasoning step: Let x = 5.")
+                .is_ok()
+        );
     }
 
     #[test]

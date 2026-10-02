@@ -14,10 +14,10 @@ impl DatasetReader {
     /// Auto-detects format from file extension.
     pub fn read_dataset<P: AsRef<Path>>(path: P) -> Result<Vec<(String, String)>> {
         let p = path.as_ref();
-        if let Some(ext) = p.extension().and_then(|s| s.to_str()) {
-            if ext.eq_ignore_ascii_case("parquet") {
-                return Self::read_parquet(p);
-            }
+        if let Some(ext) = p.extension().and_then(|s| s.to_str())
+            && ext.eq_ignore_ascii_case("parquet")
+        {
+            return Self::read_parquet(p);
         }
         Self::read_jsonl(p)
     }
@@ -30,10 +30,10 @@ impl DatasetReader {
         F: FnMut(String, String) -> Result<()>,
     {
         let p = path.as_ref();
-        if let Some(ext) = p.extension().and_then(|s| s.to_str()) {
-            if ext.eq_ignore_ascii_case("parquet") {
-                return Self::stream_parquet(p, f);
-            }
+        if let Some(ext) = p.extension().and_then(|s| s.to_str())
+            && ext.eq_ignore_ascii_case("parquet")
+        {
+            return Self::stream_parquet(p, f);
         }
         Self::stream_jsonl(p, f)
     }
