@@ -65,10 +65,10 @@ impl RateLimiter {
 
             if state.tokens >= 1.0 {
                 state.tokens -= 1.0;
+                drop(state);
                 return;
             }
 
-            // Need to wait for token refill
             let needed = 1.0 - state.tokens;
             let wait_secs = needed / state.refill_rate_per_sec;
             drop(state);

@@ -21,6 +21,10 @@ out/
 node_modules/
 *.egg-info/
 
+# Tool caches / generated
+.desloppify/
+scorecard.png
+
 # Test / curated outputs (generated)
 test_out/
 curated/

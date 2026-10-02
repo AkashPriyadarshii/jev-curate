@@ -45,7 +45,6 @@ impl PyJevCurator {
         })
     }
 
-    /// Evaluates a single text, returns (passed, reasons, scores, nouls).
     fn filter_text(&self, py: Python<'_>, text: String) -> PyResult<PyObject> {
         let rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
@@ -62,7 +61,6 @@ impl PyJevCurator {
         Ok(d.into())
     }
 
-    /// Filters a file (parquet/jsonl) to out_dir, returns dict with counts.
     #[pyo3(signature = (input, out="./curated", dry_run=false))]
     fn filter_file(
         &self,
@@ -88,7 +86,6 @@ impl PyJevCurator {
                 let mut total = 0usize;
                 let mut writer = parquet_io::DatasetWriter::new(&out_p)
                     .map_err(|e| anyhow::anyhow!(e.to_string()))?;
-                // collect via stream callback into vec then process (ponytail: simple, reuse filter; streaming queue when file >100k)
                 let mut records: Vec<(String, String)> = Vec::new();
                 parquet_io::DatasetReader::stream_dataset(&input_p, |t, r| {
                     records.push((t, r));

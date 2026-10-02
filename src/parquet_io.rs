@@ -266,11 +266,11 @@ impl DatasetReader {
 }
 
 /// Parquet writer: schema-preserving when input is parquet + --format parquet.
-/// Uses ArrowWriter to keep original schema/columns; verdict appended as sidecar if schema present.
-#[allow(dead_code)]
 pub struct ParquetWriter {
     writer: Option<parquet::arrow::arrow_writer::ArrowWriter<File>>,
+    #[allow(dead_code)]
     schema: arrow::datatypes::SchemaRef,
+    #[allow(dead_code)]
     path: std::path::PathBuf,
 }
 

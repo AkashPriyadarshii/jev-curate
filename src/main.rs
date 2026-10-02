@@ -130,11 +130,9 @@ async fn main() -> anyhow::Result<()> {
             let tokens_total = Arc::new(AtomicUsize::new(0));
             let semaphore = Arc::new(tokio::sync::Semaphore::new(concurrency));
 
-            // Bounded channels: records (backpressure) + results
             let (record_tx, mut record_rx) = mpsc::channel::<(String, String)>(200);
             let (result_tx, mut result_rx) = mpsc::channel::<(u8, String, Vec<String>, u64)>(200);
 
-            // Producer: streaming reader -> record channel (blocking_send for backpressure)
             let input_clone = input.clone();
             let producer = tokio::task::spawn_blocking(move || {
                 DatasetReader::stream_dataset(&input_clone, |text, raw| {
@@ -153,8 +151,6 @@ async fn main() -> anyhow::Result<()> {
             );
             pb.enable_steady_tick(std::time::Duration::from_millis(100));
 
-            // Consumer: spawn bounded workers as records arrive
-            // ponytail: channel queue bounds memory, semaphore bounds concurrency; task-per-row avoided via channel backpressure
             let mut worker_handles = Vec::new();
             while let Some((text, raw_line)) = record_rx.recv().await {
                 total_count.fetch_add(1, Ordering::Relaxed);
@@ -251,7 +247,6 @@ async fn main() -> anyhow::Result<()> {
                 worker_handles.push(h);
             }
 
-            // Producer finished, check for read errors
             match producer.await {
                 Ok(Ok(())) => {}
                 Ok(Err(e)) => anyhow::bail!("Failed to read dataset: {}", e),
@@ -263,7 +258,6 @@ async fn main() -> anyhow::Result<()> {
             let mut writer = DatasetWriter::new(&out)?;
             let mut audit_file = std::fs::File::create(out.join("audit.jsonl"))?;
             let mut row_number: u64 = 0;
-            // ponytail: file-based resume — load seen hashes if manifest exists, skip seen
             let seen: std::collections::HashSet<String> = if out.join("manifest.json").exists() {
                 // best-effort: read clean/rejected/errors and hash raw lines
                 let mut s = std::collections::HashSet::new();
@@ -297,7 +291,6 @@ async fn main() -> anyhow::Result<()> {
                     1 => writer.write_rejected_record(&raw, &reasons)?,
                     _ => writer.write_error_record(&raw, &reasons.join("; "))?,
                 }
-                // audit per row
                 let audit = serde_json::json!({
                     "row_id": hash,
                     "row_number": row_number,
@@ -350,7 +343,6 @@ async fn main() -> anyhow::Result<()> {
                     (total as f64 * 350.0 / 1_000_000.0) * 0.042
                 );
             }
-            // manifest
             let manifest = serde_json::json!({
                 "tool_version": "0.2.0",
                 "model": effective_model,

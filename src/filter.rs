@@ -31,8 +31,6 @@ impl CurateFilter {
         }
     }
 
-    /// Fast host-side sanity check before spending any API tokens.
-    /// Returns Ok(clean_text) or Err(rejection_reason).
     pub fn pre_filter_sanity(&self, text: &str) -> Result<String, String> {
         let trimmed = text.trim();
         if trimmed.is_empty() {
@@ -90,9 +88,7 @@ impl CurateFilter {
         None
     }
 
-    /// Evaluates a single record against the configured preset.
     pub async fn evaluate_record(&self, text: &str) -> Result<CurateVerdict> {
-        // Stage 0: secret scan before API
         if let Some(reason) = Self::secret_scan(text) {
             return Ok(CurateVerdict {
                 passed: false,
@@ -102,7 +98,6 @@ impl CurateFilter {
                 input_tokens: 0,
             });
         }
-        // Stage 1: Host-side sanity check
         let clean_text = match self.pre_filter_sanity(text) {
             Ok(cleaned) => cleaned,
             Err(reason) => {
@@ -116,12 +111,10 @@ impl CurateFilter {
             }
         };
 
-        // Stage 2: Speculative parallel fan-out evaluation
         let state = serde_json::json!({
             "text": clean_text
         });
 
-        // Fail closed: an unevaluated record never passes the sift.
         let (answers, input_tokens) =
             match self.client.evaluate(state, &self.preset.questions).await {
                 Ok(a) => a,
@@ -141,7 +134,6 @@ impl CurateFilter {
         let mut scores = HashMap::new();
         let mut nouls = HashMap::new();
 
-        // Check Noul rejection thresholds. Missing answer = reject.
         for (q_name, threshold) in &self.preset.reject_nouls {
             match answers.get(q_name).and_then(|a| a.noul) {
                 Some(noul_val) => {
@@ -161,7 +153,6 @@ impl CurateFilter {
             }
         }
 
-        // Check Score minimum thresholds. Missing answer = reject.
         for (q_name, min_score) in &self.preset.min_scores {
             match answers.get(q_name).and_then(|a| a.score) {
                 Some(score_val) => {
@@ -181,7 +172,6 @@ impl CurateFilter {
             }
         }
 
-        // Confidence floor: Choice/Score require confidence >= floor. Noul has no confidence, skip.
         for (q_name, ans) in answers.iter() {
             if ans.noul.is_some() && ans.score.is_none() && ans.choice.is_none() {
                 continue; // Noul answer, no confidence field per API
@@ -205,7 +195,6 @@ impl CurateFilter {
             }
         }
 
-        // Choice gating: if allowed_choices non-empty, reject if choice not in allowed
         for (q_name, allowed) in &self.preset.allowed_choices {
             if allowed.is_empty() {
                 continue;
@@ -222,7 +211,6 @@ impl CurateFilter {
             }
         }
 
-        // Policy: any = pass if any gate passed (invert fail-closed)
         if self.preset.policy == "any" && !rejection_reasons.is_empty() {
             // if any Noul/Score/Choice passed, allow overall pass
             let total_gates = self.preset.reject_nouls.len()

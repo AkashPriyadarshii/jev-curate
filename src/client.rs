@@ -7,7 +7,6 @@ use std::collections::HashMap;
 use std::time::Duration;
 
 fn rand_jitter() -> u64 {
-    // ponytail: time-based jitter, no extra dep, upgrade to rand if needed
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map(|d| d.subsec_nanos() as u64)
@@ -50,9 +49,6 @@ struct JevRequest<'a> {
 struct JevUsage {
     #[serde(default)]
     input_tokens: u64,
-    #[allow(dead_code)]
-    #[serde(default)]
-    output_tokens: u64,
 }
 
 /// Response payload received from TypeSafe AI.

@@ -30,6 +30,16 @@ fn default_policy() -> String {
     "all".to_string()
 }
 
+#[derive(Debug, thiserror::Error)]
+pub enum PresetError {
+    #[error("failed to read rubric: {0}")]
+    Io(#[from] std::io::Error),
+    #[error("invalid rubric yaml: {0}")]
+    Yaml(#[from] serde_yaml::Error),
+    #[error("invalid rubric json: {0}")]
+    Json(#[from] serde_json::Error),
+}
+
 impl PresetConfig {
     /// Loads a pre-built preset by name or from a file path (json/yaml).
     pub fn from_name(name: &str) -> Option<Self> {
@@ -44,14 +54,11 @@ impl PresetConfig {
         }
     }
 
-    /// Loads preset from JSON or YAML file.
-    pub fn from_file(path: &str) -> anyhow::Result<Self> {
+    pub fn from_file(path: &str) -> Result<Self, PresetError> {
         let s = std::fs::read_to_string(path)?;
         if path.ends_with(".yaml") || path.ends_with(".yml") {
             let v: serde_json::Value = serde_yaml::from_str(&s)?;
-            // allow `questions` as list shorthand -> map is required, keep as-is
-            Ok(serde_json::from_value(v.clone())
-                .map_err(|e| anyhow::anyhow!("invalid rubric yaml: {}", e))?)
+            Ok(serde_json::from_value(v).map_err(PresetError::Json)?)
         } else {
             Ok(serde_json::from_str(&s)?)
         }
