@@ -19,17 +19,41 @@ pub struct PresetConfig {
     pub questions: HashMap<String, JevQuestionConfig>,
     pub min_scores: HashMap<String, f64>,
     pub reject_nouls: HashMap<String, f64>, // reject if Noul probability >= threshold
-    pub min_confidence: f64, // reject any verdict below this answer confidence
+    pub min_confidence: f64,                // reject any verdict below this answer confidence
+    #[serde(default)]
+    pub allowed_choices: HashMap<String, Vec<String>>, // choice q -> allowed values, empty=any
+    #[serde(default = "default_policy")]
+    pub policy: String, // "all" or "any" — all gates must pass vs any gate passes
+}
+
+fn default_policy() -> String {
+    "all".to_string()
 }
 
 impl PresetConfig {
-    /// Loads a pre-built preset by name.
+    /// Loads a pre-built preset by name or from a file path (json/yaml).
     pub fn from_name(name: &str) -> Option<Self> {
+        if std::path::Path::new(name).exists() {
+            return Self::from_file(name).ok();
+        }
         match name {
             "reasoning-math" => Some(Self::reasoning_math()),
             "anti-sycophancy" => Some(Self::anti_sycophancy()),
             "code-correctness" => Some(Self::code_correctness()),
             _ => None,
+        }
+    }
+
+    /// Loads preset from JSON or YAML file.
+    pub fn from_file(path: &str) -> anyhow::Result<Self> {
+        let s = std::fs::read_to_string(path)?;
+        if path.ends_with(".yaml") || path.ends_with(".yml") {
+            let v: serde_json::Value = serde_yaml::from_str(&s)?;
+            // allow `questions` as list shorthand -> map is required, keep as-is
+            Ok(serde_json::from_value(v.clone())
+                .map_err(|e| anyhow::anyhow!("invalid rubric yaml: {}", e))?)
+        } else {
+            Ok(serde_json::from_str(&s)?)
         }
     }
 
@@ -51,7 +75,8 @@ impl PresetConfig {
             "reasoning_depth".to_string(),
             JevQuestionConfig {
                 question_type: "score".to_string(),
-                instructions: "Rate the mathematical and logical rigor of this explanation.".to_string(),
+                instructions: "Rate the mathematical and logical rigor of this explanation."
+                    .to_string(),
                 criteria: Some(serde_json::json!([
                     "Superficial, hand-wavy, or incorrect calculations",
                     "Basic answer with missing intermediate steps",
@@ -70,11 +95,15 @@ impl PresetConfig {
 
         Self {
             name: "reasoning-math".to_string(),
-            description: "Filters mathematical and logical reasoning traces for circularity and rigor.".to_string(),
+            description:
+                "Filters mathematical and logical reasoning traces for circularity and rigor."
+                    .to_string(),
             questions,
             min_scores,
             reject_nouls,
             min_confidence: 0.5,
+            allowed_choices: HashMap::new(),
+            policy: "all".to_string(),
         }
     }
 
@@ -111,11 +140,14 @@ impl PresetConfig {
 
         Self {
             name: "anti-sycophancy".to_string(),
-            description: "Filters out robotic AI disclaimers, flattery, and conversational filler.".to_string(),
+            description: "Filters out robotic AI disclaimers, flattery, and conversational filler."
+                .to_string(),
             questions,
             min_scores,
             reject_nouls,
             min_confidence: 0.5,
+            allowed_choices: HashMap::new(),
+            policy: "all".to_string(),
         }
     }
 
@@ -137,7 +169,9 @@ impl PresetConfig {
             "code_quality".to_string(),
             JevQuestionConfig {
                 question_type: "score".to_string(),
-                instructions: "Rate the completeness, idiomacy, and correctness of this code snippet.".to_string(),
+                instructions:
+                    "Rate the completeness, idiomacy, and correctness of this code snippet."
+                        .to_string(),
                 criteria: Some(serde_json::json!([
                     "Broken, pseudo-code, or unrunnable syntax",
                     "Partial implementation with obvious bugs",
@@ -156,11 +190,14 @@ impl PresetConfig {
 
         Self {
             name: "code-correctness".to_string(),
-            description: "Drops lazy code stubs, unclosed blocks, and unrunnable pseudo-code.".to_string(),
+            description: "Drops lazy code stubs, unclosed blocks, and unrunnable pseudo-code."
+                .to_string(),
             questions,
             min_scores,
             reject_nouls,
             min_confidence: 0.5,
+            allowed_choices: HashMap::new(),
+            policy: "all".to_string(),
         }
     }
 }

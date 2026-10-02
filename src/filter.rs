@@ -11,6 +11,8 @@ pub struct CurateVerdict {
     pub rejection_reasons: Vec<String>,
     pub scores: HashMap<String, f64>,
     pub nouls: HashMap<String, f64>,
+    #[serde(default)]
+    pub input_tokens: u64,
 }
 
 /// Filter engine running host sanity checks and Jev fan-out evaluations.
@@ -43,7 +45,9 @@ impl CurateFilter {
 
         // Check for repetitive character flood (e.g. "===========" or "-----------")
         let non_symbol_count = trimmed.chars().filter(|c| c.is_alphanumeric()).count();
-        if non_symbol_count == 0 || (trimmed.len() > 100 && (non_symbol_count as f64 / trimmed.len() as f64) < 0.20) {
+        if non_symbol_count == 0
+            || (trimmed.len() > 100 && (non_symbol_count as f64 / trimmed.len() as f64) < 0.20)
+        {
             return Err("Repetitive non-alphanumeric symbol flood".to_string());
         }
 
@@ -66,8 +70,38 @@ impl CurateFilter {
         Ok(joined)
     }
 
+    fn secret_scan(text: &str) -> Option<String> {
+        let lower = text.to_lowercase();
+        for pat in [
+            "sk-",
+            "ghp_",
+            "gho_",
+            "aws_access_key",
+            "typesafe_api_key",
+            "bearer sk-",
+        ] {
+            if lower.contains(pat) {
+                return Some(format!("secret pattern {} detected", pat));
+            }
+        }
+        if text.contains("AKIA") {
+            return Some("possible AWS key".to_string());
+        }
+        None
+    }
+
     /// Evaluates a single record against the configured preset.
     pub async fn evaluate_record(&self, text: &str) -> Result<CurateVerdict> {
+        // Stage 0: secret scan before API
+        if let Some(reason) = Self::secret_scan(text) {
+            return Ok(CurateVerdict {
+                passed: false,
+                rejection_reasons: vec![format!("Secret scan: {}", reason)],
+                scores: HashMap::new(),
+                nouls: HashMap::new(),
+                input_tokens: 0,
+            });
+        }
         // Stage 1: Host-side sanity check
         let clean_text = match self.pre_filter_sanity(text) {
             Ok(cleaned) => cleaned,
@@ -77,6 +111,7 @@ impl CurateFilter {
                     rejection_reasons: vec![format!("Host sanity failure: {}", reason)],
                     scores: HashMap::new(),
                     nouls: HashMap::new(),
+                    input_tokens: 0,
                 });
             }
         };
@@ -87,17 +122,19 @@ impl CurateFilter {
         });
 
         // Fail closed: an unevaluated record never passes the sift.
-        let answers = match self.client.evaluate(state, &self.preset.questions).await {
-            Ok(a) => a,
-            Err(e) => {
-                return Ok(CurateVerdict {
-                    passed: false,
-                    rejection_reasons: vec![format!("Jev evaluation failed: {}", e)],
-                    scores: HashMap::new(),
-                    nouls: HashMap::new(),
-                });
-            }
-        };
+        let (answers, input_tokens) =
+            match self.client.evaluate(state, &self.preset.questions).await {
+                Ok(a) => a,
+                Err(e) => {
+                    return Ok(CurateVerdict {
+                        passed: false,
+                        rejection_reasons: vec![format!("Jev evaluation failed: {}", e)],
+                        scores: HashMap::new(),
+                        nouls: HashMap::new(),
+                        input_tokens: 0,
+                    });
+                }
+            };
 
         let mut passed = true;
         let mut rejection_reasons = Vec::new();
@@ -144,16 +181,57 @@ impl CurateFilter {
             }
         }
 
-        // Confidence floor: no verdict below preset minimum survives.
+        // Confidence floor: Choice/Score require confidence >= floor. Noul has no confidence, skip.
         for (q_name, ans) in answers.iter() {
-            if let Some(conf) = ans.confidence {
-                if conf < self.preset.min_confidence {
+            if ans.noul.is_some() && ans.score.is_none() && ans.choice.is_none() {
+                continue; // Noul answer, no confidence field per API
+            }
+            match ans.confidence {
+                Some(conf) if conf < self.preset.min_confidence => {
                     passed = false;
                     rejection_reasons.push(format!(
                         "{}: confidence {:.2} below floor {:.2}, rejecting",
                         q_name, conf, self.preset.min_confidence
                     ));
                 }
+                None => {
+                    passed = false;
+                    rejection_reasons.push(format!(
+                        "{}: confidence missing (fail-closed), rejecting",
+                        q_name
+                    ));
+                }
+                _ => {}
+            }
+        }
+
+        // Choice gating: if allowed_choices non-empty, reject if choice not in allowed
+        for (q_name, allowed) in &self.preset.allowed_choices {
+            if allowed.is_empty() {
+                continue;
+            }
+            if let Some(ans) = answers.get(q_name) {
+                if let Some(ref ch) = ans.choice {
+                    if !allowed.contains(ch) {
+                        passed = false;
+                        rejection_reasons.push(format!(
+                            "{}: choice '{}' not in allowed {:?}, rejecting",
+                            q_name, ch, allowed
+                        ));
+                    }
+                }
+            }
+        }
+
+        // Policy: any = pass if any gate passed (invert fail-closed)
+        if self.preset.policy == "any" && !rejection_reasons.is_empty() {
+            // if any Noul/Score/Choice passed, allow overall pass
+            let total_gates = self.preset.reject_nouls.len()
+                + self.preset.min_scores.len()
+                + self.preset.allowed_choices.len();
+            if rejection_reasons.len() < total_gates {
+                passed = true;
+                rejection_reasons.clear();
             }
         }
 
@@ -162,6 +240,7 @@ impl CurateFilter {
             rejection_reasons,
             scores,
             nouls,
+            input_tokens,
         })
     }
 }
@@ -177,8 +256,14 @@ mod tests {
 
         assert!(filter.pre_filter_sanity("").is_err());
         assert!(filter.pre_filter_sanity("   \n\t ").is_err());
-        assert!(filter.pre_filter_sanity("==========================================================================").is_err());
-        assert!(filter.pre_filter_sanity("Valid mathematical reasoning step: Let x = 5.").is_ok());
+        assert!(filter
+            .pre_filter_sanity(
+                "=========================================================================="
+            )
+            .is_err());
+        assert!(filter
+            .pre_filter_sanity("Valid mathematical reasoning step: Let x = 5.")
+            .is_ok());
     }
 
     #[test]

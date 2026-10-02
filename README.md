@@ -12,7 +12,7 @@ Keywords: typesafe ai, type safe ai, jev, api.typesafe.ai, jev-1.13.0, jev-lates
 
 **High-Throughput Synthetic & Pretraining Dataset Sifter Powered by TypeSafe AI (Jev)**
 
-> Beta: v0.1.1 is experimental. Expect rough edges. Please contribute by opening an issue or PR.
+> Beta: v0.2.0 is experimental. Expect rough edges. Please contribute by opening an issue or PR.
 
 **Live:** [jev-curate.vercel.app](https://jev-curate.vercel.app) (measured **24.0 rows/sec** single-node on local mock bench `examples/bench_mock.rs`, 1,500+ cluster target)
 
@@ -37,7 +37,7 @@ Cleaning 10M to 1B rows of synthetic reasoning data, instruction tuning pairs, o
 * **Regex heuristics are blind to reasoning flaws:** Keyword and regex filters can check syntax, but fail to detect circular reasoning, hallucinated derivation steps, or robotic sycophancy.
 * **Context rot from uncompressed inputs:** Naively feeding raw data into LLMs causes decision accuracy to crater while burning money on boilerplate text.
 
-`jev-curate` solves this by piping Apache Arrow and Parquet streams through **TypeSafe AI's Jev model** (`jev-1.13.0`):
+`jev-curate` solves this by piping Parquet/JSONL through **TypeSafe AI's Jev model** (`jev-latest`, pin with `JEV_MODEL=jev-1.13.0`):
 * **Single-round-trip rubrics per row:** Evaluates all rubric questions concurrently in one HTTP request per row via Jev's speculative parallel fan-out with zero per-question round-trips. Single-node throughput is bounded by TypeSafe's 1,200 req/min (20 rows/sec) limit; horizontal scaling across worker nodes targets 1,500+ rows/sec cluster throughput.
 * **~$4.20 per 100M tokens:** Jev bills $0.042/Mtok for input, zero for output. TypeSafe benchmarks System One workflows **444.6x cheaper and 193.6x faster** than generative LLMs ([source](https://typesafe.ai)).
 * **Mathematical calibration:** Receives calibrated probabilities (`Noul`), ordinal rubrics (`Score` on a 0 to 4 scale, sent as an ordered list), and categorical choices (`Choice`), eliminating generative text slop.
@@ -47,19 +47,32 @@ Cleaning 10M to 1B rows of synthetic reasoning data, instruction tuning pairs, o
 
 ## Quickstart
 
-### CLI (Rust Single Binary).
+### Install (pick your OS)
+| OS | Rust | Python |
+|---|---|---|
+| **Linux** | `cargo install jev-curate` or `gh release download` `tar.gz` | `pip install jev-curate` (manylinux wheel) |
+| **macOS** | `cargo install` or `tar.gz` (x86_64 + arm64) | `pip install` (universal2 wheel) |
+| **Windows** | `cargo install` or `zip` | `pip install` (win wheel) |
 ```bash
-# Install via Cargo
+# Rust (any OS)
 cargo install jev-curate
+# or download prebuilt from GitHub Releases
+
+# Python
+pip install jev-curate  # no Rust toolchain needed (wheels on PyPI)
+# from source: maturin develop  # python feature auto-enabled
 
 # Set your TypeSafe AI key
-export TYPESAFE_API_KEY="your-api-key"
+export TYPESAFE_API_KEY="your-api-key"  # or set TYPESAFE_API_KEY in env
 
 # Filter a Parquet dataset using the math reasoning preset:
 jev-curate filter train.parquet \
   --preset reasoning-math \
+  --model jev-latest \
   --out ./output/ \
   --concurrency 32
+# YAML rubric: --preset rubric.yaml
+# Parquet out: --format parquet (opt-in, keeps schema; else jsonl)
 ```
 
 ### Python API
@@ -74,9 +87,11 @@ maturin develop   # python feature auto-enabled via pyproject.toml
 from jev_curate import PyJevCurator
 
 curator = PyJevCurator(api_key="your-api-key", preset="reasoning-math")
+# single row
+verdict = curator.filter_text("Let x=5... therefore...")  # -> {passed, rejection_reasons, scores, nouls}
+# whole file -> ./curated/clean.jsonl + rejected.jsonl + errors.jsonl + manifest.json
+stats = curator.filter_file("train.parquet", out="./curated")  # -> {passed, rejected, errors, total}
 ```
-
-`PyJevCurator` currently wraps the same filter pipeline as the CLI (see `src/filter.rs`); constructor-only for now. Use the CLI for row-level sifting.
 
 ---
 
@@ -90,7 +105,9 @@ curator = PyJevCurator(api_key="your-api-key", preset="reasoning-math")
 | `-p, --preset` | `reasoning-math` | Pre-built rubric (`reasoning-math`, `anti-sycophancy`, `code-correctness`). |
 | `-o, --out` | `./curated/` | Destination folder for `clean.jsonl` and `rejected.jsonl`. |
 | `-c, --concurrency` | `32` | Worker concurrency (adaptive token bucket prevents 429 rate limits). |
-| `--dry-run` | `false` | Offline evaluation simulation with host pre-filtering and zero API calls (no `TYPESAFE_API_KEY` needed). |
+| `--dry-run` | `false` | Host pre-filtering only, no API calls (no `TYPESAFE_API_KEY` needed). |
+| `--model` | `jev-latest` | Jev model (or `JEV_MODEL` env, pin `jev-1.13.0` for repro). |
+| `--format` | `jsonl` | Output format: `jsonl` or `parquet` (opt-in, preserves schema). |
 | `--endpoint` | *None* | Custom API endpoint URL for offline mock testing (or set `TYPESAFE_ENDPOINT`). |
 
 ---
@@ -132,7 +149,7 @@ jev-curate/
 │   ├── main.rs                # Standalone CLI binary entrypoint
 │   ├── client.rs              # TypeSafe AI HTTP client (speculative fan-out)
 │   ├── filter.rs              # Host-side sanity pruning & Jev pipeline
-│   ├── parquet_io.rs          # Parquet/Arrow reader + buffered JSONL writer
+│   ├── parquet_io.rs          # Batch-decoded Parquet reader + buffered JSONL writer (clean/rejected/errors)
 │   ├── rate_limiter.rs        # Request rate limiter with auto 429 backoff
 │   └── presets.rs             # Pre-built post-training evaluation rubrics
 └── tests/

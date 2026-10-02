@@ -78,9 +78,20 @@ async fn main() {
     let rate = |d: Duration| ROWS as f64 / d.as_secs_f64();
 
     println!("jev-curate benchmark (mock server, no network)");
-    println!("machine cores: {}", std::thread::available_parallelism().unwrap());
+    println!(
+        "machine cores: {}",
+        std::thread::available_parallelism().unwrap()
+    );
     println!("rows: {ROWS}, concurrency 1 and {CONCURRENCY}");
-    println!("sequential: {:.1} rows/sec ({:.0} ms/row)", rate(seq), seq.as_millis() as f64 / ROWS as f64);
-    println!("concurrent {CONCURRENCY}: {:.1} rows/sec ({:.0} ms/row)", rate(par), par.as_millis() as f64 / ROWS as f64);
+    println!(
+        "sequential: {:.1} rows/sec ({:.0} ms/row)",
+        rate(seq),
+        seq.as_millis() as f64 / ROWS as f64
+    );
+    println!(
+        "concurrent {CONCURRENCY}: {:.1} rows/sec ({:.0} ms/row)",
+        rate(par),
+        par.as_millis() as f64 / ROWS as f64
+    );
     println!("note: client rate limiter defaults to 20 req/sec (TypeSafe 1,200 req/min policy)");
 }

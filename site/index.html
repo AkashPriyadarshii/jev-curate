@@ -38,7 +38,7 @@
       "description": "High-throughput dataset sifter for synthetic and pretraining datasets. Rust CLI with TypeSafe Jev judgment, Parquet and JSONL I/O, speculative fan-out batching.",
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "Linux, macOS, Windows",
-      "softwareVersion": "0.1.0",
+      "softwareVersion": "0.2.0",
       "offers": {
         "@context": "https://schema.org",
         "@type": "Offer",
@@ -87,7 +87,7 @@
       "acceptedAnswer": {
         "@context": "https://schema.org",
         "@type": "Answer",
-        "text": "TypeSafe Jev is a System One decision model for AI agents. It returns typed answers: Choice options, 1-to-5 Score ratings, and Noul calibrated probabilities, instead of free text. jev-curate feeds each dataset row to Jev as structured state and reads the typed verdict back."
+        "text": "TypeSafe Jev is a System One decision model for AI agents. It returns typed answers: Choice options, 0-to-4 Score ratings, and Noul calibrated probabilities, instead of free text. jev-curate feeds each dataset row to Jev as structured state and reads the typed verdict back."
       }
     },
     {
@@ -195,9 +195,9 @@
       <h2>LLM judges are an API call with a prompt bolted on</h2>
       <p class="section-lead">You paste a csv into a chat window and get grades back in prose. jev-curate treats judging as a pipeline: predefined rubrics, batched questions, typed answers, two output files ready for training.</p>
       <ul class="reason-list">
-        <li><strong>Judgment by <a href="https://typesafe.ai">TypeSafe Jev</a>.</strong> Machine-native Choice, Score and Noul questions. One state ingest per micro-batch, questions fanned into one request.</li>
+        <li><strong>Judgment by <a href="https://typesafe.ai">TypeSafe Jev</a>.</strong> Machine-native Choice, Score and Noul questions. One state per record, all questions fanned into one request.</li>
         <li><strong>No token waste.</strong> Blank and padding lines drop in Rust before the API. 8k token ceiling per row.</li>
-        <li><strong>Parquet in, Parquet out.</strong> Streaming Arrow/Parquet reader and writer. JSONL too. No pandas step in the middle.</li>
+        <li><strong>Parquet in, JSONL out.</strong> Batch-decoded Parquet reader, buffered JSONL writer (clean/rejected/errors). JSONL too. No pandas step in the middle.</li>
         <li><strong>Safety rails built in.</strong> Token bucket rate limiter with 429 backoff. Dry run verifies the pipeline without spending a credit.</li>
         <li><strong>Zero runtime dependencies.</strong> Tests run against an in-process mock server. Curate on a laptop with a Rust binary.</li>
       </ul>
@@ -227,8 +227,8 @@
       <h2>One command in, two files out</h2>
       <div class="code-block">
         <button class="copy-btn" data-copy="cargo install jev-curate">copy</button>
-        <pre><code>$ cargo install jev-curate
-$ jev-curate --input corpus.parquet --preset anti-sycophancy --out ./curated/</code></pre>
+        <pre><code>$ cargo install jev-curate  # or pip install jev-curate
+$ jev-curate filter corpus.parquet --preset anti-sycophancy --out ./curated/ --model jev-latest</code></pre>
       </div>
       <p class="section-lead">The binary writes <code>clean.jsonl</code> with accepted rows and <code>rejected.jsonl</code> with the rest, plus structural stats. Run <code>--dry-run</code> first to see keep and reject counts before any row touches the API. Requires only a <code>TYPESAFE_API_KEY</code>.</p>
       <h3 class="steps-heading">Run it in six steps</h3>

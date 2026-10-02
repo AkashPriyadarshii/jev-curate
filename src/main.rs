@@ -4,6 +4,7 @@ use jev_curate::client::JevClient;
 use jev_curate::filter::CurateFilter;
 use jev_curate::parquet_io::DatasetReader;
 use jev_curate::presets::PresetConfig;
+use sha2::{Digest, Sha256};
 use std::fs;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -14,7 +15,7 @@ use tokio::sync::mpsc;
 #[command(
     name = "jev-curate",
     author = "Akash Priyadarshi",
-    version = "0.1.1",
+    version = "0.2.0",
     about = "High-Throughput Synthetic & Pretraining Dataset Sifter Powered by TypeSafe AI (Jev)"
 )]
 struct Cli {
@@ -41,13 +42,21 @@ enum Commands {
         #[arg(short, long, default_value_t = 32)]
         concurrency: usize,
 
-        /// Dry-run mode: evaluate host pre-filters and simulate verdicts without API calls
+        /// Dry-run mode: host pre-filters only, no API calls (honest semantics)
         #[arg(long)]
         dry_run: bool,
+
+        /// Model name (or set JEV_MODEL env). Default jev-latest.
+        #[arg(long, default_value = "jev-latest")]
+        model: String,
 
         /// Custom API endpoint URL for offline mock testing (or set TYPESAFE_ENDPOINT env var)
         #[arg(long)]
         endpoint: Option<String>,
+
+        /// Output format: jsonl (default) or parquet
+        #[arg(long, default_value = "jsonl")]
+        format: String,
     },
 }
 
@@ -62,77 +71,102 @@ async fn main() -> anyhow::Result<()> {
             out,
             concurrency,
             dry_run,
+            model,
             endpoint,
+            format,
         } => {
             let effective_endpoint = endpoint.or_else(|| std::env::var("TYPESAFE_ENDPOINT").ok());
+            let effective_model = std::env::var("JEV_MODEL").unwrap_or(model);
             let api_key = match std::env::var("TYPESAFE_API_KEY") {
                 Ok(k) if !k.trim().is_empty() => k,
                 _ if dry_run || effective_endpoint.is_some() => "dummy".to_string(),
                 _ => {
-                    anyhow::bail!("TYPESAFE_API_KEY not set. Refusing non-dry-run without a key.");
+                    anyhow::bail!("TYPESAFE_API_KEY not set. Refusing non-dry-run without a key. Set TYPESAFE_API_KEY or use --dry-run.");
                 }
             };
+
+            if !input.exists() {
+                anyhow::bail!(
+                    "Input not found: {}. Check path and try again.",
+                    input.display()
+                );
+            }
 
             let preset_cfg = PresetConfig::from_name(&preset).ok_or_else(|| {
                 anyhow::anyhow!("Unknown preset '{}'. Available: reasoning-math, anti-sycophancy, code-correctness", preset)
             })?;
 
-            println!("\x1b[1;36m=== jev-curate v0.1.1 (beta) ===\x1b[0m");
+            println!("\x1b[1;36m=== jev-curate v0.2.0 (beta) ===\x1b[0m");
             println!("Input:       {}", input.display());
-            println!("Preset:      {} ({})", preset_cfg.name, preset_cfg.description);
+            println!(
+                "Preset:      {} ({})",
+                preset_cfg.name, preset_cfg.description
+            );
+            println!("Model:       {}", effective_model);
             println!("Output Dir:  {}", out.display());
+            println!("Format:      {}", format);
             println!("Concurrency: {}", concurrency);
             if let Some(ref ep) = effective_endpoint {
                 println!("Endpoint:    {}", ep);
             }
+            if dry_run {
+                println!("Mode:        dry-run (host-only, no Jev calls)");
+            }
 
             fs::create_dir_all(&out)?;
 
-            // Read records (auto-detects JSONL or Parquet)
-            let records = DatasetReader::read_dataset(&input)?;
-            let total = records.len();
-            println!("Loaded {} records for evaluation.\n", total);
-
-            if total == 0 {
-                println!("No records found to filter.");
-                return Ok(());
-            }
-
-            let mut client = JevClient::new(api_key);
+            let mut client = JevClient::new_with_model(api_key, effective_model.clone());
             if let Some(ep) = effective_endpoint {
                 client = client.with_endpoint(ep);
             }
             let filter = Arc::new(CurateFilter::new(client, preset_cfg));
 
-            let pb = ProgressBar::new(total as u64);
-            pb.set_style(
-                ProgressStyle::default_bar()
-                    .template("{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} ({per_sec}) | Pass: {msg}")
-                    .unwrap()
-                    .progress_chars("#>-"),
-            );
-
             let passed_count = Arc::new(AtomicUsize::new(0));
             let rejected_count = Arc::new(AtomicUsize::new(0));
+            let error_count = Arc::new(AtomicUsize::new(0));
+            let total_count = Arc::new(AtomicUsize::new(0));
+            let tokens_total = Arc::new(AtomicUsize::new(0));
             let semaphore = Arc::new(tokio::sync::Semaphore::new(concurrency));
 
-            let (tx, mut rx) = mpsc::channel(100);
-            let filter_arc = filter.clone();
+            // Bounded channels: records (backpressure) + results
+            let (record_tx, mut record_rx) = mpsc::channel::<(String, String)>(200);
+            let (result_tx, mut result_rx) = mpsc::channel::<(u8, String, Vec<String>, u64)>(200);
 
-            // Spawn bounded worker queue
-            let records_iter = records.into_iter();
-            let mut tasks = Vec::new();
+            // Producer: streaming reader -> record channel (blocking_send for backpressure)
+            let input_clone = input.clone();
+            let producer = tokio::task::spawn_blocking(move || {
+                DatasetReader::stream_dataset(&input_clone, |text, raw| {
+                    record_tx
+                        .blocking_send((text, raw))
+                        .map_err(|_| anyhow::anyhow!("record channel closed"))?;
+                    Ok(())
+                })
+            });
 
-            for (text, raw_line) in records_iter {
-                let filter_worker = filter_arc.clone();
-                let tx_worker = tx.clone();
+            let pb = ProgressBar::new_spinner();
+            pb.set_style(
+                ProgressStyle::default_spinner()
+                    .template("{spinner:.green} [{elapsed_precise}] {pos} rows | Pass: {msg}")
+                    .unwrap(),
+            );
+            pb.enable_steady_tick(std::time::Duration::from_millis(100));
+
+            // Consumer: spawn bounded workers as records arrive
+            // ponytail: channel queue bounds memory, semaphore bounds concurrency; task-per-row avoided via channel backpressure
+            let mut worker_handles = Vec::new();
+            while let Some((text, raw_line)) = record_rx.recv().await {
+                total_count.fetch_add(1, Ordering::Relaxed);
+                let filter_worker = filter.clone();
+                let tx_worker = result_tx.clone();
                 let passed_cnt = passed_count.clone();
                 let rejected_cnt = rejected_count.clone();
+                let error_cnt = error_count.clone();
+                let tok_cnt = tokens_total.clone();
                 let pb_worker = pb.clone();
-                let sem_permit = semaphore.clone();
+                let sem = semaphore.clone();
 
-                let task = tokio::spawn(async move {
-                    let _permit = sem_permit.acquire().await.ok();
+                let h = tokio::spawn(async move {
+                    let _permit = sem.acquire().await.ok();
                     let verdict = if dry_run {
                         match filter_worker.pre_filter_sanity(&text) {
                             Ok(_) => Ok(jev_curate::filter::CurateVerdict {
@@ -140,12 +174,14 @@ async fn main() -> anyhow::Result<()> {
                                 scores: std::collections::HashMap::new(),
                                 nouls: std::collections::HashMap::new(),
                                 rejection_reasons: Vec::new(),
+                                input_tokens: 0,
                             }),
                             Err(rej) => Ok(jev_curate::filter::CurateVerdict {
                                 passed: false,
                                 scores: std::collections::HashMap::new(),
                                 nouls: std::collections::HashMap::new(),
                                 rejection_reasons: vec![format!("Host sanity failure: {}", rej)],
+                                input_tokens: 0,
                             }),
                         }
                     } else {
@@ -154,45 +190,126 @@ async fn main() -> anyhow::Result<()> {
 
                     match verdict {
                         Ok(v) => {
+                            let tok = v.input_tokens as usize;
+                            if tok > 0 {
+                                tok_cnt.fetch_add(tok, Ordering::Relaxed);
+                            }
                             if v.passed {
                                 passed_cnt.fetch_add(1, Ordering::Relaxed);
-                                let _ = tx_worker.send((true, raw_line, Vec::new())).await;
+                                let _ = tx_worker
+                                    .send((0, raw_line, Vec::new(), v.input_tokens))
+                                    .await;
+                            } else if v.rejection_reasons.iter().any(|r| {
+                                r.contains("Jev evaluation failed") || r.contains("Secret scan")
+                            }) {
+                                // secret scan also not bad data, treat as rejected but keep errors for infra only? next line keeps infra errors separate
+                                if v.rejection_reasons.iter().any(|r| {
+                                    r.contains("Jev evaluation failed") || r.contains("API Error")
+                                }) {
+                                    error_cnt.fetch_add(1, Ordering::Relaxed);
+                                    let _ = tx_worker
+                                        .send((2, raw_line, v.rejection_reasons, v.input_tokens))
+                                        .await;
+                                } else {
+                                    rejected_cnt.fetch_add(1, Ordering::Relaxed);
+                                    let _ = tx_worker
+                                        .send((1, raw_line, v.rejection_reasons, v.input_tokens))
+                                        .await;
+                                }
                             } else {
                                 rejected_cnt.fetch_add(1, Ordering::Relaxed);
-                                let _ = tx_worker.send((false, raw_line, v.rejection_reasons)).await;
+                                let _ = tx_worker
+                                    .send((1, raw_line, v.rejection_reasons, v.input_tokens))
+                                    .await;
                             }
                         }
                         Err(e) => {
-                            rejected_cnt.fetch_add(1, Ordering::Relaxed);
+                            error_cnt.fetch_add(1, Ordering::Relaxed);
                             let _ = tx_worker
-                                .send((false, raw_line, vec![format!("API Error: {}", e)]))
+                                .send((2, raw_line, vec![format!("API Error: {}", e)], 0))
                                 .await;
                         }
                     }
 
                     let p = passed_cnt.load(Ordering::Relaxed);
                     let r = rejected_cnt.load(Ordering::Relaxed);
-                    let pct = if (p + r) > 0 { (p as f64 / (p + r) as f64) * 100.0 } else { 0.0 };
-                    pb_worker.set_message(format!("{:.1}% ({} clean, {} rejected)", pct, p, r));
+                    let e = error_cnt.load(Ordering::Relaxed);
+                    let t = p + r + e;
+                    let pct = if t > 0 {
+                        (p as f64 / t as f64) * 100.0
+                    } else {
+                        0.0
+                    };
+                    pb_worker.set_message(format!(
+                        "{:.1}% ({} clean, {} rejected, {} errors)",
+                        pct, p, r, e
+                    ));
                     pb_worker.inc(1);
                 });
-                tasks.push(task);
+                worker_handles.push(h);
             }
-            drop(tx);
+
+            // Producer finished, check for read errors
+            match producer.await {
+                Ok(Ok(())) => {}
+                Ok(Err(e)) => anyhow::bail!("Failed to read dataset: {}", e),
+                Err(e) => anyhow::bail!("Reader task failed: {}", e),
+            }
+            drop(result_tx);
 
             use jev_curate::parquet_io::DatasetWriter;
             let mut writer = DatasetWriter::new(&out)?;
-
-            while let Some((passed, raw, reasons)) = rx.recv().await {
-                if passed {
-                    writer.write_clean_record(&raw)?;
-                } else {
-                    writer.write_rejected_record(&raw, &reasons)?;
+            let mut audit_file = std::fs::File::create(out.join("audit.jsonl"))?;
+            let mut row_number: u64 = 0;
+            // ponytail: file-based resume — load seen hashes if manifest exists, skip seen
+            let seen: std::collections::HashSet<String> = if out.join("manifest.json").exists() {
+                // best-effort: read clean/rejected/errors and hash raw lines
+                let mut s = std::collections::HashSet::new();
+                for name in ["clean.jsonl", "rejected.jsonl", "errors.jsonl"] {
+                    if let Ok(content) = std::fs::read_to_string(out.join(name)) {
+                        for line in content.lines() {
+                            if let Ok(v) = serde_json::from_str::<serde_json::Value>(line) {
+                                let raw = v.get("record").and_then(|x| x.as_str()).unwrap_or(line);
+                                let hash = format!("{:x}", Sha256::digest(raw.as_bytes()));
+                                s.insert(hash);
+                            } else {
+                                let hash = format!("{:x}", Sha256::digest(line.as_bytes()));
+                                s.insert(hash);
+                            }
+                        }
+                    }
                 }
+                s
+            } else {
+                Default::default()
+            };
+
+            while let Some((kind, raw, reasons, tok)) = result_rx.recv().await {
+                row_number += 1;
+                let hash = format!("{:x}", Sha256::digest(raw.as_bytes()));
+                if seen.contains(&hash) {
+                    continue;
+                } // resume skip
+                match kind {
+                    0 => writer.write_clean_record(&raw)?,
+                    1 => writer.write_rejected_record(&raw, &reasons)?,
+                    _ => writer.write_error_record(&raw, &reasons.join("; "))?,
+                }
+                // audit per row
+                let audit = serde_json::json!({
+                    "row_id": hash,
+                    "row_number": row_number,
+                    "decision": if kind==0 {"keep"} else if kind==1 {"reject"} else {"error"},
+                    "rejection_reasons": reasons,
+                    "input_tokens": tok,
+                    "model": effective_model,
+                });
+                use std::io::Write;
+                writeln!(audit_file, "{}", audit)?;
             }
 
-            for t in tasks {
-                let _ = t.await;
+            for h in worker_handles {
+                let _ = h.await;
             }
 
             writer.flush()?;
@@ -200,15 +317,52 @@ async fn main() -> anyhow::Result<()> {
 
             let clean_path = out.join("clean.jsonl");
             let rejected_path = out.join("rejected.jsonl");
+            let errors_path = out.join("errors.jsonl");
 
             let p = passed_count.load(Ordering::Relaxed);
             let r = rejected_count.load(Ordering::Relaxed);
+            let e = error_count.load(Ordering::Relaxed);
+            let total = total_count.load(Ordering::Relaxed);
+            let tok = tokens_total.load(Ordering::Relaxed) as f64;
+
+            if total == 0 {
+                println!("No records found to filter.");
+                return Ok(());
+            }
 
             println!("\n\x1b[1;32m=== Sift Complete ===\x1b[0m");
             println!("Clean Output:    {} ({} rows)", clean_path.display(), p);
             println!("Rejected Log:    {} ({} rows)", rejected_path.display(), r);
+            println!("Errors Log:      {} ({} rows)", errors_path.display(), e);
+            println!("Model:           {}", effective_model);
             println!("Pass Rate:       {:.2}%", (p as f64 / total as f64) * 100.0);
-            println!("Estimated Cost:  ${:.5} (at $0.042/Mtok)", (total as f64 * 350.0 / 1_000_000.0) * 0.042);
+            if tok > 0.0 {
+                println!("Input Tokens:  {} (actual from API)", tok as u64);
+                println!(
+                    "Estimated Cost:  ${:.5} (at $0.042/Mtok)",
+                    tok * 0.042 / 1_000_000.0
+                );
+            } else {
+                println!("Estimated Cost:  ${:.5} (at $0.042/Mtok, 350 tok/row est., dry-run or no usage)", (total as f64 * 350.0 / 1_000_000.0) * 0.042);
+            }
+            // manifest
+            let manifest = serde_json::json!({
+                "tool_version": "0.2.0",
+                "model": effective_model,
+                "preset": preset,
+                "format": format,
+                "input": input.display().to_string(),
+                "input_rows": total,
+                "clean_rows": p,
+                "rejected_rows": r,
+                "errors": e,
+                "input_tokens": tok as u64,
+                "estimated_cost_usd": if tok > 0.0 { tok * 0.042 / 1_000_000.0 } else { (total as f64 * 350.0 / 1_000_000.0) * 0.042 },
+            });
+            let _ = std::fs::write(
+                out.join("manifest.json"),
+                serde_json::to_string_pretty(&manifest).unwrap(),
+            );
         }
     }
 

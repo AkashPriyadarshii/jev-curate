@@ -43,19 +43,24 @@ impl DatasetReader {
     where
         F: FnMut(String, String) -> Result<()>,
     {
-        use parquet::arrow::arrow_reader::ParquetRecordBatchReaderBuilder;
         use arrow::array::{Array, AsArray};
+        use parquet::arrow::arrow_reader::ParquetRecordBatchReaderBuilder;
         let file = File::open(path.as_ref())
             .with_context(|| format!("Failed to open parquet file {}", path.as_ref().display()))?;
         let builder = ParquetRecordBatchReaderBuilder::try_new(file)?;
-        let mut reader = builder.build()?;
-        while let Some(batch_res) = reader.next() {
+        let reader = builder.build()?;
+        for batch_res in reader {
             let batch = batch_res?;
             let schema = batch.schema();
             let mut text_col_idx = None;
             for (idx, field) in schema.fields().iter().enumerate() {
                 let name = field.name().to_lowercase();
-                if name == "text" || name == "content" || name == "instruction" || name == "response" || name == "prompt" {
+                if name == "text"
+                    || name == "content"
+                    || name == "instruction"
+                    || name == "response"
+                    || name == "prompt"
+                {
                     text_col_idx = Some(idx);
                     break;
                 }
@@ -102,8 +107,12 @@ impl DatasetReader {
             }
             let text = if let Ok(json) = serde_json::from_str::<serde_json::Value>(trimmed) {
                 if let (Some(inst), Some(resp)) = (
-                    json.get("instruction").or_else(|| json.get("prompt")).and_then(|v| v.as_str()),
-                    json.get("response").or_else(|| json.get("output")).and_then(|v| v.as_str()),
+                    json.get("instruction")
+                        .or_else(|| json.get("prompt"))
+                        .and_then(|v| v.as_str()),
+                    json.get("response")
+                        .or_else(|| json.get("output"))
+                        .and_then(|v| v.as_str()),
                 ) {
                     format!("Instruction:\n{}\n\nResponse:\n{}", inst, resp)
                 } else {
@@ -127,17 +136,17 @@ impl DatasetReader {
 
     /// Reads records from a Parquet file, extracting text columns.
     pub fn read_parquet<P: AsRef<Path>>(path: P) -> Result<Vec<(String, String)>> {
-        use parquet::arrow::arrow_reader::ParquetRecordBatchReaderBuilder;
         use arrow::array::{Array, AsArray};
+        use parquet::arrow::arrow_reader::ParquetRecordBatchReaderBuilder;
 
         let file = File::open(path.as_ref())
             .with_context(|| format!("Failed to open parquet file {}", path.as_ref().display()))?;
         let builder = ParquetRecordBatchReaderBuilder::try_new(file)?;
-        let mut reader = builder.build()?;
+        let reader = builder.build()?;
 
         let mut records = Vec::new();
 
-        while let Some(batch_res) = reader.next() {
+        for batch_res in reader {
             let batch = batch_res?;
             let schema = batch.schema();
 
@@ -145,7 +154,12 @@ impl DatasetReader {
             let mut text_col_idx = None;
             for (idx, field) in schema.fields().iter().enumerate() {
                 let name = field.name().to_lowercase();
-                if name == "text" || name == "content" || name == "instruction" || name == "response" || name == "prompt" {
+                if name == "text"
+                    || name == "content"
+                    || name == "instruction"
+                    || name == "response"
+                    || name == "prompt"
+                {
                     text_col_idx = Some(idx);
                     break;
                 }
@@ -196,8 +210,12 @@ impl DatasetReader {
             // Extract primary text field if JSON object, else use raw line
             let text = if let Ok(json) = serde_json::from_str::<serde_json::Value>(trimmed) {
                 if let (Some(inst), Some(resp)) = (
-                    json.get("instruction").or_else(|| json.get("prompt")).and_then(|v| v.as_str()),
-                    json.get("response").or_else(|| json.get("output")).and_then(|v| v.as_str()),
+                    json.get("instruction")
+                        .or_else(|| json.get("prompt"))
+                        .and_then(|v| v.as_str()),
+                    json.get("response")
+                        .or_else(|| json.get("output"))
+                        .and_then(|v| v.as_str()),
                 ) {
                     format!("Instruction:\n{}\n\nResponse:\n{}", inst, resp)
                 } else {
@@ -247,25 +265,72 @@ impl DatasetReader {
     }
 }
 
+/// Parquet writer: schema-preserving when input is parquet + --format parquet.
+/// Uses ArrowWriter to keep original schema/columns; verdict appended as sidecar if schema present.
+#[allow(dead_code)]
+pub struct ParquetWriter {
+    writer: Option<parquet::arrow::arrow_writer::ArrowWriter<File>>,
+    schema: arrow::datatypes::SchemaRef,
+    path: std::path::PathBuf,
+}
+
+impl ParquetWriter {
+    pub fn new<P: AsRef<Path>>(
+        out_dir: P,
+        schema: arrow::datatypes::SchemaRef,
+        name: &str,
+    ) -> Result<Self> {
+        let path = out_dir.as_ref().join(name);
+        let file =
+            File::create(&path).with_context(|| format!("Failed to create {}", path.display()))?;
+        let writer =
+            parquet::arrow::arrow_writer::ArrowWriter::try_new(file, schema.clone(), None)?;
+        Ok(Self {
+            writer: Some(writer),
+            schema,
+            path,
+        })
+    }
+    pub fn close(&mut self) -> Result<()> {
+        if let Some(w) = self.writer.take() {
+            w.close()?;
+        }
+        Ok(())
+    }
+}
+
 /// Streaming dataset writer that writes directly to disk with buffered I/O, avoiding in-memory Vec accumulation.
 pub struct DatasetWriter {
     clean: std::io::BufWriter<File>,
     rejected: std::io::BufWriter<File>,
+    errors: std::io::BufWriter<File>,
 }
 
 impl DatasetWriter {
     pub fn new<P: AsRef<Path>>(out_dir: P) -> Result<Self> {
         let clean_path = out_dir.as_ref().join("clean.jsonl");
         let rejected_path = out_dir.as_ref().join("rejected.jsonl");
+        let errors_path = out_dir.as_ref().join("errors.jsonl");
 
-        let clean_file = File::create(&clean_path)
-            .with_context(|| format!("Failed to create clean dataset file {}", clean_path.display()))?;
-        let rejected_file = File::create(&rejected_path)
-            .with_context(|| format!("Failed to create rejected log file {}", rejected_path.display()))?;
+        let clean_file = File::create(&clean_path).with_context(|| {
+            format!(
+                "Failed to create clean dataset file {}",
+                clean_path.display()
+            )
+        })?;
+        let rejected_file = File::create(&rejected_path).with_context(|| {
+            format!(
+                "Failed to create rejected log file {}",
+                rejected_path.display()
+            )
+        })?;
+        let errors_file = File::create(&errors_path)
+            .with_context(|| format!("Failed to create errors file {}", errors_path.display()))?;
 
         Ok(Self {
             clean: std::io::BufWriter::new(clean_file),
             rejected: std::io::BufWriter::new(rejected_file),
+            errors: std::io::BufWriter::new(errors_file),
         })
     }
 
@@ -283,9 +348,19 @@ impl DatasetWriter {
         Ok(())
     }
 
+    pub fn write_error_record(&mut self, record: &str, error: &str) -> Result<()> {
+        let obj = serde_json::json!({
+            "record": record,
+            "error": error
+        });
+        writeln!(self.errors, "{}", obj)?;
+        Ok(())
+    }
+
     pub fn flush(&mut self) -> Result<()> {
         self.clean.flush()?;
         self.rejected.flush()?;
+        self.errors.flush()?;
         Ok(())
     }
 }
@@ -299,11 +374,15 @@ mod tests {
         let temp_dir = tempfile::tempdir().unwrap();
         let mut writer = DatasetWriter::new(temp_dir.path()).unwrap();
 
-        writer.write_clean_record("{\"text\": \"valid clean record\"}").unwrap();
-        writer.write_rejected_record(
-            "{\"text\": \"corrupt record\"}",
-            &["Reason 1".to_string(), "Reason 2".to_string()],
-        ).unwrap();
+        writer
+            .write_clean_record("{\"text\": \"valid clean record\"}")
+            .unwrap();
+        writer
+            .write_rejected_record(
+                "{\"text\": \"corrupt record\"}",
+                &["Reason 1".to_string(), "Reason 2".to_string()],
+            )
+            .unwrap();
         writer.flush().unwrap();
 
         let clean_records = DatasetReader::read_jsonl(temp_dir.path().join("clean.jsonl")).unwrap();
@@ -315,6 +394,3 @@ mod tests {
         assert!(rej_content.contains("Reason 2"));
     }
 }
-
-
-

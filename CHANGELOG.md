@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-02 (beta)
+- Streaming pipeline: bounded channel + backpressure, no Vec materialization, separates errors.jsonl.
+- Timeouts 10s/90s, exponential backoff with jitter, retry-after-ms, 429/5xx handling.
+- Confidence fail-closed fix (Noul has no confidence), model configurable via --model/JEV_MODEL (default jev-latest).
+- Python: PyJevCurator.filter_text/filter_file, per-OS wheels, docs honesty (JSONL outputs, fan-out per record).
+
 ## [0.1.1] - 2026-09-24 (beta)
 > Beta: this release is experimental. Expect rough edges. Please contribute by opening an issue or PR.
 ### Fixed

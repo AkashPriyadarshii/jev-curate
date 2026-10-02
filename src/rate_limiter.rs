@@ -59,7 +59,8 @@ impl RateLimiter {
             let mut state = self.state.lock().await;
             let now = Instant::now();
             let elapsed = now.duration_since(state.last_refill).as_secs_f64();
-            state.tokens = (state.tokens + elapsed * state.refill_rate_per_sec).min(state.max_tokens);
+            state.tokens =
+                (state.tokens + elapsed * state.refill_rate_per_sec).min(state.max_tokens);
             state.last_refill = now;
 
             if state.tokens >= 1.0 {
@@ -75,13 +76,16 @@ impl RateLimiter {
         }
     }
 
-    /// Registers an HTTP 429 response, applying exponential backoff or respecting `retry-after`.
-    pub async fn trigger_backoff(&self, retry_after_secs: Option<u64>) {
+    /// Registers an HTTP 429/5xx backoff, respecting `retry-after`/`retry-after-ms` or exponential.
+    pub async fn trigger_backoff(&self, delay: Option<Duration>) {
         let mut state = self.state.lock().await;
-        let delay = retry_after_secs
-            .map(Duration::from_secs)
-            .unwrap_or_else(|| Duration::from_millis(1500));
-        state.backoff_until = Some(Instant::now() + delay);
+        let d = delay.unwrap_or_else(|| Duration::from_millis(1500));
+        state.backoff_until = Some(Instant::now() + d.min(Duration::from_secs(60)));
+    }
+
+    /// Legacy compat: seconds-based.
+    pub async fn trigger_backoff_secs(&self, secs: Option<u64>) {
+        self.trigger_backoff(secs.map(Duration::from_secs)).await
     }
 }
 
