@@ -3,7 +3,10 @@ use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
 use std::path::Path;
 
-/// Stream reader yielding row texts and original lines/JSON strings.
+/// Reader yielding row texts and original lines/JSON strings.
+///
+/// Batch-oriented Parquet decoding + line-buffered JSONL. For large datasets
+/// prefer the `stream_*` methods which avoid materializing the full `Vec`.
 pub struct DatasetReader;
 
 impl DatasetReader {
@@ -17,6 +20,109 @@ impl DatasetReader {
             }
         }
         Self::read_jsonl(p)
+    }
+
+    /// Streams records via callback without materializing the full `Vec`.
+    /// Auto-detects format from file extension. Bounded memory: only
+    /// current batch/line is held plus worker queue.
+    pub fn stream_dataset<P: AsRef<Path>, F>(path: P, f: F) -> Result<()>
+    where
+        F: FnMut(String, String) -> Result<()>,
+    {
+        let p = path.as_ref();
+        if let Some(ext) = p.extension().and_then(|s| s.to_str()) {
+            if ext.eq_ignore_ascii_case("parquet") {
+                return Self::stream_parquet(p, f);
+            }
+        }
+        Self::stream_jsonl(p, f)
+    }
+
+    /// Streams Parquet records via callback (batch-decoded, not Vec).
+    pub fn stream_parquet<P: AsRef<Path>, F>(path: P, mut on_record: F) -> Result<()>
+    where
+        F: FnMut(String, String) -> Result<()>,
+    {
+        use parquet::arrow::arrow_reader::ParquetRecordBatchReaderBuilder;
+        use arrow::array::{Array, AsArray};
+        let file = File::open(path.as_ref())
+            .with_context(|| format!("Failed to open parquet file {}", path.as_ref().display()))?;
+        let builder = ParquetRecordBatchReaderBuilder::try_new(file)?;
+        let mut reader = builder.build()?;
+        while let Some(batch_res) = reader.next() {
+            let batch = batch_res?;
+            let schema = batch.schema();
+            let mut text_col_idx = None;
+            for (idx, field) in schema.fields().iter().enumerate() {
+                let name = field.name().to_lowercase();
+                if name == "text" || name == "content" || name == "instruction" || name == "response" || name == "prompt" {
+                    text_col_idx = Some(idx);
+                    break;
+                }
+            }
+            let col_idx = text_col_idx.unwrap_or(0);
+            if batch.num_columns() == 0 || batch.num_rows() == 0 {
+                continue;
+            }
+            let col = batch.column(col_idx);
+            if let Some(arr) = col.as_string_opt::<i32>() {
+                for i in 0..arr.len() {
+                    if arr.is_valid(i) {
+                        let val = arr.value(i).to_string();
+                        let raw = serde_json::json!({ "text": &val }).to_string();
+                        on_record(val, raw)?;
+                    }
+                }
+            } else if let Some(arr) = col.as_string_opt::<i64>() {
+                for i in 0..arr.len() {
+                    if arr.is_valid(i) {
+                        let val = arr.value(i).to_string();
+                        let raw = serde_json::json!({ "text": &val }).to_string();
+                        on_record(val, raw)?;
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+
+    /// Streams JSONL records via callback (line-buffered, not Vec).
+    pub fn stream_jsonl<P: AsRef<Path>, F>(path: P, mut on_record: F) -> Result<()>
+    where
+        F: FnMut(String, String) -> Result<()>,
+    {
+        let file = File::open(path.as_ref())
+            .with_context(|| format!("Failed to open file {}", path.as_ref().display()))?;
+        let reader = BufReader::new(file);
+        for line in reader.lines() {
+            let line_str = line?;
+            let trimmed = line_str.trim();
+            if trimmed.is_empty() {
+                continue;
+            }
+            let text = if let Ok(json) = serde_json::from_str::<serde_json::Value>(trimmed) {
+                if let (Some(inst), Some(resp)) = (
+                    json.get("instruction").or_else(|| json.get("prompt")).and_then(|v| v.as_str()),
+                    json.get("response").or_else(|| json.get("output")).and_then(|v| v.as_str()),
+                ) {
+                    format!("Instruction:\n{}\n\nResponse:\n{}", inst, resp)
+                } else {
+                    json.get("text")
+                        .or_else(|| json.get("content"))
+                        .or_else(|| json.get("response"))
+                        .or_else(|| json.get("output"))
+                        .or_else(|| json.get("instruction"))
+                        .or_else(|| json.get("prompt"))
+                        .and_then(|v| v.as_str())
+                        .unwrap_or(trimmed)
+                        .to_string()
+                }
+            } else {
+                trimmed.to_string()
+            };
+            on_record(text, line_str)?;
+        }
+        Ok(())
     }
 
     /// Reads records from a Parquet file, extracting text columns.

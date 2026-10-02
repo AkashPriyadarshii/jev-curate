@@ -10,7 +10,7 @@
 - [x] Canonical documentation skeleton created.
 - [x] Cargo workspace + PyO3 project setup.
 - [x] TypeSafe AI Jev fan-out HTTP client (`client.rs`).
-- [x] Parquet/Arrow & JSONL streaming reader & writer (`parquet_io.rs`).
+- [x] Parquet/Arrow batch reader + buffered JSONL writer (`parquet_io.rs`).
 - [x] Presets suite implementation (`presets.rs` - reasoning-math, anti-sycophancy, code-correctness).
 - [x] Host-side sanity pruning & ceiling enforcement (`filter.rs`).
 - [x] Live terminal telemetry HUD & dry-run mode (`indicatif` in `main.rs`).

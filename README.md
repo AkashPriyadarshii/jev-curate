@@ -132,8 +132,8 @@ jev-curate/
 │   ├── main.rs                # Standalone CLI binary entrypoint
 │   ├── client.rs              # TypeSafe AI HTTP client (speculative fan-out)
 │   ├── filter.rs              # Host-side sanity pruning & Jev pipeline
-│   ├── parquet_io.rs          # Streaming Parquet/Arrow reader and writer
-│   ├── rate_limiter.rs        # Adaptive token-bucket with auto 429 backoff
+│   ├── parquet_io.rs          # Parquet/Arrow reader + buffered JSONL writer
+│   ├── rate_limiter.rs        # Request rate limiter with auto 429 backoff
 │   └── presets.rs             # Pre-built post-training evaluation rubrics
 └── tests/
     └── mock_test.rs           # In-process mock tests via typesafe-rs-mock (100% offline)

@@ -15,9 +15,9 @@ pytest
 ```
 
 ## Code Style
-- **Rust:** Idiomatic Rust 2024, zero unsafe unless strictly required for FFI, descriptive error handling with `thiserror`/`anyhow`.
+- **Rust:** Idiomatic Rust 2021 (edition `2021`), zero unsafe unless strictly required for FFI, descriptive error handling with `thiserror`/`anyhow`.
 - **Formatting:** `cargo fmt` and `cargo clippy -- -D warnings`.
-- **Concurrency:** `tokio` async tasks + `rayon` CPU parallel pre-filtering.
+- **Concurrency:** `tokio` async tasks with bounded concurrency for network-bound Jev calls.
 - **Immutability:** Transform data via iterators and streams; return fresh Arrow RecordBatches.
 
 - Profile: release-order touch 2026-09-22

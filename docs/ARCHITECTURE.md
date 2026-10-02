@@ -7,20 +7,20 @@ Raw Parquet / JSONL File
          │
          ▼
  ┌─────────────────────────────────────────┐
- │ Stream Reader (arrow::RecordBatchReader)│
+ │ Batch Reader (RecordBatchReader / BufReader)│
  └───────────────────┬─────────────────────┘
-                     │ Chunks of 500 rows
+                     │ incrementally, batch-decoded
                      ▼
  ┌─────────────────────────────────────────┐
  │ Host Sanity Filter (Rust stdlib)        │
  │ - Strip blanks & repetitive ASCII       │
  │ - Enforce 8k-token ceiling              │
  └───────────────────┬─────────────────────┘
-                     │ Micro-batches (3-5 rows)
+                     │ one record per request
                      ▼
  ┌─────────────────────────────────────────┐
- │ Speculative Fan-Out Worker Pool (Tokio) │
- │ - Rate Limiter: 1,200 req/min           │
+ │ Multi-Question Fan-Out Pool (Tokio)     │
+ │ - Request Limiter: 20 req/sec + 429 backoff
  │ - POST https://api.typesafe.ai/v1/systemone
  │ - Evaluates Noul, Score, Choice         │
  └───────────────────┬─────────────────────┘
@@ -28,8 +28,8 @@ Raw Parquet / JSONL File
          ┌───────────┴───────────┐
          ▼                       ▼
  ┌───────────────┐       ┌────────────────────────┐
- │ clean.parquet │       │ rejected.parquet       │
- │ (Passed Rows) │       │ (Rows + Jev Breakdown) │
+ │ clean.jsonl   │       │ rejected.jsonl         │
+ │ (Passed Rows) │       │ (Rows + reasons)       │
  └───────────────┘       └────────────────────────┘
 ```
 

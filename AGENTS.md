@@ -26,11 +26,11 @@ pytest
 | `src/main.rs` | Standalone CLI binary (`jev-curate`) |
 | `src/client.rs` | TypeSafe AI HTTP client with speculative fan-out batching |
 | `src/filter.rs` | Pre-filtering and Jev evaluation pipeline |
-| `src/parquet_io.rs` | Streaming Parquet reader and writer |
-| `src/rate_limiter.rs` | Token bucket rate limiter with auto 429 backoff |
+| `src/parquet_io.rs` | Batch-oriented Parquet reader and buffered JSONL writer |
+| `src/rate_limiter.rs` | Request rate limiter (20 req/sec) with auto 429 backoff |
 | `src/presets.rs` | Pre-built evaluation rubrics (math-reasoning, anti-sycophancy, code-correctness) |
 
 ## Constraints & Rules
-- **Zero Token Waste:** Ingest state once per micro-batch, run all questions via speculative fan-out.
+- **Zero Token Waste:** Ingest state once per record, run all configured questions together via multi-question fan-out.
 - **Context Rot Guard:** Enforce 8k-token maximum per row in host code; drop blank/padding lines in Rust before sending to API.
-- **₹0 Testing Budget:** All unit and integration tests must run against in-process mock server (`typesafe-rs-mock`); never burn live API credits in CI.
+- **₹0 Testing Budget:** Offline tests: local unit tests plus WireMock integration coverage (zero live API credits); never burn live API credits in CI.

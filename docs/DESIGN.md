@@ -8,22 +8,20 @@
 - Hard byte limit per record (`max_tokens_per_row = 8,000`).
 - Prevents context rot per TypeSafe AI skill Rule #3.
 
-### B. TypeSafe AI Speculative Fan-Out Client (`src/client.rs`)
+### B. TypeSafe AI Multi-Question Fan-Out Client (`src/client.rs`)
 - Endpoint: `POST https://api.typesafe.ai/v1/systemone`
 - Model: `jev-1.13.0`
-- Micro-batches records into a single multi-question JSON payload.
-- Ingests `state` once, runs multiple Noul and Score questions simultaneously.
+- One record per `state`; all configured Noul/Score/Choice questions are evaluated together in one request.
+- Ingests `state` once, runs multiple questions simultaneously via speculative fan-out.
 
-### C. Adaptive Rate Limiter (`src/rate_limiter.rs`)
-- Token-bucket algorithm capping requests at 1,200 req/min.
-- Automatically captures HTTP 429 and parses `retry-after` header to pause worker threads gracefully.
+### C. Adaptive Request Limiter (`src/rate_limiter.rs`)
+- Token-bucket algorithm capping requests at 20 requests/sec (1,200 req/min).
+- Backs off on HTTP 429 and respects `retry-after` header. Input-token-per-second quotas are not locally enforced.
 
-### D. Streaming Parquet & Arrow Engine (`src/parquet_io.rs`)
+### D. Parquet/Arrow Reader + Buffered JSONL Writer (`src/parquet_io.rs`)
 - Uses `arrow` and `parquet` crates.
-- Iterates over `RecordBatchReader` in chunks of 500 rows.
-- Zero-copy extraction of text columns.
-- Writes partitioned Arrow batches to `clean.parquet` and `rejected.parquet`.
+- Decodes `RecordBatchReader` batches and reads JSONL line-buffered; records must be yielded incrementally without materializing the full dataset into a `Vec`.
+- Copies string values from columns into owned `String`s for evaluation; writes buffered `clean.jsonl` and `rejected.jsonl` via `BufWriter`.
 
 ### E. PyO3 Python Layer (`src/lib.rs`)
-- Exposes `JevCurator` class to Python.
-- Accepts and returns Polars DataFrames or PyArrow Tables with zero serialization overhead.
+- Exposes `PyJevCurator` class to Python. Constructor-only for now; row-level sifting uses the CLI. Intended to accept Polars/PyArrow objects via PyO3 once the batch pipeline is finalized.
