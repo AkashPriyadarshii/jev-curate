@@ -18,6 +18,8 @@ Keywords: typesafe ai, type safe ai, jev, api.typesafe.ai, jev-1.13.0, jev-lates
 
 **Product Hunt:** [jev-curate Upcoming](https://www.producthunt.com/products/jev-curate?launch=jev-curate) (launches Oct 13, 12:01am PT)
 
+<a href="https://www.producthunt.com/products/jev-curate?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-jev-curate" target="_blank" rel="noopener noreferrer"><img alt="jev-curate - Sift 1B-row datasets 444x cheaper with Jev | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1272040&theme=light&t=1791323078281"></a>
+
 [![PyPI](https://img.shields.io/pypi/v/jev-curate?style=flat-square)](https://pypi.org/project/jev-curate/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![TypeSafe AI](https://img.shields.io/badge/Model-Jev--1.13.0-indigo.svg?style=flat-square)](https://typesafe.ai)
