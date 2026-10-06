@@ -11,7 +11,7 @@ verbatim data text, and writes accepted and rejected rows to separate files.
 - Routing dataset rows with typed decisions at pipeline scale.
 
 ## Docs
-- Homepage + six-step quickstart + six-step quickstart: https://jev-curate.vercel.app/
+- Homepage + quickstart: https://jev-curate.vercel.app/
 - Real measured benchmark (not claims): https://jev-curate.vercel.app/benchmarks.html
 - What is Jev (model explainer): https://jev-curate.vercel.app/what-is-jev.html
 - Glossary: what is jev-curate, what is TypeSafe Jev: https://jev-curate.vercel.app/glossary.html

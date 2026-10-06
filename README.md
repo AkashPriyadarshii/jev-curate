@@ -16,6 +16,8 @@ Keywords: typesafe ai, type safe ai, jev, api.typesafe.ai, jev-1.13.0, jev-lates
 
 **Live:** [jev-curate.vercel.app](https://jev-curate.vercel.app) (measured **24.0 rows/sec** single-node on local mock bench `examples/bench_mock.rs`, 1,500+ cluster target)
 
+**Product Hunt:** [jev-curate Upcoming](https://www.producthunt.com/products/jev-curate?launch=jev-curate) (launches Oct 13, 12:01am PT)
+
 [![PyPI](https://img.shields.io/pypi/v/jev-curate?style=flat-square)](https://pypi.org/project/jev-curate/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![TypeSafe AI](https://img.shields.io/badge/Model-Jev--1.13.0-indigo.svg?style=flat-square)](https://typesafe.ai)
@@ -89,7 +91,7 @@ from jev_curate import PyJevCurator
 curator = PyJevCurator(api_key="your-api-key", preset="reasoning-math")
 # single row
 verdict = curator.filter_text("Let x=5... therefore...")  # -> {passed, rejection_reasons, scores, nouls}
-# whole file -> ./curated/clean.jsonl + rejected.jsonl + errors.jsonl + manifest.json
+# whole file -> ./curated/clean.jsonl + rejected.jsonl + errors.jsonl
 stats = curator.filter_file("train.parquet", out="./curated")  # -> {passed, rejected, errors, total}
 ```
 

@@ -23,6 +23,7 @@ node_modules/
 
 # Tool caches / generated
 .desloppify/
+.supercov/
 scorecard.png
 
 # Test / curated outputs (generated)
