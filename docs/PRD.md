@@ -15,7 +15,7 @@ Fine-tuning and post-training teams (evaluating synthetic reasoning traces, inst
 - **Dual Distribution:** Single-binary Rust CLI (`cargo install jev-curate`) + Python library (`pip install jev-curate`).
 
 ## 4. MVP Requirements
-1. Read `.parquet` and `.jsonl` incrementally without loading the full dataset into memory; `examples/bench_mock.rs` measures **24.0 rows/sec** single-node on local mock (rate-limiter bound).
+1. Read `.parquet` and `.jsonl` incrementally without loading the full dataset into memory; `bash bench/run_mock.sh` measures **23.9 rows/sec** single-node on local mock (rate-limiter bound, results in `bench/results/mock.json`).
 2. One record per Jev request; all questions for that record run together via fan-out; model via `JEV_MODEL` / `--model` (default `jev-latest`).
 3. Rate limiter at 20 req/sec (1,200 req/min) with backoff handling.
 4. 3 presets (`reasoning-math`, `anti-sycophancy`, `code-correctness`) plus external rubric files (JSON/YAML).

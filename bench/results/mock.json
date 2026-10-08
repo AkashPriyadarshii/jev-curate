@@ -1,0 +1,30 @@
+{
+  "concurrency": [
+    1,
+    32
+  ],
+  "concurrent": {
+    "errors": 0,
+    "latency_p50_ms": 48.2167,
+    "latency_p95_ms": 4710.4361,
+    "passed": 120,
+    "rate_limits": 0,
+    "requests_per_sec": 23.923415882608275,
+    "rows_per_sec": 23.923415882608275
+  },
+  "mode": "local-mock",
+  "note": "local mock: zero-latency judge. 1 req/row so requests_per_sec == rows_per_sec. rate_limits counts 429s from a live API; mock returns none.",
+  "rows": 120,
+  "sequential": {
+    "errors": 0,
+    "latency_p50_ms": 48.1295,
+    "latency_p95_ms": 63.851099999999995,
+    "passed": 120,
+    "rate_limits": 0,
+    "requests_per_sec": 23.92697153310495,
+    "rows_per_sec": 23.92697153310495
+  },
+  "tool": "jev-curate bench_mock",
+  "hardware": "Intel i3-1115G4 (2C/4T), 8GB RAM, Windows 11, 4 cores visible",
+  "commit": "6b99616"
+}

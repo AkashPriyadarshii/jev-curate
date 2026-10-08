@@ -14,7 +14,9 @@ Keywords: typesafe ai, type safe ai, jev, api.typesafe.ai, jev-1.13.0, jev-lates
 
 > Beta: v0.2.0 is experimental. Expect rough edges. Please contribute by opening an issue or PR.
 
-**Live:** [jev-curate.vercel.app](https://jev-curate.vercel.app) (measured **24.0 rows/sec** single-node on local mock bench `examples/bench_mock.rs`, 1,500+ cluster target)
+**Live:** [jev-curate.vercel.app](https://jev-curate.vercel.app)
+
+Measured: **23.9 rows/sec** single-node local mock (`bash bench/run_mock.sh`, results in `bench/results/mock.json`). Not measured: **1,500+ rows/sec** is a horizontal-scaling target, not a benchmark result.
 
 **Product Hunt:** [jev-curate Upcoming](https://www.producthunt.com/products/jev-curate?launch=jev-curate) (launches Oct 13, 12:01am PT)
 
