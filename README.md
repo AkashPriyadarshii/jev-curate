@@ -186,7 +186,7 @@ jev-curate/
 
 ### Author
 * **Akash Priyadarshi** (Patna, Bihar, India)
-* [GitHub](https://github.com/AkashPriyadarshii) &bull; [Portfolio](https://akashpriyadarshi.vercel.app) &bull; [LinkedIn](https://linkedin.com/in/akashpriyadarshii) &bull; [Resume](https://akashpriyadarshii.github.io/Resume/)
+* [GitHub](https://github.com/AkashPriyadarshii) &bull; [Portfolio](https://akashpriyadarshi.is-a.dev) &bull; [LinkedIn](https://linkedin.com/in/akashpriyadarshii) &bull; [Resume](https://akashpriyadarshii.github.io/Resume/)
 
 ### Social
 * [X / Twitter](https://x.com/Akash__ydv001) &bull; [Threads](https://www.threads.net/@akash.priyadarshii) &bull; [Instagram](https://www.instagram.com/akash.priyadarshii/) &bull; [Reddit](https://reddit.com/user/akashpriyadarshi)
