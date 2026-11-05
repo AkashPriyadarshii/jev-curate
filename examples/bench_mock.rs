@@ -57,8 +57,16 @@ async fn run_batch(client: JevClient, concurrent: usize) -> (Duration, Vec<RowSa
             let verdict = filter.evaluate_record(&row).await;
             let latency = t0.elapsed();
             match verdict {
-                Ok(v) => RowSample { latency, passed: v.passed, errored: false },
-                Err(_) => RowSample { latency, passed: false, errored: true },
+                Ok(v) => RowSample {
+                    latency,
+                    passed: v.passed,
+                    errored: false,
+                },
+                Err(_) => RowSample {
+                    latency,
+                    passed: false,
+                    errored: true,
+                },
             }
         }));
     }
@@ -99,7 +107,10 @@ async fn main() {
     let rate = |d: Duration| ROWS as f64 / d.as_secs_f64();
 
     let summarize = |samples: &[RowSample]| {
-        let mut ms: Vec<f64> = samples.iter().map(|s| s.latency.as_secs_f64() * 1000.0).collect();
+        let mut ms: Vec<f64> = samples
+            .iter()
+            .map(|s| s.latency.as_secs_f64() * 1000.0)
+            .collect();
         ms.sort_by(|a, b| a.partial_cmp(b).unwrap());
         let errors = samples.iter().filter(|s| s.errored).count();
         let passed = samples.iter().filter(|s| s.passed).count();
@@ -118,13 +129,19 @@ async fn main() {
         "sequential: {:.1} rows/sec ({:.0} ms/row) p50={:.0}ms p95={:.0}ms errors={} passed={}/{ROWS}",
         rate(seq_elapsed),
         seq_elapsed.as_millis() as f64 / ROWS as f64,
-        seq_p50, seq_p95, seq_err, seq_pass,
+        seq_p50,
+        seq_p95,
+        seq_err,
+        seq_pass,
     );
     println!(
         "concurrent {CONCURRENCY}: {:.1} rows/sec ({:.0} ms/row) p50={:.0}ms p95={:.0}ms errors={} passed={}/{ROWS}",
         rate(par_elapsed),
         par_elapsed.as_millis() as f64 / ROWS as f64,
-        par_p50, par_p95, par_err, par_pass,
+        par_p50,
+        par_p95,
+        par_err,
+        par_pass,
     );
     println!("note: client rate limiter defaults to 20 req/sec (TypeSafe 1,200 req/min policy)");
 
