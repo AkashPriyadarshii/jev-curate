@@ -8,7 +8,7 @@ Keywords: typesafe ai, type safe ai, jev, api.typesafe.ai, jev-1.13.0, jev-lates
 
 # `jev-curate`
 
-**Support:** fuel the next build — [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/AkashPriyadarshi)
+**Support:** fuel the next build - [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/AkashPriyadarshi)
 
 **High-Throughput Synthetic & Pretraining Dataset Sifter Powered by TypeSafe AI (Jev)**
 
@@ -188,10 +188,11 @@ jev-curate/
 
 ### Author
 * **Akash Priyadarshi** (Patna, Bihar, India)
-* [GitHub](https://github.com/AkashPriyadarshii) &bull; [Portfolio](https://akashpriyadarshi.is-a.dev) &bull; [Project page](https://akashpriyadarshi.is-a.dev/projects/jev-curate/) &bull; [LinkedIn](https://linkedin.com/in/akash-priyadarshi-1aa51b37a) &bull; [Resume](https://akashpriyadarshii.github.io/Resume/)
+* Akash Priyadarshi, self-taught developer & open-source builder from Patna, Bihar, India. Rust systems tooling, AI agents, Android internals.
+* [GitHub](https://github.com/AkashPriyadarshii) &bull; [Portfolio](https://akashpriyadarshi.is-a.dev) &bull; [Project page](https://akashpriyadarshi.is-a.dev/projects/jev-curate/) &bull; [LinkedIn](https://linkedin.com/in/akashpriyadarshii) &bull; [Resume](https://akashpriyadarshii.github.io/Resume/)
 
 ### Social
-* [X / Twitter](https://x.com/Akash__ydv001) &bull; [Threads](https://www.threads.net/@akash.priyadarshii) &bull; [Instagram](https://www.instagram.com/akash.priyadarshii/) &bull; [Reddit](https://reddit.com/user/akashpriyadarshi)
+* [X / Twitter](https://x.com/Akash__ydv001) &bull; [Threads](https://www.threads.net/@akash.priyadarshii) &bull; [Instagram](https://www.instagram.com/akash.priyadarshii/) &bull; [Reddit](https://reddit.com/user/akashpriyadarshii)
 
 ---
 
