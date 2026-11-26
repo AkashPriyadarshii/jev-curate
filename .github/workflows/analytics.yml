@@ -1,0 +1,118 @@
+name: Analytics Snapshot
+
+on:
+  schedule:
+    # Runs every 13 days at 00:00 UTC (inside GitHub's 14-day traffic window)
+    - cron: '0 0 */13 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  collect-analytics:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Collect stats
+        env:
+          GH_TOKEN: ${{ secrets.TRAFFIC_TOKEN || github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          mkdir -p analytics
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          # 1. GitHub repo metadata
+          REPO_JSON=$(gh api "repos/${REPO}" 2>/dev/null || echo '{}')
+          STARS=$(echo "$REPO_JSON" | jq -r '.stargazers_count // 0')
+          FORKS=$(echo "$REPO_JSON" | jq -r '.forks_count // 0')
+          WATCHERS=$(echo "$REPO_JSON" | jq -r '.subscribers_count // 0')
+
+          # 2. GitHub release asset downloads
+          RELEASE_DL=$(gh api "repos/${REPO}/releases" --paginate 2>/dev/null \
+            | jq '[.[].assets[].download_count] | add // 0' 2>/dev/null || echo 0)
+
+          # 3. GitHub 14-day traffic (requires TRAFFIC_TOKEN PAT with repo scope; falls back to null on 403)
+          VIEWS_JSON=$(gh api "repos/${REPO}/traffic/views" 2>/dev/null || echo '{}')
+          VIEWS=$(echo "$VIEWS_JSON" | jq -r '.count // "null"')
+          UNIQUE_VIEWS=$(echo "$VIEWS_JSON" | jq -r '.uniques // "null"')
+
+          CLONES_JSON=$(gh api "repos/${REPO}/traffic/clones" 2>/dev/null || echo '{}')
+          CLONES=$(echo "$CLONES_JSON" | jq -r '.count // "null"')
+          UNIQUE_CLONES=$(echo "$CLONES_JSON" | jq -r '.uniques // "null"')
+
+          # 4. crates.io downloads
+          CRATE_JSON=$(curl -sf -A "jev-curate-analytics (https://github.com/${REPO})" \
+            "https://crates.io/api/v1/crates/jev-curate" 2>/dev/null || echo '{}')
+          CRATE_TOTAL=$(echo "$CRATE_JSON" | jq -r '.crate.downloads // 0')
+          CRATE_RECENT=$(echo "$CRATE_JSON" | jq -r '.crate.recent_downloads // 0')
+
+          # 5. PyPI downloads (pypistats.org)
+          PYPI_JSON=$(curl -sf "https://pypistats.org/api/packages/jev-curate/recent" 2>/dev/null || echo '{}')
+          PYPI_MONTH=$(echo "$PYPI_JSON" | jq -r '.data.last_month // 0')
+
+          # Append JSONL record
+          jq -nc \
+            --arg ts "$TIMESTAMP" \
+            --argjson stars "$STARS" \
+            --argjson forks "$FORKS" \
+            --argjson watchers "$WATCHERS" \
+            --argjson release_dl "$RELEASE_DL" \
+            --argjson views "$VIEWS" \
+            --argjson unique_views "$UNIQUE_VIEWS" \
+            --argjson clones "$CLONES" \
+            --argjson unique_clones "$UNIQUE_CLONES" \
+            --argjson crate_total "$CRATE_TOTAL" \
+            --argjson crate_recent "$CRATE_RECENT" \
+            --argjson pypi_month "$PYPI_MONTH" \
+            '{
+              timestamp: $ts,
+              github: {
+                stars: $stars,
+                forks: $forks,
+                watchers: $watchers,
+                release_downloads: $release_dl,
+                views_14d: $views,
+                unique_views_14d: $unique_views,
+                clones_14d: $clones,
+                unique_clones_14d: $unique_clones
+              },
+              crates_io: {
+                total: $crate_total,
+                recent_90d: $crate_recent
+              },
+              pypi: {
+                last_month: $pypi_month
+              }
+            }' >> analytics/history.jsonl
+
+          # 6. Combined total downloads badge (Shields.io endpoint JSON)
+          TOTAL_DL=$((RELEASE_DL + CRATE_TOTAL + PYPI_MONTH))
+          jq -nc --arg msg "$TOTAL_DL" \
+            '{schemaVersion: 1, label: "total downloads", message: $msg, color: "brightgreen"}' \
+            > analytics/badge.json
+
+          # Rebuild Markdown summary table (newest first, last 20 snapshots)
+          {
+            echo "# jev-curate Analytics"
+            echo ""
+            echo "![Total Downloads](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/${REPO}/main/analytics/badge.json)"
+            echo ""
+            echo "Updated every 13 days by \`.github/workflows/analytics.yml\`."
+            echo ""
+            echo "| Date (UTC) | Stars | Forks | Release DL | Views (14d) | Clones (14d) | crates.io Total | PyPI (30d) |"
+            echo "| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
+            tac analytics/history.jsonl | head -n 20 | jq -r '"| \(.timestamp[0:10]) | \(.github.stars) | \(.github.forks) | \(.github.release_downloads) | \(.github.views_14d // "-") | \(.github.clones_14d // "-") | \(.crates_io.total) | \(.pypi.last_month) |"'
+          } > analytics/README.md
+
+      - name: Commit and push snapshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add analytics/history.jsonl analytics/README.md analytics/badge.json
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(analytics): update 13-day snapshot"
+            git push
+          fi
