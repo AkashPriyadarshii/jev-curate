@@ -66,38 +66,38 @@ jobs:
           CRATE_RECENT=${CRATE_RECENT:-0}
           PYPI_MONTH=${PYPI_MONTH:-0}
 
-          # Append JSONL record
+          # Append JSONL record (use --arg + tonumber? so malformed/empty API output never breaks jq)
           jq -nc \
             --arg ts "$TIMESTAMP" \
-            --argjson stars "$STARS" \
-            --argjson forks "$FORKS" \
-            --argjson watchers "$WATCHERS" \
-            --argjson release_dl "$RELEASE_DL" \
-            --argjson views "$VIEWS" \
-            --argjson unique_views "$UNIQUE_VIEWS" \
-            --argjson clones "$CLONES" \
-            --argjson unique_clones "$UNIQUE_CLONES" \
-            --argjson crate_total "$CRATE_TOTAL" \
-            --argjson crate_recent "$CRATE_RECENT" \
-            --argjson pypi_month "$PYPI_MONTH" \
+            --arg stars "$STARS" \
+            --arg forks "$FORKS" \
+            --arg watchers "$WATCHERS" \
+            --arg release_dl "$RELEASE_DL" \
+            --arg views "$VIEWS" \
+            --arg unique_views "$UNIQUE_VIEWS" \
+            --arg clones "$CLONES" \
+            --arg unique_clones "$UNIQUE_CLONES" \
+            --arg crate_total "$CRATE_TOTAL" \
+            --arg crate_recent "$CRATE_RECENT" \
+            --arg pypi_month "$PYPI_MONTH" \
             '{
               timestamp: $ts,
               github: {
-                stars: $stars,
-                forks: $forks,
-                watchers: $watchers,
-                release_downloads: $release_dl,
-                views_14d: $views,
-                unique_views_14d: $unique_views,
-                clones_14d: $clones,
-                unique_clones_14d: $unique_clones
+                stars: ($stars | tonumber? // 0),
+                forks: ($forks | tonumber? // 0),
+                watchers: ($watchers | tonumber? // 0),
+                release_downloads: ($release_dl | tonumber? // 0),
+                views_14d: ($views | tonumber? // null),
+                unique_views_14d: ($unique_views | tonumber? // null),
+                clones_14d: ($clones | tonumber? // null),
+                unique_clones_14d: ($unique_clones | tonumber? // null)
               },
               crates_io: {
-                total: $crate_total,
-                recent_90d: $crate_recent
+                total: ($crate_total | tonumber? // 0),
+                recent_90d: ($crate_recent | tonumber? // 0)
               },
               pypi: {
-                last_month: $pypi_month
+                last_month: ($pypi_month | tonumber? // 0)
               }
             }' >> analytics/history.jsonl
 
