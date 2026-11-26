@@ -49,35 +49,66 @@ impl CurateFilter {
             return Err("Repetitive non-alphanumeric symbol flood".to_string());
         }
 
-        // Strip blank/padding lines, then enforce hard ceiling at a char
-        // boundary so truncation never panics or silently alters bytes.
-        let stripped: Vec<&str> = trimmed
+        // Strip blank/padding lines and trailing whitespace, preserving leading indentation,
+        // then enforce hard ceiling at a char boundary so truncation never panics or silently alters bytes.
+        let stripped: Vec<&str> = text
             .lines()
-            .map(|l| l.trim())
-            .filter(|l| !l.is_empty())
+            .map(|l| l.trim_end())
+            .filter(|l| !l.trim().is_empty())
             .collect();
         if stripped.is_empty() {
             return Err("Record has no content lines".to_string());
         }
         let joined = stripped.join("\n");
         if joined.len() > self.max_chars_per_row {
-            let cut = joined.floor_char_boundary(self.max_chars_per_row);
+            let mut cut = self.max_chars_per_row;
+            while cut > 0 && !joined.is_char_boundary(cut) {
+                cut -= 1;
+            }
             return Ok(joined[..cut].to_string());
         }
 
         Ok(joined)
     }
 
-    fn secret_scan(text: &str) -> Option<String> {
+    fn has_sk_secret(text: &str) -> bool {
+        let bytes = text.as_bytes();
+        let mut i = 0;
+        while i + 3 <= bytes.len() {
+            if &bytes[i..i + 3] == b"sk-" {
+                let boundary_ok = i == 0 || !bytes[i - 1].is_ascii_alphanumeric();
+                if boundary_ok {
+                    let mut rest = &bytes[i + 3..];
+                    for prefix in [
+                        b"proj-".as_slice(),
+                        b"live-".as_slice(),
+                        b"test-".as_slice(),
+                    ] {
+                        if rest.starts_with(prefix) {
+                            rest = &rest[prefix.len()..];
+                            break;
+                        }
+                    }
+                    let token_len = rest
+                        .iter()
+                        .take_while(|&&b| b.is_ascii_alphanumeric() || b == b'_' || b == b'-')
+                        .count();
+                    if token_len >= 16 {
+                        return true;
+                    }
+                }
+            }
+            i += 1;
+        }
+        false
+    }
+
+    pub fn secret_scan(text: &str) -> Option<String> {
+        if Self::has_sk_secret(text) {
+            return Some("secret pattern sk- token detected".to_string());
+        }
         let lower = text.to_lowercase();
-        for pat in [
-            "sk-",
-            "ghp_",
-            "gho_",
-            "aws_access_key",
-            "typesafe_api_key",
-            "bearer sk-",
-        ] {
+        for pat in ["ghp_", "gho_", "aws_access_key", "typesafe_api_key"] {
             if lower.contains(pat) {
                 return Some(format!("secret pattern {} detected", pat));
             }
@@ -172,21 +203,20 @@ impl CurateFilter {
             }
         }
 
+        let mut confidence_failures = Vec::new();
         for (q_name, ans) in answers.iter() {
             if ans.noul.is_some() && ans.score.is_none() && ans.choice.is_none() {
                 continue; // Noul answer, no confidence field per API
             }
             match ans.confidence {
                 Some(conf) if conf < self.preset.min_confidence => {
-                    passed = false;
-                    rejection_reasons.push(format!(
+                    confidence_failures.push(format!(
                         "{}: confidence {:.2} below floor {:.2}, rejecting",
                         q_name, conf, self.preset.min_confidence
                     ));
                 }
                 None => {
-                    passed = false;
-                    rejection_reasons.push(format!(
+                    confidence_failures.push(format!(
                         "{}: confidence missing (fail-closed), rejecting",
                         q_name
                     ));
@@ -199,20 +229,24 @@ impl CurateFilter {
             if allowed.is_empty() {
                 continue;
             }
-            if let Some(ans) = answers.get(q_name)
-                && let Some(ref ch) = ans.choice
-                && !allowed.contains(ch)
-            {
-                passed = false;
-                rejection_reasons.push(format!(
-                    "{}: choice '{}' not in allowed {:?}, rejecting",
-                    q_name, ch, allowed
-                ));
+            match answers.get(q_name).and_then(|a| a.choice.as_ref()) {
+                Some(ch) if allowed.contains(ch) => {}
+                Some(ch) => {
+                    passed = false;
+                    rejection_reasons.push(format!(
+                        "{}: choice '{}' not in allowed {:?}, rejecting",
+                        q_name, ch, allowed
+                    ));
+                }
+                None => {
+                    passed = false;
+                    rejection_reasons.push(format!("{}: choice answer missing, rejecting", q_name));
+                }
             }
         }
 
         if self.preset.policy == "any" && !rejection_reasons.is_empty() {
-            // if any Noul/Score/Choice passed, allow overall pass
+            // if any Noul/Score/Choice passed, allow overall pass (min_confidence still enforced)
             let total_gates = self.preset.reject_nouls.len()
                 + self.preset.min_scores.len()
                 + self.preset.allowed_choices.len();
@@ -220,6 +254,11 @@ impl CurateFilter {
                 passed = true;
                 rejection_reasons.clear();
             }
+        }
+
+        if !confidence_failures.is_empty() {
+            passed = false;
+            rejection_reasons.extend(confidence_failures);
         }
 
         Ok(CurateVerdict {
@@ -265,7 +304,7 @@ mod tests {
         let padded = "\n\n  Valid math content here with more text to pass length.  \n\n";
         let out = filter.pre_filter_sanity(padded).unwrap();
         assert!(!out.contains("\n\n"));
-        assert!(out.starts_with("Valid"));
+        assert!(out.starts_with("  Valid"));
 
         let big = "é".repeat(40_000);
         let out = filter.pre_filter_sanity(&big).unwrap();

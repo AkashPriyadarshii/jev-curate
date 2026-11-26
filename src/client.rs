@@ -91,7 +91,19 @@ impl JevClient {
     }
 
     /// Overrides the endpoint (used for in-process offline mock tests).
+    /// Rejects non-HTTPS endpoints unless the host is localhost, 127.0.0.1, or [::1].
     pub fn with_endpoint(mut self, endpoint: String) -> Self {
+        if let Ok(parsed) = reqwest::Url::parse(&endpoint)
+            && parsed.scheme() != "https"
+        {
+            let host = parsed.host_str().unwrap_or("");
+            if host != "localhost" && host != "127.0.0.1" && host != "[::1]" {
+                panic!(
+                    "Refusing non-HTTPS endpoint '{}' (only https:// or localhost/127.0.0.1/[::1] allowed)",
+                    endpoint
+                );
+            }
+        }
         self.endpoint = endpoint;
         self
     }

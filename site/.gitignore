@@ -15,4 +15,5 @@ __pycache__/
 dist/
 
 # Local dev snapshots
-site/shot-*.png
+shot-*.png
+.vercel/

@@ -51,8 +51,8 @@ Keywords: jev-curate use cases, RLHF data filtering, anti-sycophancy preset, rea
 }</script>
   <script defer src="/_vercel/insights/script.js"></script>
 </head>
-<!-- impeccable-disable em-dash-overuse: CLI flags like --dry-run are not em-dashes -->
 <body>
+  <a class="skip-link" href="#main">Skip to main content</a>
   <header class="site-header">
     <a class="logo" href="index.html">jev-curate<sup>beta</sup></a>
     <nav class="site-nav" aria-label="Site">
@@ -96,7 +96,7 @@ Keywords: jev-curate use cases, RLHF data filtering, anti-sycophancy preset, rea
         </div>
       </div>
       <div class="terminal" aria-label="All three presets">
-        <div class="terminal-bar"><span class="t-dot"></span><span>jev-curate -p &lt;preset&gt; -i set.jsonl</span></div>
+        <div class="terminal-bar"><span class="t-dot"></span><span>jev-curate filter set.jsonl -p &lt;preset&gt;</span></div>
         <pre>presets:
   reasoning-math     chain-of-thought correctness
   anti-sycophancy    honesty over agreement
@@ -108,8 +108,8 @@ output: clean.jsonl + rejected.jsonl</pre>
     <section class="why" id="rlhf">
       <h2>RLHF: honesty over agreement</h2>
       <p class="section-lead">Preference data drifts toward whatever the judge agrees with. Filtering with <code>anti-sycophancy</code> scores each exemplar for rated honesty before it reaches the preference pipeline. Runs where the model grovels, hedges to the prompt, or mirrors the user's tone score low on the sycophancy checks and land in <code>rejected.jsonl</code>.</p>
-      <p class="section-lead">The workflow is the same shape as every other job here: point <code>-i</code> at the mined pairs, <code>--dry-run</code> to read the reject rate, adjust the Noul threshold until the drop rate matches the critique from the human audit pass, then run the batch.</p>
-      <pre class="inline-term"><span>jev-curate -p anti-sycophancy -i pairs.jsonl -o ./curated --dry-run</span></pre>
+      <p class="section-lead">The workflow is the same shape as every other job here: point <code>jev-curate filter &lt;INPUT&gt;</code> at the mined pairs, <code>--dry-run</code> to read the reject rate, adjust the Noul threshold until the drop rate matches the critique from the human audit pass, then run the batch.</p>
+      <pre class="inline-term"><span>jev-curate filter pairs.jsonl -p anti-sycophancy -o ./curated --dry-run</span></pre>
     </section>
 
     <section class="presets" id="reasoning">
@@ -166,7 +166,7 @@ output: clean.jsonl + rejected.jsonl</pre>
       <div class="footer-author">
         <h3>Author</h3>
         <a href="https://github.com/AkashPriyadarshii">GitHub</a>
-        <a href="https://akashpriyadarshi.vercel.app">Portfolio</a>
+        <a href="https://akashpriyadarshi.is-a.dev">Portfolio</a>
         <a href="https://linkedin.com/in/akashpriyadarshii">LinkedIn</a>
         <a href="https://akashpriyadarshii.github.io/Resume/">Resume</a>
       </div>
@@ -175,7 +175,7 @@ output: clean.jsonl + rejected.jsonl</pre>
         <a href="https://x.com/Akash__ydv001">X / Twitter</a>
         <a href="https://www.threads.net/@akash.priyadarshii">Threads</a>
         <a href="https://www.instagram.com/akash.priyadarshii/">Instagram</a>
-        <a href="https://reddit.com/user/akashpriyadarshi">Reddit</a>
+        <a href="https://reddit.com/user/akashpriyadarshii">Reddit</a>
       </div>
     </div>
     <p class="footer-tag">The dataset sifter for the TypeSafe Jev ecosystem</p>

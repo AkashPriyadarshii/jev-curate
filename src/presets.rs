@@ -41,6 +41,27 @@ pub enum PresetError {
 }
 
 impl PresetConfig {
+    /// Loads a pre-built preset by name or from a file path (json/yaml), surfacing parse/IO errors.
+    pub fn load(name: &str) -> anyhow::Result<Self> {
+        let p = std::path::Path::new(name);
+        if p.exists()
+            || name.ends_with(".yaml")
+            || name.ends_with(".yml")
+            || name.ends_with(".json")
+        {
+            return Ok(Self::from_file(name)?);
+        }
+        match name {
+            "reasoning-math" => Ok(Self::reasoning_math()),
+            "anti-sycophancy" => Ok(Self::anti_sycophancy()),
+            "code-correctness" => Ok(Self::code_correctness()),
+            _ => anyhow::bail!(
+                "Unknown preset '{}'. Available: reasoning-math, anti-sycophancy, code-correctness, or path to .yaml/.json",
+                name
+            ),
+        }
+    }
+
     /// Loads a pre-built preset by name or from a file path (json/yaml).
     pub fn from_name(name: &str) -> Option<Self> {
         if std::path::Path::new(name).exists() {

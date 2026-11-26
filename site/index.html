@@ -38,7 +38,7 @@
       "description": "High-throughput dataset sifter for synthetic and pretraining datasets. Rust CLI with TypeSafe Jev judgment, Parquet and JSONL I/O, speculative fan-out batching.",
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "Linux, macOS, Windows",
-      "softwareVersion": "0.2.0",
+      "softwareVersion": "0.3.0-beta.1",
       "offers": {
         "@context": "https://schema.org",
         "@type": "Offer",
@@ -107,7 +107,7 @@
       "acceptedAnswer": {
         "@context": "https://schema.org",
         "@type": "Answer",
-        "text": "jev-curate targets 1,500+ rows per second across a cluster (20 rows/sec per single node against TypeSafe's 1,200 req/min limit) using multi-threaded streaming with speculative fan-out batching, which batches independent judgement questions for each row into a single API request."
+        "text": "jev-curate has a 63-node cluster target (24/s single node) using multi-threaded streaming with speculative fan-out batching, which batches independent judgement questions for each row into a single API request."
       }
     },
     {
@@ -134,8 +134,8 @@
 }</script>
   <script defer src="/_vercel/insights/script.js"></script>
 </head>
-<!-- impeccable-disable em-dash-overuse: CLI flags like --dry-run are not em-dashes -->
 <body>
+  <a class="skip-link" href="#main">Skip to main content</a>
   <header class="site-header">
     <a class="logo" href="index.html">jev-curate<sup>beta</sup></a>
     <nav class="site-nav" aria-label="Site">
@@ -166,12 +166,12 @@
   <main id="top">
     <section class="hero">
       <div class="hero-copy">
-        <p class="eyebrow">Rust + TypeSafe Jev judgment</p>
-        <h1>Sift synthetic and pretraining datasets with Jev judgment</h1>
+        <p class="eyebrow">Rust + TypeSafe Jev judgment · v0.3.0-beta.1</p>
+        <h1>Filter LLM training data with typed verdicts, not fragile prompts</h1>
         <p class="lead">jev-curate streams Parquet and JSONL through a Jev evaluation pipeline, keeps rows that pass your rubric, and writes the rejects to a second file. Measured numbers in the <a href="benchmarks.html" class="lead-link">benchmarks</a>, no invented speeds.</p>
         <div class="hero-actions">
-          <a class="btn btn-primary" href="#quickstart">Try the CLI</a>
-          <a class="btn btn-ghost" href="https://github.com/AkashPriyadarshii/jev-curate#readme">Read the README</a>
+          <a class="btn btn-primary" href="#sandbox">Try 10s sandbox</a>
+          <a class="btn btn-ghost" href="#quickstart">Quickstart</a>
         </div>
         <p class="hero-note">Output unmetered. About <a href="https://docs.typesafe.ai/models.md">$4.20 per 100M input tokens</a>.</p>
         <div class="verdict" role="group" aria-label="Dry run keep and reject counts">
@@ -180,15 +180,85 @@
           <span class="judge-line">18.8% rejected</span>
         </div>
       </div>
-      <div class="terminal" aria-label="Terminal showing a jev-curate dry run">
-        <div class="terminal-bar"><span class="t-dot"></span><span>jev-curate --dry-run</span></div>
-        <pre><code>$ jev-curate --input corpus.jsonl --preset reasoning-math --concurrency 32 --dry-run
-[info] preset: reasoning-math
-[info] concurrency: 32
-[info] dry-run: no rows sent, no credits spent
-[info] would keep 812,044 of 1,000,000 rows
-[info] would reject 187,956 rows (18.8%)</code></pre>
+      <div class="terminal" aria-label="Interactive hero terminal">
+        <div class="terminal-bar">
+          <span class="t-dot"></span>
+          <div class="hero-tabs" role="tablist" aria-label="Usage examples">
+            <button class="hero-tab is-active" type="button" role="tab" aria-selected="true" data-tab="cli">CLI</button>
+            <button class="hero-tab" type="button" role="tab" aria-selected="false" data-tab="python">Python</button>
+            <button class="hero-tab" type="button" role="tab" aria-selected="false" data-tab="verdict">Verdict JSON</button>
+          </div>
+          <button class="hero-copy-btn" type="button">copy</button>
+        </div>
+        <div class="hero-panel" data-panel="cli">
+          <pre><code>$ pip install jev-curate
+$ jev-curate filter corpus.parquet \
+  --preset reasoning-math \
+  --format parquet \
+  --resume \
+  --model jev-latest</code></pre>
+        </div>
+        <div class="hero-panel" data-panel="python" hidden>
+          <pre><code>from jev_curate import PyJevCurator
+
+curator = PyJevCurator(preset="reasoning-math", model="jev-latest")
+stats = curator.filter_file("corpus.parquet", out_dir="./curated/", resume=True)
+print(stats.kept, stats.rejected)</code></pre>
+        </div>
+        <div class="hero-panel" data-panel="verdict" hidden>
+          <pre><code>{
+  "passed": true,
+  "scores": { "reasoning_depth": 3.2 },
+  "nouls": { "has_circular_reasoning": 0.12 },
+  "rejection_reasons": [],
+  "input_tokens": 148
+}</code></pre>
+        </div>
       </div>
+    </section>
+
+    <section class="sandbox" id="sandbox">
+      <h2>10-second browser rubric sandbox</h2>
+      <p class="section-lead">Test exact <code>src/presets.rs</code> thresholds and live <code>secret_scan</code> in your browser before touching an API key.</p>
+      <div class="sandbox-controls">
+        <label for="sandbox-preset">Preset:
+          <select id="sandbox-preset">
+            <option value="reasoning-math">reasoning-math (depth &ge; 2.0, circular &lt; 0.70)</option>
+            <option value="anti-sycophancy">anti-sycophancy (syc &lt; 0.65, disclaimer &lt; 0.80)</option>
+            <option value="code-correctness">code-correctness (quality &ge; 2.0, stub &lt; 0.75)</option>
+          </select>
+        </label>
+        <span id="sandbox-secret-badge" class="sandbox-badge">secret_scan: clean</span>
+      </div>
+      <div class="sandbox-grid">
+        <div class="sandbox-pane">
+          <label class="sandbox-label" for="sandbox-input">Input rows (JSONL or plain text)</label>
+          <textarea id="sandbox-input" rows="7" spellcheck="false"></textarea>
+        </div>
+        <div class="sandbox-pane">
+          <div class="sandbox-out-tabs" role="tablist" aria-label="Sandbox output files">
+            <button class="sandbox-out-tab is-active" type="button" role="tab" aria-selected="true" data-out="clean">clean.jsonl (<span id="sandbox-clean-count">0</span>)</button>
+            <button class="sandbox-out-tab" type="button" role="tab" aria-selected="false" data-out="rejected">rejected.jsonl (<span id="sandbox-rejected-count">0</span>)</button>
+          </div>
+          <pre id="sandbox-clean-out" class="sandbox-out"></pre>
+          <pre id="sandbox-rejected-out" class="sandbox-out" hidden></pre>
+        </div>
+      </div>
+      <style>
+        .hero-tabs{display:flex;gap:6px;margin-left:8px;flex:1}
+        .hero-tab,.hero-copy-btn,.sandbox-out-tab{background:transparent;border:1px solid currentColor;color:inherit;font:inherit;font-size:.78rem;padding:2px 8px;border-radius:3px;cursor:pointer;opacity:.75}
+        .hero-tab.is-active,.sandbox-out-tab.is-active{opacity:1;font-weight:700}
+        .sandbox{margin:48px 0}
+        .sandbox-controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin:16px 0}
+        .sandbox-badge{font-size:.82rem;padding:3px 8px;border:1px solid currentColor;border-radius:3px}
+        .sandbox-badge.is-alert{font-weight:700}
+        .sandbox-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+        @media (max-width:800px){.sandbox-grid{grid-template-columns:1fr}}
+        .sandbox-label{display:block;font-size:.85rem;font-weight:600;margin-bottom:6px}
+        #sandbox-input{width:100%;font-family:monospace;font-size:.82rem;padding:10px;border:1px solid currentColor;border-radius:4px;background:transparent;color:inherit;box-sizing:border-box}
+        .sandbox-out-tabs{display:flex;gap:8px;margin-bottom:6px}
+        .sandbox-out{margin:0;padding:10px;border:1px solid currentColor;border-radius:4px;font-size:.8rem;min-height:142px;max-height:220px;overflow:auto;white-space:pre-wrap;word-break:break-word}
+      </style>
     </section>
 
     <section class="why" id="why">
@@ -226,30 +296,34 @@
     <section class="quickstart" id="quickstart">
       <h2>One command in, two files out</h2>
       <div class="code-block">
-        <button class="copy-btn" data-copy="cargo install jev-curate">copy</button>
-        <pre><code>$ cargo install jev-curate  # or pip install jev-curate
-$ jev-curate filter corpus.parquet --preset anti-sycophancy --out ./curated/ --model jev-latest</code></pre>
+        <button class="copy-btn" data-copy="pip install jev-curate">copy</button>
+        <pre><code>$ pip install jev-curate  # or cargo install jev-curate
+$ jev-curate filter corpus.parquet --preset anti-sycophancy --format parquet --resume --model jev-latest --out ./curated/</code></pre>
       </div>
       <p class="section-lead">The binary writes <code>clean.jsonl</code> with accepted rows and <code>rejected.jsonl</code> with the rest, plus structural stats. Run <code>--dry-run</code> first to see keep and reject counts before any row touches the API. Requires only a <code>TYPESAFE_API_KEY</code>.</p>
       <h3 class="steps-heading">Run it in six steps</h3>
       <ol class="steps">
-        <li><span>Install</span> the binary with <code>cargo install jev-curate</code> or grab a release build.</li>
+        <li><span>Install</span> via <code>pip install jev-curate</code> or <code>cargo install jev-curate</code>.</li>
         <li><span>Export</span> a <code>TYPESAFE_API_KEY</code> or run without one in dry-run mode.</li>
-        <li><span>Point</span> the CLI at a <code>.jsonl</code> or <code>.parquet</code> file with <code>-i</code>.</li>
+        <li><span>Point</span> the CLI at a <code>.jsonl</code> or <code>.parquet</code> file with <code>jev-curate filter &lt;INPUT&gt;</code>.</li>
         <li><span>Pick</span> a preset with <code>-p</code>: reasoning-math, anti-sycophancy or code-correctness.</li>
         <li><span>Check</span> what would change with <code>--dry-run</code> before spending a token.</li>
         <li><span>Run</span> for real and read <code>clean.jsonl</code> and <code>rejected.jsonl</code> from the output folder.</li>
       </ol>
-      <table class="flag-table">
+      <div class="table-wrap"><table class="flag-table">
         <thead><tr><th>Flag</th><th>Default</th><th>What it does</th></tr></thead>
         <tbody>
-          <tr><td><code>-i, --input</code></td><td>required</td><td>.jsonl or .parquet input path</td></tr>
+          <tr><td><code>&lt;INPUT&gt;</code></td><td>required</td><td>.jsonl or .parquet input path</td></tr>
           <tr><td><code>-p, --preset</code></td><td>reasoning-math</td><td>rubric to evaluate against</td></tr>
           <tr><td><code>-o, --out</code></td><td>./curated/</td><td>output directory</td></tr>
+          <tr><td><code>--format</code></td><td>jsonl</td><td>output format (<code>jsonl</code> or <code>parquet</code>)</td></tr>
+          <tr><td><code>--resume</code></td><td>off</td><td>resume interrupted run from checkpoint</td></tr>
+          <tr><td><code>--model</code></td><td>jev-latest</td><td>Jev model identifier</td></tr>
+          <tr><td><code>--endpoint</code></td><td>TypeSafe API</td><td>custom HTTPS or localhost endpoint</td></tr>
           <tr><td><code>-c, --concurrency</code></td><td>32</td><td>parallel worker count</td></tr>
           <tr><td><code>--dry-run</code></td><td>off</td><td>count before scoring; no key needed</td></tr>
         </tbody>
-      </table>
+      </table></div>
     </section>
 
     <section class="cost" id="cost">
@@ -257,7 +331,7 @@ $ jev-curate filter corpus.parquet --preset anti-sycophancy --out ./curated/ --m
       <div class="stat-row">
         <div class="stat">
           <p class="stat-num">1500+</p>
-          <p class="stat-label">rows per second, per worker target</p>
+          <p class="stat-label">cluster target (63 nodes)</p>
         </div>
         <div class="stat">
           <p class="stat-num">$0.042</p>
@@ -291,7 +365,7 @@ $ jev-curate filter corpus.parquet --preset anti-sycophancy --out ./curated/ --m
       </div>
       <div class="author-links">
         <a href="https://github.com/AkashPriyadarshii">GitHub</a>
-        <a href="https://akashpriyadarshi.vercel.app">Portfolio</a>
+        <a href="https://akashpriyadarshi.is-a.dev">Portfolio</a>
         <a href="https://linkedin.com/in/akashpriyadarshii">LinkedIn</a>
         <a href="https://akashpriyadarshii.github.io/Resume/">Resume</a>
       </div>
@@ -325,7 +399,7 @@ $ jev-curate filter corpus.parquet --preset anti-sycophancy --out ./curated/ --m
       <div class="footer-author">
         <h3>Author</h3>
         <a href="https://github.com/AkashPriyadarshii">GitHub</a>
-        <a href="https://akashpriyadarshi.vercel.app">Portfolio</a>
+        <a href="https://akashpriyadarshi.is-a.dev">Portfolio</a>
         <a href="https://linkedin.com/in/akashpriyadarshii">LinkedIn</a>
         <a href="https://akashpriyadarshii.github.io/Resume/">Resume</a>
       </div>
@@ -334,7 +408,7 @@ $ jev-curate filter corpus.parquet --preset anti-sycophancy --out ./curated/ --m
         <a href="https://x.com/Akash__ydv001">X / Twitter</a>
         <a href="https://www.threads.net/@akash.priyadarshii">Threads</a>
         <a href="https://www.instagram.com/akash.priyadarshii">Instagram</a>
-        <a href="https://reddit.com/user/akashpriyadarshi">Reddit</a>
+        <a href="https://reddit.com/user/akashpriyadarshii">Reddit</a>
 
         <a href="https://buymeacoffee.com/AkashPriyadarshi" target="_blank" rel="noopener">Support</a>
       </div>
@@ -344,6 +418,7 @@ $ jev-curate filter corpus.parquet --preset anti-sycophancy --out ./curated/ --m
   </footer>
 
   <script src="script.js"></script>
-<a class="ph-float" href="https://www.producthunt.com/products/jev-curate?launch=jev-curate" target="_blank" rel="noopener noreferrer" aria-label="jev-curate on Product Hunt" title="Find jev-curate on Product Hunt"><span aria-hidden="true">P</span></a><style>.ph-float{position:fixed;right:20px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:60;display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:9999px;background:#FF6154;color:#fff;font-weight:700;font-size:24px;font-family:inherit;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.35);transition:transform .2s ease}.ph-float:hover{transform:scale(1.05)}.ph-float span{line-height:1}@media (prefers-reduced-motion:reduce){.ph-float{transition:none}}@media print{.ph-float{display:none}}</style>
-<a class="bmc-float" href="https://buymeacoffee.com/AkashPriyadarshi" target="_blank" rel="noopener noreferrer" aria-label="Support my work on Buy Me a Coffee" title="Fuel the next build"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 8h1a4 4 0 1 1 0 8h-1" /><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" /><line x1="6" x2="6" y1="2" y2="4" /><line x1="10" x2="10" y1="2" y2="4" /><line x1="14" x2="14" y1="2" y2="4" /></svg></a><style>.bmc-float{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom));z-index:60;display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:9999px;background:#FFDD00;color:#000;box-shadow:0 8px 24px rgba(0,0,0,.35);transition:transform .2s ease}.bmc-float:hover{transform:scale(1.05)}.bmc-float svg{width:20px;height:20px}@media (prefers-reduced-motion:reduce){.bmc-float{transition:none}}@media print{.bmc-float{display:none}}</style></body>
+  <script src="sandbox.js"></script>
+<a class="ph-float" href="https://www.producthunt.com/products/jev-curate?launch=jev-curate" target="_blank" rel="noopener noreferrer" aria-label="jev-curate on Product Hunt" title="Find jev-curate on Product Hunt"><span aria-hidden="true">P</span></a><style>.ph-float{position:fixed;right:20px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:60;display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:4px;background:#C93224;color:#fff;font-weight:700;font-size:24px;font-family:inherit;text-decoration:none;box-shadow:2px 2px 0 #1e1e1e;transition:transform .2s ease}.ph-float:hover{transform:scale(1.05)}.ph-float span{line-height:1}@media (prefers-reduced-motion:reduce){.ph-float{transition:none}}@media print{.ph-float{display:none}}</style>
+<a class="bmc-float" href="https://buymeacoffee.com/AkashPriyadarshi" target="_blank" rel="noopener noreferrer" aria-label="Support my work on Buy Me a Coffee" title="Fuel the next build"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 8h1a4 4 0 1 1 0 8h-1" /><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" /><line x1="6" x2="6" y1="2" y2="4" /><line x1="10" x2="10" y1="2" y2="4" /><line x1="14" x2="14" y1="2" y2="4" /></svg></a><style>.bmc-float{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom));z-index:60;display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:4px;background:#FFDD00;color:#000;box-shadow:2px 2px 0 #1e1e1e;transition:transform .2s ease}.bmc-float:hover{transform:scale(1.05)}.bmc-float svg{width:20px;height:20px}@media (prefers-reduced-motion:reduce){.bmc-float{transition:none}}@media print{.bmc-float{display:none}}</style></body>
 </html>

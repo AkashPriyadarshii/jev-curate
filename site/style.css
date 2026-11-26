@@ -118,10 +118,12 @@ code, pre {
   grid-template-columns: 1.1fr 0.9fr;
   gap: 60px;
   align-items: center;
-  padding: 100px 100px 100px 100px;
+  padding: 56px 100px 56px 100px;
   max-width: 1200px;
   margin: 0 auto;
 }
+
+.hero > * { min-width: 0; }
 
 .eyebrow {
   font-family: var(--mono);
@@ -167,6 +169,7 @@ code, pre {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   overflow: hidden;
+  max-width: 100%;
 }
 
 .terminal-bar {
@@ -203,6 +206,8 @@ section {
   max-width: 1200px;
   margin: 0 auto;
 }
+
+.hero > * { min-width: 0; }
 
 h2 {
   font-family: var(--display);
@@ -311,18 +316,21 @@ h2 {
 .copy-btn:hover { color: var(--pink); border-color: var(--pink); }
 
 .quickstart .section-lead code {
-  background: var(--grey-4);
+  background: #f5f3f0;
   padding: 2px 5px;
   border-radius: var(--radius);
+}
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .flag-table {
   width: 100%;
   margin-top: 40px;
   border-collapse: collapse;
-  display: block;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .flag-table th {
@@ -344,7 +352,7 @@ h2 {
 }
 
 .flag-table td code {
-  background: var(--grey-4);
+  background: #f5f3f0;
   padding: 2px 5px;
   border-radius: var(--radius);
 }
@@ -352,7 +360,7 @@ h2 {
 /* cost */
 .cost {
   border-top: 1px solid var(--grey-2);
-  background: var(--grey-4);
+  background: #f5f3f0;
   max-width: none;
   padding-left: clamp(24px, 8vw, calc((100% - 1200px) / 2 + 100px));
   padding-right: clamp(24px, 8vw, calc((100% - 1200px) / 2 + 100px));
@@ -407,6 +415,8 @@ h2 {
   max-width: 1200px;
   margin: 0 auto;
 }
+
+.hero > * { min-width: 0; }
 
 .footer h3 {
   font-family: var(--body);
@@ -469,8 +479,9 @@ h2 {
 /* ---- mid tablet: 960–1100px gap fix (M1/M2/M3) ---- */
 @media (max-width: 1100px) {
   .nav { padding: 20px 40px; }
-  .site-header { padding: 16px 40px; }
-  .hero { padding: 80px 40px 80px; }
+  .site-header { padding: 16px 32px; gap: 12px; }
+  .site-nav { gap: 14px; white-space: nowrap; }
+  .hero { padding: 56px 40px 56px; }
   section { padding: 80px 40px; }
   .cost { padding: 80px 40px; }
   .breadcrumb { padding: 20px 40px 0; }
@@ -713,9 +724,6 @@ h2 {
   border-collapse: collapse;
   margin: 24px 0;
   font-size: 15px;
-  display: block;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
 }
 .bench-table th, .bench-table td {
   border: 1px solid var(--grey-3);
@@ -775,8 +783,15 @@ h2 {
   overflow-x: auto;
 }
 
-@media (max-width: 960px) {
-  .site-header { padding: 15px 30px; flex-wrap: wrap; gap: 12px; }
-  .site-nav { display: none; }
-  .breadcrumb { padding: 16px 30px 0; }
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--ink);
+  color: var(--substrate);
+  padding: 10px 16px;
+  font-family: var(--mono);
+  font-size: 13px;
+  z-index: 100;
 }
+.skip-link:focus { left: 12px; top: 12px; }

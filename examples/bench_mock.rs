@@ -119,33 +119,38 @@ async fn main() {
     let (seq_p50, seq_p95, seq_err, seq_pass) = summarize(&seq_samples);
     let (par_p50, par_p95, par_err, par_pass) = summarize(&par_samples);
 
-    let cores = std::thread::available_parallelism()
-        .map(|n| n.get())
-        .unwrap_or(0);
-    println!("jev-curate benchmark (mock server, no network)");
-    println!("machine cores: {cores}");
-    println!("rows: {ROWS}, concurrency 1 and {CONCURRENCY}");
-    println!(
-        "sequential: {:.1} rows/sec ({:.0} ms/row) p50={:.0}ms p95={:.0}ms errors={} passed={}/{ROWS}",
-        rate(seq_elapsed),
-        seq_elapsed.as_millis() as f64 / ROWS as f64,
-        seq_p50,
-        seq_p95,
-        seq_err,
-        seq_pass,
-    );
-    println!(
-        "concurrent {CONCURRENCY}: {:.1} rows/sec ({:.0} ms/row) p50={:.0}ms p95={:.0}ms errors={} passed={}/{ROWS}",
-        rate(par_elapsed),
-        par_elapsed.as_millis() as f64 / ROWS as f64,
-        par_p50,
-        par_p95,
-        par_err,
-        par_pass,
-    );
-    println!("note: client rate limiter defaults to 20 req/sec (TypeSafe 1,200 req/min policy)");
+    let json_mode = std::env::args().any(|a| a == "--json");
+    if !json_mode {
+        let cores = std::thread::available_parallelism()
+            .map(|n| n.get())
+            .unwrap_or(0);
+        println!("jev-curate benchmark (mock server, no network)");
+        println!("machine cores: {cores}");
+        println!("rows: {ROWS}, concurrency 1 and {CONCURRENCY}");
+        println!(
+            "sequential: {:.1} rows/sec ({:.0} ms/row) p50={:.0}ms p95={:.0}ms errors={} passed={}/{ROWS}",
+            rate(seq_elapsed),
+            seq_elapsed.as_millis() as f64 / ROWS as f64,
+            seq_p50,
+            seq_p95,
+            seq_err,
+            seq_pass,
+        );
+        println!(
+            "concurrent {CONCURRENCY}: {:.1} rows/sec ({:.0} ms/row) p50={:.0}ms p95={:.0}ms errors={} passed={}/{ROWS}",
+            rate(par_elapsed),
+            par_elapsed.as_millis() as f64 / ROWS as f64,
+            par_p50,
+            par_p95,
+            par_err,
+            par_pass,
+        );
+        println!(
+            "note: client rate limiter defaults to 20 req/sec (TypeSafe 1,200 req/min policy)"
+        );
+    }
 
-    if std::env::args().any(|a| a == "--json") {
+    if json_mode {
         let out = serde_json::json!({
             "tool": "jev-curate bench_mock",
             "mode": "local-mock",

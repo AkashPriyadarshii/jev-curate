@@ -38,6 +38,98 @@ impl DatasetReader {
         Self::stream_jsonl(p, f)
     }
 
+    /// Returns the Arrow schema of a Parquet file.
+    pub fn parquet_schema<P: AsRef<Path>>(path: P) -> Result<arrow::datatypes::SchemaRef> {
+        use parquet::arrow::arrow_reader::ParquetRecordBatchReaderBuilder;
+        let file = File::open(path.as_ref())
+            .with_context(|| format!("Failed to open parquet file {}", path.as_ref().display()))?;
+        let builder = ParquetRecordBatchReaderBuilder::try_new(file)?;
+        Ok(builder.schema().clone())
+    }
+
+    /// Streams Parquet records via callback, also yielding the 1-row `RecordBatch` slice for schema-preserving output.
+    pub fn stream_parquet_rows<P: AsRef<Path>, F>(path: P, on_row: F) -> Result<()>
+    where
+        F: FnMut(String, String, arrow::record_batch::RecordBatch) -> Result<()>,
+    {
+        Self::stream_parquet_rows_with_cols(path, None, on_row)
+    }
+
+    /// Streams Parquet records with optional column selector, yielding the 1-row `RecordBatch` slice.
+    pub fn stream_parquet_rows_with_cols<P: AsRef<Path>, F>(
+        path: P,
+        cols: Option<&[String]>,
+        mut on_row: F,
+    ) -> Result<()>
+    where
+        F: FnMut(String, String, arrow::record_batch::RecordBatch) -> Result<()>,
+    {
+        use arrow::array::{Array, AsArray};
+        use parquet::arrow::arrow_reader::ParquetRecordBatchReaderBuilder;
+        let file = File::open(path.as_ref())
+            .with_context(|| format!("Failed to open parquet file {}", path.as_ref().display()))?;
+        let builder = ParquetRecordBatchReaderBuilder::try_new(file)?;
+        let reader = builder.build()?;
+        let cols: Option<&[String]> = None;
+        for batch_res in reader {
+            let batch = batch_res?;
+            let schema = batch.schema();
+            let mut text_col_idx = None;
+            if let Some(wanted) = cols
+                && !wanted.is_empty()
+            {
+                for w in wanted {
+                    if let Some((idx, _)) = schema
+                        .fields()
+                        .iter()
+                        .enumerate()
+                        .find(|(_, f)| f.name().eq_ignore_ascii_case(w))
+                    {
+                        text_col_idx = Some(idx);
+                        break;
+                    }
+                }
+            }
+            if text_col_idx.is_none() {
+                for (idx, field) in schema.fields().iter().enumerate() {
+                    let name = field.name().to_lowercase();
+                    if name == "text"
+                        || name == "content"
+                        || name == "instruction"
+                        || name == "response"
+                        || name == "prompt"
+                    {
+                        text_col_idx = Some(idx);
+                        break;
+                    }
+                }
+            }
+            let col_idx = text_col_idx.unwrap_or(0);
+            if batch.num_columns() == 0 || batch.num_rows() == 0 {
+                continue;
+            }
+            let col = batch.column(col_idx);
+            if let Some(arr) = col.as_string_opt::<i32>() {
+                for i in 0..arr.len() {
+                    if arr.is_valid(i) {
+                        let val = arr.value(i).to_string();
+                        let raw = serde_json::json!({ "text": &val }).to_string();
+                        on_row(val, raw, batch.slice(i, 1))?;
+                    }
+                }
+            } else if let Some(arr) = col.as_string_opt::<i64>() {
+                for i in 0..arr.len() {
+                    if arr.is_valid(i) {
+                        let val = arr.value(i).to_string();
+                        let raw = serde_json::json!({ "text": &val }).to_string();
+                        on_row(val, raw, batch.slice(i, 1))?;
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+
     /// Streams Parquet records via callback (batch-decoded, not Vec).
     pub fn stream_parquet<P: AsRef<Path>, F>(path: P, mut on_record: F) -> Result<()>
     where
@@ -49,20 +141,38 @@ impl DatasetReader {
             .with_context(|| format!("Failed to open parquet file {}", path.as_ref().display()))?;
         let builder = ParquetRecordBatchReaderBuilder::try_new(file)?;
         let reader = builder.build()?;
+        let cols: Option<&[String]> = None;
         for batch_res in reader {
             let batch = batch_res?;
             let schema = batch.schema();
             let mut text_col_idx = None;
-            for (idx, field) in schema.fields().iter().enumerate() {
-                let name = field.name().to_lowercase();
-                if name == "text"
-                    || name == "content"
-                    || name == "instruction"
-                    || name == "response"
-                    || name == "prompt"
-                {
-                    text_col_idx = Some(idx);
-                    break;
+            if let Some(wanted) = cols
+                && !wanted.is_empty()
+            {
+                for w in wanted {
+                    if let Some((idx, _)) = schema
+                        .fields()
+                        .iter()
+                        .enumerate()
+                        .find(|(_, f)| f.name().eq_ignore_ascii_case(w))
+                    {
+                        text_col_idx = Some(idx);
+                        break;
+                    }
+                }
+            }
+            if text_col_idx.is_none() {
+                for (idx, field) in schema.fields().iter().enumerate() {
+                    let name = field.name().to_lowercase();
+                    if name == "text"
+                        || name == "content"
+                        || name == "instruction"
+                        || name == "response"
+                        || name == "prompt"
+                    {
+                        text_col_idx = Some(idx);
+                        break;
+                    }
                 }
             }
             let col_idx = text_col_idx.unwrap_or(0);
@@ -92,43 +202,91 @@ impl DatasetReader {
     }
 
     /// Streams JSONL records via callback (line-buffered, not Vec).
-    pub fn stream_jsonl<P: AsRef<Path>, F>(path: P, mut on_record: F) -> Result<()>
+    pub fn stream_jsonl<P: AsRef<Path>, F>(path: P, on_record: F) -> Result<()>
+    where
+        F: FnMut(String, String) -> Result<()>,
+    {
+        Self::stream_jsonl_with_cols(path, None, on_record)
+    }
+
+    /// Streams JSONL records via callback with optional column selector.
+    pub fn stream_jsonl_with_cols<P: AsRef<Path>, F>(
+        path: P,
+        cols: Option<&[String]>,
+        on_record: F,
+    ) -> Result<()>
     where
         F: FnMut(String, String) -> Result<()>,
     {
         let file = File::open(path.as_ref())
             .with_context(|| format!("Failed to open file {}", path.as_ref().display()))?;
-        let reader = BufReader::new(file);
+        Self::stream_jsonl_reader(BufReader::new(file), cols, on_record)
+    }
+
+    /// Extracts text from a single JSONL line using optional column names or default heuristics.
+    pub fn extract_jsonl_text(line: &str, cols: Option<&[String]>) -> String {
+        let trimmed = line.trim();
+        if let Ok(json) = serde_json::from_str::<serde_json::Value>(trimmed) {
+            if let Some(wanted) = cols
+                && !wanted.is_empty()
+            {
+                let parts: Vec<String> = wanted
+                    .iter()
+                    .filter_map(|c| {
+                        json.get(c).and_then(|v| v.as_str()).map(|s| {
+                            if wanted.len() > 1 {
+                                format!("{}: {}", c, s)
+                            } else {
+                                s.to_string()
+                            }
+                        })
+                    })
+                    .collect();
+                if !parts.is_empty() {
+                    return parts.join("\n\n");
+                }
+            }
+            if let (Some(inst), Some(resp)) = (
+                json.get("instruction")
+                    .or_else(|| json.get("prompt"))
+                    .and_then(|v| v.as_str()),
+                json.get("response")
+                    .or_else(|| json.get("output"))
+                    .and_then(|v| v.as_str()),
+            ) {
+                format!("Instruction:\n{}\n\nResponse:\n{}", inst, resp)
+            } else {
+                json.get("text")
+                    .or_else(|| json.get("content"))
+                    .or_else(|| json.get("response"))
+                    .or_else(|| json.get("output"))
+                    .or_else(|| json.get("instruction"))
+                    .or_else(|| json.get("prompt"))
+                    .and_then(|v| v.as_str())
+                    .unwrap_or(trimmed)
+                    .to_string()
+            }
+        } else {
+            trimmed.to_string()
+        }
+    }
+
+    /// Streams JSONL records from any `BufRead` (file, stdin, etc.).
+    pub fn stream_jsonl_reader<R: BufRead, F>(
+        reader: R,
+        cols: Option<&[String]>,
+        mut on_record: F,
+    ) -> Result<()>
+    where
+        F: FnMut(String, String) -> Result<()>,
+    {
         for line in reader.lines() {
             let line_str = line?;
             let trimmed = line_str.trim();
             if trimmed.is_empty() {
                 continue;
             }
-            let text = if let Ok(json) = serde_json::from_str::<serde_json::Value>(trimmed) {
-                if let (Some(inst), Some(resp)) = (
-                    json.get("instruction")
-                        .or_else(|| json.get("prompt"))
-                        .and_then(|v| v.as_str()),
-                    json.get("response")
-                        .or_else(|| json.get("output"))
-                        .and_then(|v| v.as_str()),
-                ) {
-                    format!("Instruction:\n{}\n\nResponse:\n{}", inst, resp)
-                } else {
-                    json.get("text")
-                        .or_else(|| json.get("content"))
-                        .or_else(|| json.get("response"))
-                        .or_else(|| json.get("output"))
-                        .or_else(|| json.get("instruction"))
-                        .or_else(|| json.get("prompt"))
-                        .and_then(|v| v.as_str())
-                        .unwrap_or(trimmed)
-                        .to_string()
-                }
-            } else {
-                trimmed.to_string()
-            };
+            let text = Self::extract_jsonl_text(&line_str, cols);
             on_record(text, line_str)?;
         }
         Ok(())
@@ -145,6 +303,7 @@ impl DatasetReader {
         let reader = builder.build()?;
 
         let mut records = Vec::new();
+        let cols: Option<&[String]> = None;
 
         for batch_res in reader {
             let batch = batch_res?;
@@ -152,16 +311,33 @@ impl DatasetReader {
 
             // Find primary text column index
             let mut text_col_idx = None;
-            for (idx, field) in schema.fields().iter().enumerate() {
-                let name = field.name().to_lowercase();
-                if name == "text"
-                    || name == "content"
-                    || name == "instruction"
-                    || name == "response"
-                    || name == "prompt"
-                {
-                    text_col_idx = Some(idx);
-                    break;
+            if let Some(wanted) = cols
+                && !wanted.is_empty()
+            {
+                for w in wanted {
+                    if let Some((idx, _)) = schema
+                        .fields()
+                        .iter()
+                        .enumerate()
+                        .find(|(_, f)| f.name().eq_ignore_ascii_case(w))
+                    {
+                        text_col_idx = Some(idx);
+                        break;
+                    }
+                }
+            }
+            if text_col_idx.is_none() {
+                for (idx, field) in schema.fields().iter().enumerate() {
+                    let name = field.name().to_lowercase();
+                    if name == "text"
+                        || name == "content"
+                        || name == "instruction"
+                        || name == "response"
+                        || name == "prompt"
+                    {
+                        text_col_idx = Some(idx);
+                        break;
+                    }
                 }
             }
 
@@ -291,6 +467,13 @@ impl ParquetWriter {
             path,
         })
     }
+    pub fn write_batch(&mut self, batch: &arrow::record_batch::RecordBatch) -> Result<()> {
+        if let Some(w) = self.writer.as_mut() {
+            w.write(batch)?;
+        }
+        Ok(())
+    }
+
     pub fn close(&mut self) -> Result<()> {
         if let Some(w) = self.writer.take() {
             w.close()?;
@@ -308,24 +491,29 @@ pub struct DatasetWriter {
 
 impl DatasetWriter {
     pub fn new<P: AsRef<Path>>(out_dir: P) -> Result<Self> {
+        Self::open(out_dir, false)
+    }
+
+    pub fn open<P: AsRef<Path>>(out_dir: P, append: bool) -> Result<Self> {
         let clean_path = out_dir.as_ref().join("clean.jsonl");
         let rejected_path = out_dir.as_ref().join("rejected.jsonl");
         let errors_path = out_dir.as_ref().join("errors.jsonl");
 
-        let clean_file = File::create(&clean_path).with_context(|| {
-            format!(
-                "Failed to create clean dataset file {}",
-                clean_path.display()
-            )
-        })?;
-        let rejected_file = File::create(&rejected_path).with_context(|| {
-            format!(
-                "Failed to create rejected log file {}",
-                rejected_path.display()
-            )
-        })?;
-        let errors_file = File::create(&errors_path)
-            .with_context(|| format!("Failed to create errors file {}", errors_path.display()))?;
+        let open_file = |path: &Path| -> Result<File> {
+            if append {
+                std::fs::OpenOptions::new()
+                    .create(true)
+                    .append(true)
+                    .open(path)
+                    .with_context(|| format!("Failed to open {} for append", path.display()))
+            } else {
+                File::create(path).with_context(|| format!("Failed to create {}", path.display()))
+            }
+        };
+
+        let clean_file = open_file(&clean_path)?;
+        let rejected_file = open_file(&rejected_path)?;
+        let errors_file = open_file(&errors_path)?;
 
         Ok(Self {
             clean: std::io::BufWriter::new(clean_file),

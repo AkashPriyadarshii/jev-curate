@@ -24,11 +24,13 @@ node_modules/
 # Tool caches / generated
 .desloppify/
 .supercov/
+.vercel/
+.claude/
+*.local.md
 scorecard.png
 
 # Test / curated outputs (generated)
 test_out/
 curated/
 
-# Local launch helpers live outside the repo (Downloads/jev-curate-launch/)
 checks/
