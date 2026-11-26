@@ -113,7 +113,7 @@ curate:  jev-curate filter set.jsonl -p reasoning-math --dry-run</pre>
 
     <section class="why" id="table">
       <h2>Side by side</h2>
-      <table class="bench-table" aria-label="Comparison table">
+      <div class="table-wrap"><table class="bench-table" aria-label="Comparison table">
         <thead>
           <tr><th>Axis</th><th>Hand-rolled judge script</th><th>jev-curate</th></tr>
         </thead>
@@ -126,7 +126,7 @@ curate:  jev-curate filter set.jsonl -p reasoning-math --dry-run</pre>
           <tr><td>Output shape</td><td>Whatever you designed</td><td>clean.jsonl and rejected.jsonl with verdicts</td></tr>
           <tr><td>Cost of trying</td><td>Days</td><td>Minutes to a dry run</td></tr>
         </tbody>
-      </table>
+      </table></div>
       <p class="section-lead">The honest difference is where the complexity lives. A judge script concentrates all the risk in code you own: prompt drift, parse failures, missing resume logic, throttling bugs. jev-curate moves that risk into a binary with tests, typed outputs, and a dry run that tells you the keep count before a single token is spent.</p>
     </section>
 

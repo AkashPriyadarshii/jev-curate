@@ -136,7 +136,7 @@ answers:
     <section class="why" id="answers">
       <h2>The three answer types</h2>
       <p class="section-lead">Jev does not chat. It returns one of three typed shapes, and the caller decides what to build on top: thresholds, routes, or gates.</p>
-      <table class="bench-table" aria-label="Jev answer types">
+      <div class="table-wrap"><table class="bench-table" aria-label="Jev answer types">
         <thead>
           <tr><th>Type</th><th>Shape</th><th>What it is for</th></tr>
         </thead>
@@ -145,7 +145,7 @@ answers:
           <tr><td>Score</td><td>0 to 4 + confidence</td><td>ratings: quality, depth, relevance</td></tr>
           <tr><td>Noul</td><td>calibrated probability</td><td>odds of a property: circular logic, dishonesty, breakage</td></tr>
         </tbody>
-      </table>
+      </table></div>
       <p class="section-lead">Every preset in jev-curate is a bundle of such questions. The <code>reasoning-math</code> preset asks whether the chain of thought entails the answer and how deep the reasoning is. The <code>anti-sycophancy</code> preset asks rated honesty questions. The <code>code-correctness</code> preset asks whether the program is sound. None of them ask for an essay, because no preset needs one.</p>
     </section>
 

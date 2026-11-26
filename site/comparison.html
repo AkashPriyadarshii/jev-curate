@@ -111,7 +111,7 @@ curate:  {"has_circular_reasoning": noul 0.05,
 
     <section class="why">
       <h2>Side by side</h2>
-      <table class="bench-table" aria-label="Comparison table">
+      <div class="table-wrap"><table class="bench-table" aria-label="Comparison table">
         <thead>
           <tr><th>Axis</th><th>Prompt in a chat window</th><th>jev-curate</th></tr>
         </thead>
@@ -124,7 +124,7 @@ curate:  {"has_circular_reasoning": noul 0.05,
           <tr><td>Repeats</td><td>Same prompt retyped per row</td><td>Preset rubrics, same questions each row</td></tr>
           <tr><td>Check before spending</td><td>None</td><td>--dry-run reports keep and reject counts</td></tr>
         </tbody>
-      </table>
+      </table></div>
       <p class="section-lead">The chat flow is the incumbent workflow for most dataset work, and it is the right tool for the first dozen rows you inspect on screen. The break point is anything you plan to train on: at that size the cost is in the reshaping, not in the model call.</p>
     </section>
 
@@ -170,6 +170,7 @@ curate:  {"has_circular_reasoning": noul 0.05,
         <a href="benchmarks.html">Benchmarks</a>
         <a href="what-is-jev.html">What is Jev</a>
         <a href="comparison.html">Comparison</a>
+        <a href="comparison-judges.html">vs judge scripts</a>
         <a href="glossary.html">Glossary</a>
         <a href="use-cases.html">Use cases</a>
         <a href="about.html">About</a>
