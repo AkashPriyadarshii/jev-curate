@@ -807,6 +807,13 @@ h2 {
 .hero-copy-btn,
 .sandbox-out-tab {
   min-height: 44px;
+  padding: 6px 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  cursor: pointer;
   opacity: 1;
   color: var(--substrate);
   touch-action: manipulation;
@@ -815,6 +822,7 @@ h2 {
 .hero-tab[aria-selected="true"],
 .sandbox-out-tab[aria-selected="true"] {
   color: var(--pink);
+  border-color: var(--pink);
 }
 
 #sandbox-preset {
@@ -824,6 +832,8 @@ h2 {
 }
 
 @media (max-width: 960px) {
+  html, body { overflow-x: hidden; }
+  .site-nav { display: none; }
   #sandbox-input {
     font-size: max(16px, 0.82rem);
   }
