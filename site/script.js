@@ -1,23 +1,34 @@
 (function () {
+  function fallbackCopy(text, done) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    done();
+  }
+
   /* copy button */
   var btn = document.querySelector('.copy-btn');
+  var copyStatus = document.getElementById('copy-status');
   if (btn) {
     btn.addEventListener('click', function () {
       var text = btn.getAttribute('data-copy');
       var done = function () {
         btn.textContent = 'copied';
-        setTimeout(function () { btn.textContent = 'copy'; }, 1600);
+        if (copyStatus) copyStatus.textContent = 'Copied to clipboard';
+        setTimeout(function () {
+          btn.textContent = 'copy';
+          if (copyStatus) copyStatus.textContent = '';
+        }, 1600);
       };
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(done);
+        navigator.clipboard.writeText(text).then(done).catch(function () {
+          fallbackCopy(text, done);
+        });
       } else {
-        var ta = document.createElement('textarea');
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-        done();
+        fallbackCopy(text, done);
       }
     });
   }
@@ -30,6 +41,10 @@
       var open = mobileNav.classList.toggle('open');
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
       toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      if (open) {
+        var firstLink = mobileNav.querySelector('a, button');
+        if (firstLink) firstLink.focus();
+      }
     });
     /* close on outside click */
     document.addEventListener('click', function (e) {
