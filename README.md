@@ -238,3 +238,5 @@ All tests run against an in-process mock server with zero live API credits in CI
 <p>
   <a href="https://buymeacoffee.com/AkashPriyadarshi"><img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me a Coffee" /></a>
 </p>
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=ce1c0ae3-34fa-4e5c-9716-6732d0401758" />
