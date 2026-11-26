@@ -102,8 +102,8 @@ machine cores: 4
 rows: 120, concurrency 1 and 32
 sequential:    24.0 rows/sec (42 ms/row)
 concurrent 32: 24.0 rows/sec (42 ms/row)
-note: client rate limiter defaults to 20 req/sec
-      (TypeSafe 1,200 req/min policy)</pre>
+note: jev-curate's built-in limiter defaults to 20 req/sec
+      (TypeSafe current org default: 80 req/s, 100k tok/s)</pre>
       </div>
     </section>
 
@@ -124,7 +124,7 @@ note: client rate limiter defaults to 20 req/sec
 
     <section class="presets">
       <h2>Why the ceiling is there</h2>
-      <p class="section-lead"><code>jev-curate</code> sends one fan-out request per row. Jev accepts 1,200 requests per minute, so the client's token bucket refills at 20 tokens per second. One row per token means a hard ceiling near 20 rows per second on a single worker, with short bursts above it. Measured: 24.0 rows/sec, matching a 20-token burst plus the steady refill.</p>
+      <p class="section-lead"><code>jev-curate</code> sends one fan-out request per row. In <code>v0.3.0-beta.1</code>, the client's built-in token bucket defaults to 20 tokens per second (TypeSafe's current org default is 80 req/s and 100,000 tok/s). One row per token means a client-side ceiling near 20 rows per second on a single worker, with short bursts above it. Measured: 24.0 rows/sec, matching a 20-token burst plus the steady refill.</p>
       <p class="section-lead">Raising that ceiling is a batching problem, not a compute problem. Rows are independent, so the pipeline scales horizontally: at 24 rows/sec per node, the 1,500 rows/sec figure in the project target is reachable with roughly 63 worker nodes. The target did not misreport a single-node speed; this page exists so nobody has to guess which one is true.</p>
     </section>
 

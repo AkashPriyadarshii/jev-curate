@@ -131,7 +131,7 @@ Keywords: what is jev-curate, what is TypeSafe Jev, Jev System One, Choice Score
         <dd>The client sends one row as state and all preset questions in a single request. One round trip per row instead of one per question. A 12.2x reduction in request cost at the batching layer.</dd>
 
         <dt>Token bucket / rate limit</dt>
-        <dd>The client's adaptive limiter matching TypeSafe's 1,200 requests per minute. It refills 20 tokens per second, which is why a single node sustains about 20 rows per second. See <a href="benchmarks.html">benchmarks</a> for the measured number.</dd>
+        <dd><code>jev-curate</code>'s built-in adaptive limiter defaults to 20 tokens per second (<code>v0.3.0-beta.1</code>), which is why a single node sustains about 20 rows per second (TypeSafe's current org default is 80 req/s). See <a href="benchmarks.html">benchmarks</a> for the measured number.</dd>
 
         <dt>Preset</dt>
         <dd>A bundled evaluation rubric. The three shipped presets are <code>reasoning-math</code>, <code>anti-sycophancy</code> and <code>code-correctness</code>. Each asks Jev the same questions for every row.</dd>

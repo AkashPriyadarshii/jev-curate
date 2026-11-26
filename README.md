@@ -104,7 +104,7 @@ stats = curator.filter_file("train.parquet", out="./curated")  # -> {passed, rej
 | Local mock benchmark | **23.9 rows/sec** single-node local mock (`bench/results/mock.json`) | `bash bench/run_mock.sh` |
 | Dry-run gate | Host pre-filtering only, zero API calls | `jev-curate filter <INPUT> --dry-run` |
 
-Single-node throughput is bounded by TypeSafe's 1,200 req/min (20 rows/sec) limit; the 63-node cluster target (24/s single node) is a horizontal-scaling target, not a benchmark result. Evaluation is fail-closed: missing answers or evaluation errors reject the record rather than passing it.
+`jev-curate`'s built-in limiter defaults to 20 requests per second (`v0.3.0-beta.1`); TypeSafe's current org default is 80 req/s and 100,000 tok/s (planned for `v0.3.0`). Evaluation is fail-closed: missing answers or evaluation errors reject the record rather than passing it.
 
 ---
 
