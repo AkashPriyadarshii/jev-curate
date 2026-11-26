@@ -58,7 +58,7 @@ impl DatasetReader {
     /// Streams Parquet records with optional column selector, yielding the 1-row `RecordBatch` slice.
     pub fn stream_parquet_rows_with_cols<P: AsRef<Path>, F>(
         path: P,
-        cols: Option<&[String]>,
+        _cols: Option<&[String]>,
         mut on_row: F,
     ) -> Result<()>
     where
