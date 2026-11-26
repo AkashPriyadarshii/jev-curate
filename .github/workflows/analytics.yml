@@ -53,6 +53,19 @@ jobs:
           PYPI_JSON=$(curl -sf "https://pypistats.org/api/packages/jev-curate/recent" 2>/dev/null || echo '{}')
           PYPI_MONTH=$(echo "$PYPI_JSON" | jq -r '.data.last_month // 0')
 
+          # Ensure valid JSON values for --argjson
+          STARS=${STARS:-0}
+          FORKS=${FORKS:-0}
+          WATCHERS=${WATCHERS:-0}
+          RELEASE_DL=${RELEASE_DL:-0}
+          VIEWS=${VIEWS:-null}
+          UNIQUE_VIEWS=${UNIQUE_VIEWS:-null}
+          CLONES=${CLONES:-null}
+          UNIQUE_CLONES=${UNIQUE_CLONES:-null}
+          CRATE_TOTAL=${CRATE_TOTAL:-0}
+          CRATE_RECENT=${CRATE_RECENT:-0}
+          PYPI_MONTH=${PYPI_MONTH:-0}
+
           # Append JSONL record
           jq -nc \
             --arg ts "$TIMESTAMP" \
