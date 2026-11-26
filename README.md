@@ -9,6 +9,7 @@ High-throughput synthetic & pretraining dataset sifter in Rust and Python, power
 [![PyPI](https://img.shields.io/pypi/v/jev-curate?style=flat-square)](https://pypi.org/project/jev-curate/)
 [![crates.io](https://img.shields.io/crates/v/jev-curate?style=flat-square)](https://crates.io/crates/jev-curate)
 [![downloads](https://img.shields.io/crates/d/jev-curate?style=flat-square)](https://crates.io/crates/jev-curate)
+[![total downloads](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/AkashPriyadarshii/jev-curate/main/analytics/badge.json&style=flat-square)](analytics/README.md)
 [![GitHub release](https://img.shields.io/github/v/release/AkashPriyadarshii/jev-curate?style=flat-square&label=release)](https://github.com/AkashPriyadarshii/jev-curate/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![stars](https://img.shields.io/github/stars/AkashPriyadarshii/jev-curate?style=flat-square&label=stars)](https://github.com/AkashPriyadarshii/jev-curate/stargazers)
