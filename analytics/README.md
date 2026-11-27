@@ -6,5 +6,6 @@ Updated every 13 days by `.github/workflows/analytics.yml`.
 
 | Date (UTC) | Stars | Forks | Release DL | Views (14d) | Clones (14d) | crates.io Total | PyPI (30d) |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 2026-11-27 | 116 | 16 | 94 | 84 | 188 | 58 | 152 |
 | 2026-11-26 | 116 | 16 | 93 | 84 | 188 | 57 | 39 |
 | 2026-11-26 | 116 | 16 | 93 | - | - | 57 | 39 |
