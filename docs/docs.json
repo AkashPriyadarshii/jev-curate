@@ -23,8 +23,11 @@
             "group": "Reference",
             "pages": [
               "cli-reference",
-              "ARCHITECTURE",
-              "DESIGN"
+              "python-sdk",
+              "configuration",
+              "benchmarks",
+              "architecture",
+              "design"
             ]
           }
         ]
@@ -41,7 +44,7 @@
     "primary": {
       "type": "button",
       "label": "Live Site",
-      "href": "https://jev1.vercel.app"
+      "href": "https://jev-curate.vercel.app"
     }
   },
   "footer": {

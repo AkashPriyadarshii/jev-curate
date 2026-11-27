@@ -1,0 +1,71 @@
+---
+title: Configuration
+description: Environment variables, built-in presets, custom YAML/JSON rubric schemas, and Jev output types.
+---
+
+Configure `jev-curate` with environment variables, built-in presets, or custom rubric files.
+
+## Environment variables
+
+| Variable | Required | Default | Purpose |
+| --- | --- | --- | --- |
+| `TYPESAFE_API_KEY` | Yes (unless `--dry-run`) | None | Authenticates requests to `https://api.typesafe.ai/v1/systemone`. Non-dry-run CLI execution exits with an error if unset. |
+| `JEV_MODEL` | No | `jev-latest` | Overrides the Jev model name. CLI `--model` flag takes precedence over `JEV_MODEL`. |
+
+## Built-in presets
+
+Three presets ship in `src/presets.rs`:
+
+- `reasoning-math`: Checks `has_circular_reasoning` (`noul`, reject at `>= 0.70`) and `reasoning_depth` (`score`, minimum `2.0`).
+- `anti-sycophancy`: Checks `is_sycophantic` (`noul`, reject at `>= 0.65`) and `has_ai_disclaimer` (`noul`, reject at `>= 0.80`).
+- `code-correctness`: Checks `has_stub_placeholders` (`noul`, reject at `>= 0.75`) and `code_quality` (`score`, minimum `2.0`).
+
+All three built-in presets use `min_confidence: 0.5` and `policy: "all"`.
+
+## Custom YAML and JSON rubrics
+
+Pass a `.yaml`, `.yml`, or `.json` file path anywhere a preset name is accepted.
+
+```yaml
+name: custom-qa
+description: Filters low-detail or off-topic answers.
+min_confidence: 0.5
+policy: all # "all" requires every gate to pass; "any" passes if any gate passes
+questions:
+  is_off_topic:
+    type: noul
+    instructions: Does this response ignore the user's question?
+    criteria:
+      "true": Off-topic or evasive
+      "false": Directly answers the prompt
+  clarity:
+    type: score
+    instructions: Rate how clear and well-structured the answer is.
+    criteria:
+      - Unreadable
+      - Confusing
+      - Acceptable
+      - Clear
+      - Crisp and complete
+  domain:
+    type: choice
+    instructions: Classify the primary subject.
+min_scores:
+  clarity: 2.0
+reject_nouls:
+  is_off_topic: 0.70
+allowed_choices:
+  domain:
+    - math
+    - code
+```
+
+## Output schemas (`Noul`, `Score`, `Choice`)
+
+Each question in `questions` specifies a `type` of `noul`, `score`, or `choice`:
+
+- **`noul`**: Returns a probability in `[0.0, 1.0]` for the true class. `reject_nouls` rejects the row when the probability is greater than or equal to the configured threshold.
+- **`score`**: Returns a numeric score against the rubric criteria. `min_scores` rejects the row when the score is below the configured minimum.
+- **`choice`**: Returns a categorical label. `allowed_choices` restricts accepted values to the listed strings; an empty list allows any choice.
+
+Every question also returns an answer confidence. `jev-curate` fails closed: if any answer or confidence is missing, or if confidence falls below `min_confidence`, the row is rejected.

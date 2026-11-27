@@ -1,0 +1,78 @@
+---
+title: Python SDK
+description: Install jev-curate and filter text or dataset files from Python using PyJevCurator.
+---
+
+Install `jev-curate` with pip:
+
+```bash
+pip install jev-curate
+```
+
+The Python package exposes `PyJevCurator`, a synchronous wrapper around the Rust `CurateFilter` pipeline and a single-threaded Tokio runtime.
+
+## Initialize `PyJevCurator`
+
+Pass your TypeSafe API key and a preset name (or path to a `.yaml`/`.json` rubric file). You can optionally override the model or API endpoint.
+
+```python
+import os
+from jev_curate import PyJevCurator
+
+curator = PyJevCurator(
+    api_key=os.environ["TYPESAFE_API_KEY"],
+    preset="reasoning-math",
+    model=None,      # defaults to jev-latest
+    endpoint=None,   # defaults to https://api.typesafe.ai/v1/systemone
+)
+```
+
+If `preset` does not match a built-in preset or a valid rubric file, `PyJevCurator` raises `ValueError`. If the underlying Tokio runtime fails to initialize, it raises `RuntimeError`.
+
+## Filter a single string with `filter_text`
+
+`filter_text(text)` runs host-side sanity checks, secret scanning, and the Jev API evaluation for one string.
+
+```python
+result = curator.filter_text("Step 1: Let x = 2. Therefore x + 3 = 5.")
+print(result)
+```
+
+`filter_text` returns a `dict` with four keys:
+
+| Key | Type | Meaning |
+| --- | --- | --- |
+| `passed` | `bool` | `True` when all rubric gates pass |
+| `rejection_reasons` | `list[str]` | Reasons the record failed, empty when `passed` is `True` |
+| `scores` | `dict[str, float]` | Score values returned for `score` questions |
+| `nouls` | `dict[str, float]` | True-class probabilities returned for `noul` questions |
+
+## Filter a dataset file with `filter_file`
+
+`filter_file(input, out="./curated", dry_run=False)` streams a JSONL or Parquet file, evaluates each row, and writes clean, rejected, and errored records to `out`.
+
+```python
+summary = curator.filter_file(
+    input="train.jsonl",
+    out="./curated",
+    dry_run=False,
+)
+print(summary)
+```
+
+Set `dry_run=True` to run secret scanning and host-side sanity checks without calling the TypeSafe API.
+
+`filter_file` returns a `dict` with row counts:
+
+| Key | Type | Meaning |
+| --- | --- | --- |
+| `passed` | `int` | Rows written to clean output |
+| `rejected` | `int` | Rows rejected by sanity checks, secret scan, or rubric gates |
+| `errors` | `int` | Rows where Jev evaluation failed |
+| `total` | `int` | Total rows read from `input` |
+
+## Error handling
+
+- Invalid `preset` values raise `ValueError` during `PyJevCurator(...)` initialization.
+- Network failures, I/O errors, and dataset parsing failures raise `RuntimeError` from `filter_text` and `filter_file`.
+- In `filter_file`, per-row Jev evaluation failures are caught, counted under `errors`, and written to the error output stream rather than aborting the batch.

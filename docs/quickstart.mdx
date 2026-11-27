@@ -1,6 +1,6 @@
 ---
 title: Quickstart
-description: Install jev-curate via Cargo or pip and run your first dataset sifting pipeline.
+description: Install jev-curate and run your first dataset sifting pipeline in 60 seconds.
 ---
 
 ## Install
@@ -17,12 +17,28 @@ pip install jev-curate
 
 </CodeGroup>
 
-## Run Your First Sift
+## Run a 60-second filter
+
+Export your TypeSafe AI API key and run `jev-curate filter` against a local Parquet or JSONL file:
 
 ```bash
-jev-curate --help
+export TYPESAFE_API_KEY="your-api-key"
+
+jev-curate filter train.parquet \
+  --preset reasoning-math \
+  --model jev-latest \
+  --out ./curated/ \
+  --concurrency 32
 ```
 
-1. Point `jev-curate` at a `.parquet` or `.jsonl` input file.
-2. Choose a judgment mode (`Noul`, `Score`, or `Choice`).
-3. Pass `--resume` on large datasets to checkpoint progress safely.
+`jev-curate` streams `train.parquet`, evaluates each row against the `reasoning-math` rubric, and writes `clean.jsonl`, `rejected.jsonl`, `errors.jsonl`, `audit.jsonl`, and `manifest.json` into `./curated/`.
+
+## Test locally with `--dry-run`
+
+Pass `--dry-run` to run host-side `secret_scan` and sanity pruning with zero API calls and no `TYPESAFE_API_KEY` required:
+
+```bash
+jev-curate filter train.parquet --dry-run --out ./curated/
+```
+
+Use `--dry-run` to verify your input path, column extraction, and local pre-filtering before spending API credits.

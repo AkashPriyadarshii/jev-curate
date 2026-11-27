@@ -3,11 +3,42 @@ title: Introduction
 description: High-throughput synthetic and pretraining dataset sifter in Rust and Python, powered by TypeSafe AI's Jev model.
 ---
 
-`jev-curate` streams, filters, and scores millions of Parquet and JSONL rows without rewriting a single character.
+<Warning>
+  `v0.3.0-beta.1` is experimental. Expect rough edges and open an issue or PR if you hit a bug.
+</Warning>
 
-## Key Capabilities
+`jev-curate` streams, filters, and scores millions of Parquet and JSONL rows without rewriting a single character. It runs a bounded streaming pipeline in Rust with Python bindings via PyO3.
 
-- **Single-round-trip speculative fan-out** per row.
-- **Calibrated judgments:** `Noul`, `Score`, and `Choice` outputs.
-- **Bounded streaming:** Resumable pipelines with `--resume`.
-- **Native Parquet & JSONL:** Opt-in `--format parquet` output backed by Apache Arrow.
+## Three-step pipeline
+
+1. **Stream and pre-filter locally.** `jev-curate` reads rows in bounded batches, runs sanity pruning on empty or malformed records, and executes `secret_scan` on your machine before any network call.
+2. **Evaluate with Jev in one round trip.** Each surviving row goes to TypeSafe AI's Jev model (`jev-latest`) in a single HTTP request using speculative parallel fan-out. You get calibrated `Noul` probabilities, `0-4` `Score` rubrics, and `Choice` classifications.
+3. **Write separated artifacts.** Clean rows go to `clean.jsonl` (or `clean.parquet` with `--format parquet`), failed rows go to `rejected.jsonl` with reasons, and transport failures go to `errors.jsonl` so your counts stay exact.
+
+## Supported platforms and formats
+
+| Target | Rust | Python |
+| :--- | :--- | :--- |
+| **Linux** | `cargo install jev-curate` or release `tar.gz` | `pip install jev-curate` (manylinux wheel) |
+| **macOS** | `cargo install jev-curate` or `tar.gz` (`x86_64`, `arm64`) | `pip install jev-curate` (universal2 wheel) |
+| **Windows** | `cargo install jev-curate` or release `zip` | `pip install jev-curate` (Windows wheel) |
+
+- **Inputs:** Local `.parquet` and `.jsonl` files, standard input (`-`), `hf://datasets/<owner>/<repo>/<path>`, and `https://` URLs.
+- **Outputs:** `jsonl` (default) or Apache Parquet (`--format parquet`, preserving the input Arrow schema).
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Install `jev-curate` and run your first filter pipeline in 60 seconds.
+  </Card>
+  <Card title="CLI Reference" icon="terminal" href="/cli-reference">
+    Inspect every subcommand, flag, output artifact, and rate limit.
+  </Card>
+  <Card title="Python SDK" icon="python" href="/python-sdk">
+    Call `PyJevCurator` directly from Python scripts and notebooks.
+  </Card>
+  <Card title="Benchmarks" icon="gauge-high" href="/benchmarks">
+    Review local mock throughput and TypeSafe System One cost numbers.
+  </Card>
+</CardGroup>

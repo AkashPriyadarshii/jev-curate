@@ -1,17 +1,59 @@
 ---
 title: CLI Reference
-description: Core flags and output formats for jev-curate.
+description: Complete reference for jev-curate subcommands, flags, output artifacts, limits, and troubleshooting.
 ---
 
-## Common Flags
+## Subcommands
 
-| Flag | Purpose |
+`jev-curate` exposes one primary subcommand:
+
+```bash
+jev-curate filter [OPTIONS] <INPUT>
+```
+
+Run `jev-curate --help` or `jev-curate filter --help` to print options, and `jev-curate --version` to print the installed version.
+
+## Flags
+
+| Flag | Default | Description |
+| :--- | :--- | :--- |
+| `<INPUT>` | Required | Path to `.parquet` or `.jsonl`, `-` for stdin, `hf://datasets/...`, or `https://...` URL. |
+| `-p, --preset` | `reasoning-math` | Built-in preset (`reasoning-math`, `anti-sycophancy`, `code-correctness`) or path to a custom `.yaml` rubric. |
+| `-o, --out` | `./curated/` | Destination directory for output artifacts. |
+| `-c, --concurrency` | `32` | Number of concurrent worker tasks. |
+| `--dry-run` | `false` | Run host-side `secret_scan` and sanity pruning only. Makes zero API calls and requires no `TYPESAFE_API_KEY`. |
+| `--model` | `jev-latest` | Jev model name. Falls back to `JEV_MODEL` env var, then `jev-latest`. |
+| `--format` | `jsonl` | Output format for clean rows: `jsonl` or `parquet` (`.parquet` input required for `parquet` output). |
+| `--resume` | `false` | Resume an interrupted run from existing output files without truncating them. |
+| `--endpoint` | None | Custom API endpoint URL for offline mock testing. Falls back to `TYPESAFE_ENDPOINT` env var. |
+| `--stdout` | `false` | Stream clean rows to stdout for Unix pipes. Requires `--format jsonl`. |
+| `--column` | None | Single column name or comma-separated list of columns to extract text from. |
+
+## Output artifacts
+
+Every `jev-curate filter` run writes five artifacts to `--out` (default `./curated/`):
+
+| Artifact | Purpose |
 | :--- | :--- |
-| `--resume` | Resume an interrupted streaming run from the last checkpoint |
-| `--format parquet` | Write curated output directly to Apache Parquet |
-| `--help` | Print full CLI options and subcommands |
+| `clean.jsonl` | Rows that passed host pre-filters and Jev rubric thresholds (or `clean.parquet` when `--format parquet` is set). |
+| `rejected.jsonl` | Rows that failed sanity pruning, `secret_scan`, or Jev rubric thresholds, with rejection reasons. |
+| `errors.jsonl` | Rows that hit transport or API errors after retries, kept separate so clean and rejected counts stay exact. |
+| `audit.jsonl` | Per-row evaluation audit log recording verdicts, scores, and `Noul` probabilities. |
+| `manifest.json` | Run summary containing input metadata, preset, model, counts, and configuration. |
 
-## Supported Formats
+## Rate limits and input ceiling
 
-- **Input:** JSONL, Apache Parquet
-- **Output:** JSONL (default), Apache Parquet (`--format parquet`)
+- **Rate limit:** The built-in rate limiter defaults to `20 req/sec` in `v0.3.0-beta.1` with automatic `429` backoff.
+- **Input ceiling:** Text payloads are subject to a `32k-char` ceiling per row.
+
+## Exit codes
+
+- `0`: Run completed.
+- Non-zero: Invalid arguments, missing `TYPESAFE_API_KEY` (when neither `--dry-run` nor `--endpoint` is set), missing input file, or incompatible `--format parquet` / `--stdout` combination.
+
+## Troubleshooting
+
+- **`TYPESAFE_API_KEY not set`:** Export `TYPESAFE_API_KEY` before running, or pass `--dry-run` for host-only filtering.
+- **`--format parquet is only supported for .parquet inputs`:** Convert JSONL input to Parquet first, or omit `--format parquet` to write `clean.jsonl`.
+- **`--stdout is only supported with --format jsonl`:** Remove `--format parquet` when piping clean rows to stdout.
+- **Interrupted runs:** Re-run the exact command with `--resume` to continue without truncating existing `clean`, `rejected`, and `errors` files.

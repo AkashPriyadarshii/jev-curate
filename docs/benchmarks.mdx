@@ -1,0 +1,52 @@
+---
+title: Benchmarks
+description: Measured throughput, latency, cost math, and reproducible mock-server benchmark instructions.
+---
+
+`jev-curate` measures 24.0 rows/sec (42 ms/row) against an in-process wiremock server on a 4-core machine.
+
+## Reproducible local benchmark
+
+Run the mock benchmark without network access or TypeSafe credits:
+
+```bash
+bash bench/run_mock.sh
+```
+
+Or invoke the Rust example directly:
+
+```bash
+cargo run --release --example bench_mock
+```
+
+The script boots an in-process wiremock server, mounts a canned response at the `systemone` path, and runs 120 identical rows through the real `JevClient` and `CurateFilter` pipeline twice: once at concurrency 1 and once at concurrency 32. Results are written to `bench/results/mock.json`.
+
+## Measured results
+
+| Run | Rows | Concurrency | Throughput | Latency |
+| --- | --- | --- | --- | --- |
+| Sequential | 120 | 1 | 24.0 rows/sec | 42 ms/row |
+| Concurrent | 120 | 32 | 24.0 rows/sec | 42 ms/row |
+
+Hardware used for this run: Intel Core i3-1115G4 (2 cores, 4 threads), 8 GB RAM, Windows 11, release build.
+
+Sequential and concurrent runs hit the same 24.0 rows/sec ceiling because `JevClient` ships with a client-side token bucket rate limiter set to 20 req/sec (with short bursts above 20). TypeSafe's org default is 80 req/sec and 100,000 tok/sec.
+
+## Scaling arithmetic
+
+Because rows are independent, horizontal scaling is linear across worker nodes at 24.0 rows/sec per node:
+
+| Nodes | Expected rows/sec | Rough daily volume |
+| --- | --- | --- |
+| 1 | 24 | 2.1M |
+| 4 | 96 | 8.3M |
+| 16 | 384 | 33.2M |
+| 63 | 1,512 | 130M |
+
+1,500+ rows/sec is a horizontal-scaling target (~63 workers at 24 rows/sec each), not a single-node benchmark.
+
+## Cost math
+
+TypeSafe Jev input pricing is `$0.042` per million tokens (`$0.042/Mtok`). Because `jev-curate` sends one speculative fan-out request per row with all rubric questions together, you pay the input token cost once per row instead of once per question.
+
+For a 1,000-token row, 1,000,000 rows equal 1,000 Mtok, or `$42.00` total input cost. Compared to frontier LLM judges priced in the `$18.65/Mtok` range, `$0.042/Mtok` is roughly 444x cheaper per input token. Actual bills depend on row length, prompt overhead, and live API usage.
