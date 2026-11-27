@@ -14,6 +14,7 @@ High-throughput synthetic & pretraining dataset sifter in Rust and Python, power
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![stars](https://img.shields.io/github/stars/AkashPriyadarshii/jev-curate?style=flat-square&label=stars)](https://github.com/AkashPriyadarshii/jev-curate/stargazers)
 [![Live Site](https://img.shields.io/badge/site-jev--curate.vercel.app-black?style=flat-square)](https://jev-curate.vercel.app)
+[![Docs](https://img.shields.io/badge/docs-jev--curate.vercel.app%2Fdocs-16A34A?style=flat-square)](https://jev-curate.vercel.app/docs)
 
 **Product Hunt:** [jev-curate Upcoming](https://www.producthunt.com/products/jev-curate?launch=jev-curate) (launches Dec 1, 12:01am PT)
 

@@ -11,5 +11,27 @@
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/docs",
+      "destination": "https://personal-d5cb568f.mintlify.app"
+    },
+    {
+      "source": "/docs/:match*",
+      "destination": "https://personal-d5cb568f.mintlify.app/:match*"
+    },
+    {
+      "source": "/_mintlify/:path*",
+      "destination": "https://personal-d5cb568f.mintlify.app/_mintlify/:path*"
+    },
+    {
+      "source": "/mintlify-assets/:path+",
+      "destination": "https://personal-d5cb568f.mintlify.app/mintlify-assets/:path+"
+    },
+    {
+      "source": "/api/request",
+      "destination": "https://personal-d5cb568f.mintlify.app/api/request"
+    }
   ]
 }

@@ -48,5 +48,10 @@
     "socials": {
       "github": "https://github.com/AkashPriyadarshii/jev-curate"
     }
+  },
+  "seo": {
+    "metatags": {
+      "canonical": "https://jev-curate.vercel.app/docs"
+    }
   }
 }
