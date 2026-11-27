@@ -1,0 +1,28 @@
+---
+title: Quickstart
+description: Install jev-curate via Cargo or pip and run your first dataset sifting pipeline.
+---
+
+## Install
+
+<CodeGroup>
+
+```bash Cargo (Rust)
+cargo install jev-curate
+```
+
+```bash pip (Python)
+pip install jev-curate
+```
+
+</CodeGroup>
+
+## Run Your First Sift
+
+```bash
+jev-curate --help
+```
+
+1. Point `jev-curate` at a `.parquet` or `.jsonl` input file.
+2. Choose a judgment mode (`Noul`, `Score`, or `Choice`).
+3. Pass `--resume` on large datasets to checkpoint progress safely.

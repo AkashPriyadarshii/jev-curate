@@ -1,0 +1,17 @@
+---
+title: CLI Reference
+description: Core flags and output formats for jev-curate.
+---
+
+## Common Flags
+
+| Flag | Purpose |
+| :--- | :--- |
+| `--resume` | Resume an interrupted streaming run from the last checkpoint |
+| `--format parquet` | Write curated output directly to Apache Parquet |
+| `--help` | Print full CLI options and subcommands |
+
+## Supported Formats
+
+- **Input:** JSONL, Apache Parquet
+- **Output:** JSONL (default), Apache Parquet (`--format parquet`)

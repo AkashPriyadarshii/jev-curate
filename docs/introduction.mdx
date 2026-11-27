@@ -1,0 +1,13 @@
+---
+title: Introduction
+description: High-throughput synthetic and pretraining dataset sifter in Rust and Python, powered by TypeSafe AI's Jev model.
+---
+
+`jev-curate` streams, filters, and scores millions of Parquet and JSONL rows without rewriting a single character.
+
+## Key Capabilities
+
+- **Single-round-trip speculative fan-out** per row.
+- **Calibrated judgments:** `Noul`, `Score`, and `Choice` outputs.
+- **Bounded streaming:** Resumable pipelines with `--resume`.
+- **Native Parquet & JSONL:** Opt-in `--format parquet` output backed by Apache Arrow.
