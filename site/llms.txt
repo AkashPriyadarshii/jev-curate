@@ -1,9 +1,8 @@
 # jev-curate
 
-jev-curate is a high-throughput synthetic and pretraining dataset sifter
-powered by TypeSafe AI's Jev System One model. It streams Parquet and JSONL
-rows through typed Jev judgments (Choice, Score, Noul) without rewriting
-verbatim data text, and writes accepted and rejected rows to separate files.
+> High-throughput synthetic and pretraining dataset sifter powered by TypeSafe AI's Jev System One model.
+
+jev-curate streams Parquet and JSONL rows through typed Jev judgments (Choice, Score, Noul) without rewriting verbatim data text, and writes accepted and rejected rows to separate files.
 
 ## When to use it
 - Pre-filtering large corpora or training datasets for quality, relevance,
@@ -11,21 +10,21 @@ verbatim data text, and writes accepted and rejected rows to separate files.
 - Routing dataset rows with typed decisions at pipeline scale.
 
 ## Docs
-- Homepage + quickstart: https://jev-curate.vercel.app/
-- Real measured benchmark (not claims): https://jev-curate.vercel.app/benchmarks.html
-- What is Jev (model explainer): https://jev-curate.vercel.app/what-is-jev.html
-- Glossary: what is jev-curate, what is TypeSafe Jev: https://jev-curate.vercel.app/glossary.html
-- Use cases: RLHF, reasoning, code data: https://jev-curate.vercel.app/use-cases.html
-- Comparison vs chat-window judging: https://jev-curate.vercel.app/comparison.html
-- Comparison vs custom judge scripts / manual labeling: https://jev-curate.vercel.app/comparison-judges.html
-- README: https://github.com/AkashPriyadarshii/jev-curate#readme
-- Sitemap: https://jev-curate.vercel.app/sitemap.xml
+- [Homepage + quickstart](https://jev-curate.vercel.app/): Overview and quickstart guide
+- [Real measured benchmark](https://jev-curate.vercel.app/benchmarks.html): Throughput and latency benchmarks
+- [What is Jev](https://jev-curate.vercel.app/what-is-jev.html): Model explainer for TypeSafe Jev System One
+- [Glossary](https://jev-curate.vercel.app/glossary.html): Definitions for jev-curate and TypeSafe Jev
+- [Use cases](https://jev-curate.vercel.app/use-cases.html): RLHF, reasoning, and code data sifting
+- [Comparison vs chat-window judging](https://jev-curate.vercel.app/comparison.html): Streaming pipeline vs chat-window judging
+- [Comparison vs custom judge scripts](https://jev-curate.vercel.app/comparison-judges.html): vs custom judge scripts and manual labeling
+- [README](https://github.com/AkashPriyadarshii/jev-curate#readme): Source repository and CLI reference
+- [Sitemap](https://jev-curate.vercel.app/sitemap.xml): XML sitemap
 
 ## Key facts
 - Pipeline: Rust streaming core, speculative fan-out batching, token-bucket rate limiter.
 - Pricing: 0.042 USD per million input tokens, output unmetered, ~250k tokens/sec.
-- Endpoint: https://api.typesafe.ai/v1/systemone; model jev-latest.
+- Endpoint: `https://api.typesafe.ai/v1/systemone`; model `jev-latest`.
 - Measured single node: 24.0 rows/sec against a local mock (rate-limit bound).
-- About: https://jev-curate.vercel.app/about.html
-- Contact: https://jev-curate.vercel.app/contact.html
-- Privacy: https://jev-curate.vercel.app/privacy.html
+- [About](https://jev-curate.vercel.app/about.html): Project background and maintainer
+- [Contact](https://jev-curate.vercel.app/contact.html): Issues, discussions, and maintainer channels
+- [Privacy](https://jev-curate.vercel.app/privacy.html): Privacy policy
