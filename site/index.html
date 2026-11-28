@@ -12,11 +12,14 @@
   <meta name="description" content="Curate synthetic and pretraining datasets in Rust with TypeSafe Jev judgment. Parquet and JSONL I/O, speculative fan-out, unmetered output, real benchmarks.">
   <meta name="keywords" content="dataset curation, synthetic data sifting, pretraining data filtering, TypeSafe Jev, Rust CLI, parquet jsonl, data quality, anti-sycophancy">
   <meta name="author" content="Akash Priyadarshi">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="canonical" href="https://jev-curate.vercel.app/">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://jev-curate.vercel.app/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="jev-curate | high-throughput dataset sifter for TypeSafe Jev">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://jev-curate.vercel.app/og.png">
   <meta property="og:url" content="https://jev-curate.vercel.app/">
@@ -117,7 +120,7 @@
       "acceptedAnswer": {
         "@context": "https://schema.org",
         "@type": "Answer",
-        "text": "TypeSafe Jev input tokens cost about $0.042 per million, about 4 dollars per 100 million, and output tokens are unmetered. TypeSafe reports System One workflows 444.6x cheaper and 193.6x faster than the baseline."
+        "text": "TypeSafe Jev input tokens cost about $0.042 per million, about 4 dollars per 100 million, and output tokens are unmetered. TypeSafe reports System One workflows 444x cheaper and 193.6x faster than the baseline."
       }
     },
     {
@@ -166,10 +169,10 @@
   <main id="main" tabindex="-1">
     <section class="hero">
       <div class="hero-copy">
-        <a class="ph-launch-banner" href="https://www.producthunt.com/products/jev-curate?launch=jev-curate" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;padding:4px 12px;border-radius:999px;background:rgba(255,97,84,0.12);border:1px solid rgba(255,97,84,0.35);color:#ff6154;font-size:0.85rem;font-weight:600;text-decoration:none;margin-bottom:12px;">Launching on Product Hunt · Dec 1 — Notify Me →</a>
+        <a class="ph-launch-banner" href="https://www.producthunt.com/products/jev-curate?launch=jev-curate" target="_blank" rel="noopener noreferrer">Launching on Product Hunt · Dec 1 — Notify Me →</a>
         <p class="eyebrow">Rust + TypeSafe Jev judgment · v0.3.0-beta.1</p>
         <h1>Filter LLM training data with typed verdicts, not fragile prompts</h1>
-        <p class="lead">jev-curate streams Parquet and JSONL through a TypeSafe Jev (a typed-verdict AI judge) evaluation pipeline, keeps rows that pass your rubric, and writes 5 output files (<code>clean</code>, <code>rejected</code>, <code>errors.jsonl</code>, <code>audit.jsonl</code>, <code>manifest.json</code>). Measured numbers in the <a href="benchmarks.html" class="lead-link">benchmarks</a>, no invented speeds.</p>
+        <p class="lead">jev-curate streams Parquet and JSONL through a TypeSafe Jev (a typed-verdict AI judge) evaluation pipeline, keeps rows that pass your rubric, and writes 3 output files (<code>clean.jsonl</code>/<code>.parquet</code>, <code>rejected.jsonl</code>, <code>errors.jsonl</code>). Measured numbers in the <a href="benchmarks.html" class="lead-link">benchmarks</a>, no invented speeds.</p>
         <div class="hero-actions">
           <a class="btn btn-primary" href="#sandbox">Try 10s sandbox</a>
           <a class="btn btn-ghost" href="#quickstart">Quickstart</a>
@@ -186,13 +189,13 @@
         <div class="terminal-bar">
           <span class="t-dot"></span>
           <div class="hero-tabs" role="tablist" aria-label="Usage examples">
-            <button class="hero-tab is-active" type="button" role="tab" aria-selected="true" data-tab="cli">CLI</button>
-            <button class="hero-tab" type="button" role="tab" aria-selected="false" data-tab="python">Python</button>
-            <button class="hero-tab" type="button" role="tab" aria-selected="false" data-tab="verdict">Verdict JSON</button>
+            <button id="hero-tab-cli" class="hero-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="hero-panel-cli" data-tab="cli">CLI</button>
+            <button id="hero-tab-python" class="hero-tab" type="button" role="tab" aria-selected="false" aria-controls="hero-panel-python" data-tab="python">Python</button>
+            <button id="hero-tab-verdict" class="hero-tab" type="button" role="tab" aria-selected="false" aria-controls="hero-panel-verdict" data-tab="verdict">Verdict JSON</button>
           </div>
           <button class="hero-copy-btn" type="button">copy</button>
         </div>
-        <div class="hero-panel" data-panel="cli">
+        <div id="hero-panel-cli" class="hero-panel" role="tabpanel" aria-labelledby="hero-tab-cli" data-panel="cli">
           <pre><code>$ pip install --pre jev-curate
 $ export TYPESAFE_API_KEY=ts_...
 $ jev-curate filter corpus.parquet \
@@ -201,14 +204,14 @@ $ jev-curate filter corpus.parquet \
   --resume \
   --model jev-latest</code></pre>
         </div>
-        <div class="hero-panel" data-panel="python" hidden>
+        <div id="hero-panel-python" class="hero-panel" role="tabpanel" aria-labelledby="hero-tab-python" data-panel="python" hidden>
           <pre><code>from jev_curate import PyJevCurator
 
 curator = PyJevCurator(api_key="your-api-key", preset="reasoning-math")
 stats = curator.filter_file("corpus.parquet", out="./curated")
 print(stats["passed"], stats["rejected"])</code></pre>
         </div>
-        <div class="hero-panel" data-panel="verdict" hidden>
+        <div id="hero-panel-verdict" class="hero-panel" role="tabpanel" aria-labelledby="hero-tab-verdict" data-panel="verdict" hidden>
           <pre><code>{
   "passed": true,
   "scores": { "reasoning_depth": 3.2 },
@@ -241,18 +244,18 @@ print(stats["passed"], stats["rejected"])</code></pre>
         </div>
         <div class="sandbox-pane">
           <div class="sandbox-out-tabs" role="tablist" aria-label="Sandbox output files">
-            <button class="sandbox-out-tab is-active" type="button" role="tab" aria-selected="true" data-out="clean">clean.jsonl (<span id="sandbox-clean-count">0</span>)</button>
-            <button class="sandbox-out-tab" type="button" role="tab" aria-selected="false" data-out="rejected">rejected.jsonl (<span id="sandbox-rejected-count">0</span>)</button>
+            <button id="sandbox-tab-clean" class="sandbox-out-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="sandbox-clean-out" data-out="clean">clean.jsonl (<span id="sandbox-clean-count">0</span>)</button>
+            <button id="sandbox-tab-rejected" class="sandbox-out-tab" type="button" role="tab" aria-selected="false" aria-controls="sandbox-rejected-out" data-out="rejected">rejected.jsonl (<span id="sandbox-rejected-count">0</span>)</button>
           </div>
-          <pre id="sandbox-clean-out" class="sandbox-out"></pre>
-          <pre id="sandbox-rejected-out" class="sandbox-out" hidden></pre>
+          <pre id="sandbox-clean-out" class="sandbox-out" role="tabpanel" aria-labelledby="sandbox-tab-clean"></pre>
+          <pre id="sandbox-rejected-out" class="sandbox-out" role="tabpanel" aria-labelledby="sandbox-tab-rejected" hidden></pre>
         </div>
       </div>
     </section>
 
     <section class="why" id="why">
       <h2>LLM judges are an API call with a prompt bolted on</h2>
-      <p class="section-lead">You paste a csv into a chat window and get grades back in prose. jev-curate treats judging as a pipeline: predefined rubrics, batched questions, typed answers, 5 output files ready for training (<code>clean</code>, <code>rejected</code>, <code>errors.jsonl</code>, <code>audit.jsonl</code>, <code>manifest.json</code>).</p>
+      <p class="section-lead">You paste a csv into a chat window and get grades back in prose. jev-curate treats judging as a pipeline: predefined rubrics, batched questions, typed answers, 3 output files ready for training (<code>clean.jsonl</code>/<code>.parquet</code>, <code>rejected.jsonl</code>, <code>errors.jsonl</code>).</p>
       <ul class="reason-list">
         <li><strong>Judgment by <a href="https://typesafe.ai">TypeSafe Jev</a>.</strong> Machine-native Choice, Score and Noul questions. One state per record, all questions fanned into one request.</li>
         <li><strong>No token waste.</strong> Blank and padding lines drop in Rust before the API. 8k token ceiling per row.</li>
@@ -283,14 +286,14 @@ print(stats["passed"], stats["rejected"])</code></pre>
     </section>
 
     <section class="quickstart" id="quickstart">
-      <h2>One command in, five files out</h2>
+      <h2>One command in, three files out</h2>
       <div class="code-block">
         <button class="copy-btn" data-copy="pip install --pre jev-curate">copy install</button>
         <span id="copy-status" class="sr-only" aria-live="polite"></span>
         <pre><code>$ pip install --pre jev-curate  # or cargo install jev-curate --version 0.3.0-beta.1
 $ jev-curate filter corpus.parquet --preset anti-sycophancy --format parquet --resume --model jev-latest --out ./curated/</code></pre>
       </div>
-      <p class="section-lead">The binary writes 5 output files: <code>clean</code>, <code>rejected</code>, <code>errors.jsonl</code>, <code>audit.jsonl</code>, and <code>manifest.json</code>. Run <code>--dry-run</code> first to see keep and reject counts before any row touches the API. Requires only a <code>TYPESAFE_API_KEY</code>.</p>
+      <p class="section-lead">The binary writes 3 output files: <code>clean.jsonl</code>/<code>.parquet</code>, <code>rejected.jsonl</code>, and <code>errors.jsonl</code>. Run <code>--dry-run</code> first to see keep and reject counts before any row touches the API. Requires only a <code>TYPESAFE_API_KEY</code>.</p>
       <h3 class="steps-heading">Run it in six steps</h3>
       <ol class="steps">
         <li><span>Install</span> via <code>pip install --pre jev-curate</code> or <code>cargo install jev-curate --version 0.3.0-beta.1</code>.</li>
@@ -298,18 +301,16 @@ $ jev-curate filter corpus.parquet --preset anti-sycophancy --format parquet --r
         <li><span>Point</span> the CLI at a <code>.jsonl</code> or <code>.parquet</code> file with <code>jev-curate filter &lt;INPUT&gt;</code>.</li>
         <li><span>Pick</span> a preset with <code>-p</code>: reasoning-math, anti-sycophancy or code-correctness.</li>
         <li><span>Check</span> what would change with <code>--dry-run</code> before spending a token.</li>
-        <li><span>Run</span> for real and inspect <code>clean</code>, <code>rejected</code>, <code>errors.jsonl</code>, <code>audit.jsonl</code>, and <code>manifest.json</code> in the output folder.</li>
+        <li><span>Run</span> for real and inspect <code>clean.jsonl</code>/<code>.parquet</code>, <code>rejected.jsonl</code>, and <code>errors.jsonl</code> in the output folder.</li>
       </ol>
       <div class="table-wrap"><table class="flag-table">
         <caption>CLI flags for jev-curate filter</caption>
         <thead><tr><th scope="col">Flag</th><th scope="col">Default</th><th scope="col">What it does</th></tr></thead>
         <tbody>
-          <tr><td><code>&lt;INPUT&gt;</code></td><td>required</td><td>.jsonl, .parquet, <code>-</code> (stdin), or <code>hf://</code> dataset path</td></tr>
+          <tr><td><code>&lt;INPUT&gt;</code></td><td>required</td><td>.jsonl or .parquet dataset path</td></tr>
           <tr><td><code>-p, --preset</code></td><td>reasoning-math</td><td>rubric to evaluate against</td></tr>
           <tr><td><code>-o, --out</code></td><td>./curated/</td><td>output directory</td></tr>
           <tr><td><code>--format</code></td><td>jsonl</td><td>output format (<code>jsonl</code> or <code>parquet</code>)</td></tr>
-          <tr><td><code>--column</code></td><td>auto</td><td>text column name to evaluate</td></tr>
-          <tr><td><code>--stdout</code></td><td>off</td><td>stream passed rows to stdout</td></tr>
           <tr><td><code>--resume</code></td><td>off</td><td>resume interrupted run from checkpoint</td></tr>
           <tr><td><code>--model</code></td><td>jev-latest</td><td>Jev model identifier</td></tr>
           <tr><td><code>--endpoint</code></td><td>TypeSafe API</td><td>custom HTTPS or localhost endpoint</td></tr>
@@ -323,7 +324,7 @@ $ jev-curate filter corpus.parquet --preset anti-sycophancy --format parquet --r
       <h2>Judgment at pipeline cost</h2>
       <div class="stat-row">
         <div class="stat">
-          <p class="stat-num">24.0</p>
+          <p class="stat-num">23.9</p>
           <p class="stat-label">rows/sec per node (1,500+ on 63 nodes)</p>
         </div>
         <div class="stat">
@@ -335,11 +336,11 @@ $ jev-curate filter corpus.parquet --preset anti-sycophancy --format parquet --r
           <p class="stat-label">output tokens, unmetered</p>
         </div>
         <div class="stat">
-          <p class="stat-num">444.6x</p>
+          <p class="stat-num">444x</p>
           <p class="stat-label">cheaper, TypeSafe System One workflow benchmark</p>
         </div>
       </div>
-      <p class="cost-src">Rates from the <a href="https://typesafe.ai">TypeSafe AI</a> model docs; 444.6x figure is TypeSafe's own <a href="https://typesafe.ai">System One benchmark</a>. 1500+ is the project target, benchmark runs live in the repo.</p>
+      <p class="cost-src">Rates from the <a href="https://typesafe.ai">TypeSafe AI</a> model docs; 444x figure is TypeSafe's own <a href="https://typesafe.ai">System One benchmark</a>. 1500+ is the project target, benchmark runs live in the repo.</p>
     </section>
 
     <section class="cta">

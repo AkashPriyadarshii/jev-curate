@@ -62,13 +62,20 @@
   }
 
   if (heroCopyBtn) {
+    var heroCopyTimer = null;
+    var copyStatus = document.getElementById('copy-status');
     heroCopyBtn.addEventListener('click', function () {
       var activePanel = document.querySelector('.hero-panel:not([hidden]) code');
       if (!activePanel) return;
       var text = activePanel.textContent.trim();
       var done = function () {
+        clearTimeout(heroCopyTimer);
         heroCopyBtn.textContent = 'copied';
-        setTimeout(function () { heroCopyBtn.textContent = 'copy'; }, 1600);
+        if (copyStatus) copyStatus.textContent = 'Copied to clipboard';
+        heroCopyTimer = setTimeout(function () {
+          heroCopyBtn.textContent = 'copy';
+          if (copyStatus) copyStatus.textContent = '';
+        }, 1600);
       };
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(done).catch(function () {
@@ -265,7 +272,9 @@
 
   presetSelect.addEventListener('change', function () {
     clearTimeout(inputTimer);
-    inputArea.value = PRESETS[presetSelect.value].sample;
+    var preset = PRESETS[presetSelect.value];
+    if (!preset) return;
+    inputArea.value = preset.sample;
     runSandbox();
   });
 
@@ -278,7 +287,9 @@
   if (resetBtn) {
     resetBtn.addEventListener('click', function () {
       clearTimeout(inputTimer);
-      inputArea.value = PRESETS[presetSelect.value].sample;
+      var preset = PRESETS[presetSelect.value];
+      if (!preset) return;
+      inputArea.value = preset.sample;
       runSandbox();
     });
   }
@@ -290,6 +301,8 @@
   });
 
   /* Initialize */
-  inputArea.value = PRESETS[presetSelect.value].sample;
+  var preset = PRESETS[presetSelect.value];
+  if (!preset) return;
+  inputArea.value = preset.sample;
   runSandbox();
 })();

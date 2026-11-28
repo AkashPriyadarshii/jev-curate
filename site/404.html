@@ -6,6 +6,7 @@
   <title>404 - Page Not Found | jev-curate</title>
   <meta name="robots" content="noindex">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/style.css">
   <style>
     .not-found {
@@ -24,12 +25,12 @@
     .not-found p {
       max-width: 34rem;
       margin-bottom: 1.5rem;
-      opacity: 0.85;
+      color: var(--grey-1);
     }
     .not-found a.home-link {
       display: inline-block;
       padding: 0.65rem 1.25rem;
-      border-radius: 8px;
+      border-radius: var(--radius);
       font-weight: 600;
       text-decoration: none;
       border: 1px solid currentColor;
@@ -40,7 +41,7 @@
   <main class="not-found">
     <h1>404 &mdash; Page Not Found</h1>
     <p>The page you requested could not be found on jev-curate.</p>
-    <a class="home-link" href="/">Back to jev-curate</a>
+    <a class="btn btn-primary home-link" href="/">Back to jev-curate</a>
   </main>
 </body>
 </html>

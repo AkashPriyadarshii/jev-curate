@@ -38,7 +38,7 @@ export TYPESAFE_API_KEY="your-api-key"
 jev-curate filter train.parquet \
   --preset reasoning-math \
   --model jev-latest \
-  --out ./output/ \
+  --out ./curated/ \
   --concurrency 32
 ```
 
@@ -67,6 +67,7 @@ curator = PyJevCurator(api_key="your-api-key", preset="reasoning-math")
 # Single row
 verdict = curator.filter_text("Let x=5... therefore...")  # -> {passed, rejection_reasons, scores, nouls}
 # Whole file -> ./curated/clean.jsonl + rejected.jsonl + errors.jsonl
+# Note: --format parquet, --resume, and --dry-run are CLI-only flags.
 stats = curator.filter_file("train.parquet", out="./curated")  # -> {passed, rejected, errors, total}
 ```
 
@@ -139,7 +140,6 @@ min_confidence: 0.5
 - Added `--resume` support for resuming interrupted curation runs
 - Added `secret_scan` host-side pre-filtering
 - Bounded streaming pipeline improvements for controlled memory usage
-- `examples/bench_mock.rs --json` outputs pure valid JSON to stdout; updated `site/*.html` CLI snippets to `jev-curate filter <INPUT>`
 
 **v0.2.0** (2026-10-02): Bounded streaming pipeline with backpressure, `errors.jsonl` separation, 10s/90s timeouts with exponential backoff and 429/5xx handling, fail-closed confidence, `--model`/`JEV_MODEL` support, and `PyJevCurator` Python bindings. Full history in [`CHANGELOG.md`](CHANGELOG.md).
 
@@ -252,7 +252,6 @@ All tests run against an in-process mock server with zero live API credits in CI
 
 - [`jev-seo`](https://github.com/AkashPriyadarshii/jev-seo) — Free Rust SEO & GEO CLI with 19-tool MCP server
 - [`jev-superpowers`](https://github.com/AkashPriyadarshii/jev-superpowers) — Jev-gated agent engineering workflows
-- [`jev-curate`](https://github.com/AkashPriyadarshii/jev-curate) — High-throughput synthetic & pretraining dataset sifter
 - [`jev-git`](https://github.com/AkashPriyadarshii/jev-git) — Jev reflex gates for git
 - [`tdlib-android`](https://github.com/AkashPriyadarshii/tdlib-android) — Precompiled TDLib binaries for four Android ABIs
 - [`kharcha`](https://github.com/AkashPriyadarshii/kharcha) — Offline-first UPI expense tracker for Android

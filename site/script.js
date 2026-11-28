@@ -14,12 +14,14 @@
   var copyStatus = document.getElementById('copy-status');
   if (btn) {
     var origLabel = btn.textContent;
+    var copyTimer = null;
     btn.addEventListener('click', function () {
       var text = btn.getAttribute('data-copy');
       var done = function () {
+        clearTimeout(copyTimer);
         btn.textContent = 'copied';
         if (copyStatus) copyStatus.textContent = 'Copied to clipboard';
-        setTimeout(function () {
+        copyTimer = setTimeout(function () {
           btn.textContent = origLabel;
           if (copyStatus) copyStatus.textContent = '';
         }, 1600);
@@ -57,7 +59,7 @@
     });
     /* close on outside click */
     document.addEventListener('click', function (e) {
-      if (!toggle.contains(e.target) && !mobileNav.contains(e.target)) {
+      if (mobileNav.classList.contains('open') && !toggle.contains(e.target) && !mobileNav.contains(e.target)) {
         closeNav();
       }
     });

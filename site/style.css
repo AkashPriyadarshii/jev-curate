@@ -1,5 +1,6 @@
 /* jev-curate landing — TypeSafe brand, light Innocent, flat */
 :root {
+  color-scheme: light;
   --pink: #f386a1;
   --magenta: #d45bb6;
   --magenta-deep: #a2278f; /* small-text accent, about 6.5:1 on white, AA */
@@ -207,7 +208,10 @@ h3[id] {
 
 /* buttons */
 .btn {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
   padding: 10px 18px;
   border-radius: var(--radius);
   font-family: var(--body);
@@ -231,6 +235,19 @@ h3[id] {
 
 .btn:not(:disabled):active {
   transform: scale(0.96);
+}
+
+.ph-launch-banner {
+  color: #b92b1e;
+  background: rgba(255, 97, 84, 0.12);
+  border: 1px solid rgba(185, 43, 30, 0.25);
+  font-size: 13px;
+  padding: 3px 10px;
+  border-radius: var(--radius);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
 }
 
 /* hero */
@@ -1038,7 +1055,7 @@ h2 {
   .reason-list li { grid-template-columns: minmax(160px, 200px) minmax(0, 1fr); gap: 30px; }
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1040px) {
   .site-header { padding: 12px 24px; flex-wrap: wrap; gap: 10px; }
   .site-nav { display: none; }
   .nav-cta { display: none; }
@@ -1089,6 +1106,7 @@ h2 {
 
   .footer { padding: 48px 24px 28px; }
   .footer-grid { grid-template-columns: 1fr 1fr; gap: 36px; }
+  .footer a { padding: 8px 0; }
 }
 
 @media (max-width: 600px) {
@@ -1122,6 +1140,7 @@ h2 {
   h2 { font-size: clamp(26px, 7vw, 40px); }
   .hero-actions { flex-direction: column; gap: 10px; }
   .cta-actions { flex-direction: column; gap: 10px; }
+  .hero-tab { padding: 6px 8px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
