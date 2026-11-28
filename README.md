@@ -26,10 +26,10 @@ High-throughput synthetic & pretraining dataset sifter in Rust and Python, power
 
 ```bash
 # Rust (any OS)
-cargo install jev-curate
+cargo install jev-curate --version 0.3.0-beta.1
 
 # Python (no Rust toolchain needed; wheels on PyPI)
-pip install jev-curate
+pip install --pre jev-curate
 
 # Set your TypeSafe AI key
 export TYPESAFE_API_KEY="your-api-key"
@@ -48,9 +48,9 @@ Use `--dry-run` for host-side pre-filtering (`secret_scan` and sanity pruning) w
 
 | OS | Rust | Python |
 |---|---|---|
-| **Linux** | `cargo install jev-curate` or `gh release download` `tar.gz` | `pip install jev-curate` (manylinux wheel) |
-| **macOS** | `cargo install jev-curate` or `tar.gz` (`x86_64` + `arm64`) | `pip install jev-curate` (universal2 wheel) |
-| **Windows** | `cargo install jev-curate` or `zip` | `pip install jev-curate` (win wheel) |
+| **Linux** | `cargo install jev-curate --version 0.3.0-beta.1` or `gh release download` `tar.gz` | `pip install --pre jev-curate` (manylinux wheel) |
+| **macOS** | `cargo install jev-curate --version 0.3.0-beta.1` or `tar.gz` (`x86_64` + `arm64`) | `pip install --pre jev-curate` (universal2 wheel) |
+| **Windows** | `cargo install jev-curate --version 0.3.0-beta.1` or `zip` | `pip install --pre jev-curate` (win wheel) |
 
 From source (Python bindings via `maturin`):
 
@@ -94,6 +94,28 @@ stats = curator.filter_file("train.parquet", out="./curated")  # -> {passed, rej
 - **Opt-in Parquet output (`--format parquet`)**: Preserves the input Arrow schema when writing clean records.
 - **Host-side `secret_scan` & sanity pruning**: Catches sensitive tokens and malformed/empty rows before any API request is sent.
 - **Zero rewriting**: Emits clean records verbatim without paraphrasing or altering mathematical formulas.
+
+### Custom YAML Rubric (`rubric.yaml`)
+
+```yaml
+name: custom-rigor
+description: Filter for grounded, non-circular answers
+questions:
+  is_circular:
+    type: noul
+    instructions: Does this contain circular reasoning?
+min_scores: {}
+reject_nouls:
+  is_circular: 0.7
+min_confidence: 0.5
+```
+
+### Architecture ("Why 444x cheaper?")
+
+- **Flow**: `Input → Host pre-filter (--dry-run) → Single-round-trip Jev fan-out → clean/rejected/errors`
+- **Zero-cost host pruning**: Empty/malformed rows and `secret_scan` hits are dropped locally before any API call.
+- **Single-round-trip fan-out**: All rubric questions per row are evaluated concurrently in one Jev request instead of N sequential LLM calls.
+- **Verbatim output**: Clean rows are streamed directly without rewriting, keeping token usage and latency minimal.
 
 ---
 
