@@ -13,8 +13,14 @@ Keywords: what is jev-curate, what is TypeSafe Jev, Jev System One, Choice Score
   <meta property="og:title" content="Glossary: what is jev-curate and what is Jev">
   <meta property="og:description" content="Plain-language terms for the dataset sifter, its verdict types, and the model behind it.">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="jev-curate">
   <meta property="og:image" content="https://jev-curate.vercel.app/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Glossary: what is jev-curate and what is Jev">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Glossary: what is jev-curate and what is Jev">
+  <meta name="twitter:description" content="Plain-language terms for the dataset sifter, its verdict types, and the model behind it.">
   <meta name="twitter:image" content="https://jev-curate.vercel.app/og.png">
   <meta property="og:url" content="https://jev-curate.vercel.app/glossary.html">
   <meta name="robots" content="index, follow">
@@ -66,6 +72,7 @@ Keywords: what is jev-curate, what is TypeSafe Jev, Jev System One, Choice Score
       <a href="comparison.html">Comparison</a>
       <a href="comparison-judges.html">vs judge scripts</a>
       <a href="use-cases.html">Use cases</a>
+      <a href="/docs">Docs</a>
       <a href="glossary.html" aria-current="page">Glossary</a>
     </nav>
     <a class="btn btn-primary nav-cta" href="https://github.com/AkashPriyadarshii/jev-curate">Star on GitHub</a>
@@ -103,7 +110,7 @@ Keywords: what is jev-curate, what is TypeSafe Jev, Jev System One, Choice Score
         <div class="terminal-bar"><span class="t-dot"></span><span>one row, one verdict</span></div>
         <pre>{
   "has_circular_reasoning": { "noul": 0.05 },
-  "reasoning_depth":         { "score": 4.8,
+  "reasoning_depth":         { "score": 3.8,
                                "confidence": 0.95 }
 } -> keep</pre>
       </div>
@@ -113,7 +120,7 @@ Keywords: what is jev-curate, what is TypeSafe Jev, Jev System One, Choice Score
       <h2>Core terms</h2>
       <dl class="glossary-terms">
         <dt>jev-curate</dt>
-        <dd>An open source Rust binary that streams dataset rows from Parquet or JSONL, scores each row with Jev, and writes accepted and rejected rows to two output files. Repo: <a href="https://github.com/AkashPriyadarshii/jev-curate">AkashPriyadarshii/jev-curate</a>.</dd>
+        <dd>An open source Rust binary that streams dataset rows from Parquet or JSONL, scores each row with Jev, and writes accepted and rejected rows to 5 output files (clean, rejected, errors.jsonl, audit.jsonl, manifest.json). Repo: <a href="https://github.com/AkashPriyadarshii/jev-curate">AkashPriyadarshii/jev-curate</a>.</dd>
 
         <dt>TypeSafe Jev</dt>
         <dd>The System One decision model behind the tool, served at <code>https://api.typesafe.ai/v1/systemone</code>. "System One" means the model answers typed questions fast and cheaply rather than generating prose. Pricing: <code>0.042 USD per million input tokens</code>, output unmetered, roughly 250k tokens per second.</dd>

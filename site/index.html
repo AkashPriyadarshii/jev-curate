@@ -166,16 +166,17 @@
   <main id="main" tabindex="-1">
     <section class="hero">
       <div class="hero-copy">
+        <a class="ph-launch-banner" href="https://www.producthunt.com/products/jev-curate?launch=jev-curate" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;padding:4px 12px;border-radius:999px;background:rgba(255,97,84,0.12);border:1px solid rgba(255,97,84,0.35);color:#ff6154;font-size:0.85rem;font-weight:600;text-decoration:none;margin-bottom:12px;">Launching on Product Hunt · Dec 1 — Notify Me →</a>
         <p class="eyebrow">Rust + TypeSafe Jev judgment · v0.3.0-beta.1</p>
         <h1>Filter LLM training data with typed verdicts, not fragile prompts</h1>
-        <p class="lead">jev-curate streams Parquet and JSONL through a TypeSafe Jev (a typed-verdict AI judge) evaluation pipeline, keeps rows that pass your rubric, and writes the rejects to a second file. Measured numbers in the <a href="benchmarks.html" class="lead-link">benchmarks</a>, no invented speeds.</p>
+        <p class="lead">jev-curate streams Parquet and JSONL through a TypeSafe Jev (a typed-verdict AI judge) evaluation pipeline, keeps rows that pass your rubric, and writes 5 output files (<code>clean</code>, <code>rejected</code>, <code>errors.jsonl</code>, <code>audit.jsonl</code>, <code>manifest.json</code>). Measured numbers in the <a href="benchmarks.html" class="lead-link">benchmarks</a>, no invented speeds.</p>
         <div class="hero-actions">
           <a class="btn btn-primary" href="#sandbox">Try 10s sandbox</a>
           <a class="btn btn-ghost" href="#quickstart">Quickstart</a>
         </div>
-        <p class="hero-note">Output unmetered. <a href="https://docs.typesafe.ai/models.md">$0.042 / 1M input tokens</a>.</p>
-        <div class="verdict" role="group" aria-label="Example dry-run keep and reject counts">
-          <span class="judge-dim">Example dry-run:</span>
+        <p class="hero-note">Output unmetered. <a href="https://docs.typesafe.ai/models.md">$0.042 / 1M input tokens</a>. · 116 GitHub stars · 304 downloads · MIT · 16 offline tests</p>
+        <div class="verdict" role="group" aria-label="Sample dry-run keep and reject counts (illustrative)">
+          <span class="judge-dim">Sample dry-run (illustrative):</span>
           <span class="judge">keep 812,044</span>
           <span class="judge-dim">of 1,000,000 rows</span>
           <span class="judge-line">18.8% rejected</span>
@@ -192,7 +193,8 @@
           <button class="hero-copy-btn" type="button">copy</button>
         </div>
         <div class="hero-panel" data-panel="cli">
-          <pre><code>$ pip install jev-curate
+          <pre><code>$ pip install --pre jev-curate
+$ export TYPESAFE_API_KEY=ts_...
 $ jev-curate filter corpus.parquet \
   --preset reasoning-math \
   --format parquet \
@@ -202,9 +204,9 @@ $ jev-curate filter corpus.parquet \
         <div class="hero-panel" data-panel="python" hidden>
           <pre><code>from jev_curate import PyJevCurator
 
-curator = PyJevCurator(preset="reasoning-math", model="jev-latest")
-stats = curator.filter_file("corpus.parquet", out_dir="./curated/", resume=True)
-print(stats.kept, stats.rejected)</code></pre>
+curator = PyJevCurator(api_key="your-api-key", preset="reasoning-math")
+stats = curator.filter_file("corpus.parquet", out="./curated")
+print(stats["passed"], stats["rejected"])</code></pre>
         </div>
         <div class="hero-panel" data-panel="verdict" hidden>
           <pre><code>{
@@ -250,7 +252,7 @@ print(stats.kept, stats.rejected)</code></pre>
 
     <section class="why" id="why">
       <h2>LLM judges are an API call with a prompt bolted on</h2>
-      <p class="section-lead">You paste a csv into a chat window and get grades back in prose. jev-curate treats judging as a pipeline: predefined rubrics, batched questions, typed answers, two output files ready for training.</p>
+      <p class="section-lead">You paste a csv into a chat window and get grades back in prose. jev-curate treats judging as a pipeline: predefined rubrics, batched questions, typed answers, 5 output files ready for training (<code>clean</code>, <code>rejected</code>, <code>errors.jsonl</code>, <code>audit.jsonl</code>, <code>manifest.json</code>).</p>
       <ul class="reason-list">
         <li><strong>Judgment by <a href="https://typesafe.ai">TypeSafe Jev</a>.</strong> Machine-native Choice, Score and Noul questions. One state per record, all questions fanned into one request.</li>
         <li><strong>No token waste.</strong> Blank and padding lines drop in Rust before the API. 8k token ceiling per row.</li>
@@ -281,31 +283,33 @@ print(stats.kept, stats.rejected)</code></pre>
     </section>
 
     <section class="quickstart" id="quickstart">
-      <h2>One command in, two files out</h2>
+      <h2>One command in, five files out</h2>
       <div class="code-block">
-        <button class="copy-btn" data-copy="pip install jev-curate">copy install</button>
+        <button class="copy-btn" data-copy="pip install --pre jev-curate">copy install</button>
         <span id="copy-status" class="sr-only" aria-live="polite"></span>
-        <pre><code>$ pip install jev-curate  # or cargo install jev-curate
+        <pre><code>$ pip install --pre jev-curate  # or cargo install jev-curate --version 0.3.0-beta.1
 $ jev-curate filter corpus.parquet --preset anti-sycophancy --format parquet --resume --model jev-latest --out ./curated/</code></pre>
       </div>
-      <p class="section-lead">The binary writes <code>clean.jsonl</code> with accepted rows and <code>rejected.jsonl</code> with the rest, plus structural stats. Run <code>--dry-run</code> first to see keep and reject counts before any row touches the API. Requires only a <code>TYPESAFE_API_KEY</code>.</p>
+      <p class="section-lead">The binary writes 5 output files: <code>clean</code>, <code>rejected</code>, <code>errors.jsonl</code>, <code>audit.jsonl</code>, and <code>manifest.json</code>. Run <code>--dry-run</code> first to see keep and reject counts before any row touches the API. Requires only a <code>TYPESAFE_API_KEY</code>.</p>
       <h3 class="steps-heading">Run it in six steps</h3>
       <ol class="steps">
-        <li><span>Install</span> via <code>pip install jev-curate</code> or <code>cargo install jev-curate</code>.</li>
+        <li><span>Install</span> via <code>pip install --pre jev-curate</code> or <code>cargo install jev-curate --version 0.3.0-beta.1</code>.</li>
         <li><span>Export</span> a <code>TYPESAFE_API_KEY</code> or run without one in dry-run mode.</li>
         <li><span>Point</span> the CLI at a <code>.jsonl</code> or <code>.parquet</code> file with <code>jev-curate filter &lt;INPUT&gt;</code>.</li>
         <li><span>Pick</span> a preset with <code>-p</code>: reasoning-math, anti-sycophancy or code-correctness.</li>
         <li><span>Check</span> what would change with <code>--dry-run</code> before spending a token.</li>
-        <li><span>Run</span> for real and read <code>clean.jsonl</code> and <code>rejected.jsonl</code> from the output folder.</li>
+        <li><span>Run</span> for real and inspect <code>clean</code>, <code>rejected</code>, <code>errors.jsonl</code>, <code>audit.jsonl</code>, and <code>manifest.json</code> in the output folder.</li>
       </ol>
       <div class="table-wrap"><table class="flag-table">
         <caption>CLI flags for jev-curate filter</caption>
         <thead><tr><th scope="col">Flag</th><th scope="col">Default</th><th scope="col">What it does</th></tr></thead>
         <tbody>
-          <tr><td><code>&lt;INPUT&gt;</code></td><td>required</td><td>.jsonl or .parquet input path</td></tr>
+          <tr><td><code>&lt;INPUT&gt;</code></td><td>required</td><td>.jsonl, .parquet, <code>-</code> (stdin), or <code>hf://</code> dataset path</td></tr>
           <tr><td><code>-p, --preset</code></td><td>reasoning-math</td><td>rubric to evaluate against</td></tr>
           <tr><td><code>-o, --out</code></td><td>./curated/</td><td>output directory</td></tr>
           <tr><td><code>--format</code></td><td>jsonl</td><td>output format (<code>jsonl</code> or <code>parquet</code>)</td></tr>
+          <tr><td><code>--column</code></td><td>auto</td><td>text column name to evaluate</td></tr>
+          <tr><td><code>--stdout</code></td><td>off</td><td>stream passed rows to stdout</td></tr>
           <tr><td><code>--resume</code></td><td>off</td><td>resume interrupted run from checkpoint</td></tr>
           <tr><td><code>--model</code></td><td>jev-latest</td><td>Jev model identifier</td></tr>
           <tr><td><code>--endpoint</code></td><td>TypeSafe API</td><td>custom HTTPS or localhost endpoint</td></tr>
@@ -409,7 +413,7 @@ $ jev-curate filter corpus.parquet --preset anti-sycophancy --format parquet --r
 
   <script defer src="script.js"></script>
   <script defer src="sandbox.js"></script>
-<a class="ph-float" href="https://www.producthunt.com/products/jev-curate?launch=jev-curate" target="_blank" rel="noopener noreferrer" aria-label="jev-curate on Product Hunt" title="Find jev-curate on Product Hunt"><span aria-hidden="true">P</span></a>
+<a class="ph-float" href="https://www.producthunt.com/products/jev-curate?launch=jev-curate" target="_blank" rel="noopener noreferrer" aria-label="jev-curate on Product Hunt (Launching Dec 1)" title="Product Hunt Launch — Dec 1"><span aria-hidden="true">PH</span></a>
 <a class="bmc-float" href="https://buymeacoffee.com/AkashPriyadarshi" target="_blank" rel="noopener noreferrer" aria-label="Support my work on Buy Me a Coffee" title="Fuel the next build"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 8h1a4 4 0 1 1 0 8h-1" /><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" /><line x1="6" x2="6" y1="2" y2="4" /><line x1="10" x2="10" y1="2" y2="4" /><line x1="14" x2="14" y1="2" y2="4" /></svg></a>  <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=ce1c0ae3-34fa-4e5c-9716-6732d0401758" alt="" width="1" height="1" style="display:none" />
 </body>
 </html>

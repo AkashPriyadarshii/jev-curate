@@ -10,6 +10,10 @@ jev-curate streams Parquet and JSONL rows through typed Jev judgments (Choice, S
 - Routing dataset rows with typed decisions at pipeline scale.
 
 ## Docs
+- [Documentation](https://jev-curate.vercel.app/docs): Full Mintlify documentation hub
+- [Quickstart](https://jev-curate.vercel.app/docs/quickstart): Install and run your first curation pipeline
+- [CLI reference](https://jev-curate.vercel.app/docs/cli-reference): Commands, flags, presets, and output files
+- [Python SDK](https://jev-curate.vercel.app/docs/python-sdk): Python bindings and programmatic usage
 - [Homepage + quickstart](https://jev-curate.vercel.app/): Overview and quickstart guide
 - [Real measured benchmark](https://jev-curate.vercel.app/benchmarks.html): Throughput and latency benchmarks
 - [What is Jev](https://jev-curate.vercel.app/what-is-jev.html): Model explainer for TypeSafe Jev System One
