@@ -34,3 +34,5 @@ test_out/
 curated/
 
 checks/
+.vercel
+.env*
