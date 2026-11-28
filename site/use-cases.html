@@ -95,7 +95,7 @@ Keywords: jev-curate use cases, RLHF data filtering, anti-sycophancy preset, rea
       <div class="hero-copy">
         <p class="eyebrow">Three jobs this tool already fits</p>
         <h1>Use cases: RLHF, reasoning and code data</h1>
-        <p class="lead">Each workflow names the preset, the threshold behavior, and the expected cost shape. All three run on the same binary with the same two output files.</p>
+        <p class="lead">Each workflow names the preset, the threshold behavior, and the expected cost shape. All three run on the same binary and write three output files (clean, rejected, and errors).</p>
         <div class="hero-actions">
           <a class="btn btn-primary" href="#rlhf">RLHF workflow</a>
           <a class="btn btn-ghost" href="#reasoning">Reasoning workflow</a>
@@ -120,14 +120,13 @@ output: clean.jsonl + rejected.jsonl</pre>
 
     <section class="presets" id="reasoning">
       <h2>Reasoning sets: keep the steps that entail the answer</h2>
-      <p class="section-lead">Synthetic reasoning data degrades when the chain of thought is fluent but disconnected from the conclusion. The <code>reasoning-math</code> preset evaluates chain-of-thought correctness and arithmetic soundness, and keeps steps that actually entail the answer. This is the preset the <a href="benchmarks.html">benchmarked</a> row payload could not fool: circular reasoning scores a Noul of 0.05, and the row still passes on reasoning depth when it is sound.</p>
-      <p class="section-lead">One warning from the codebase: the preset never rewrites verbatim row text. It evaluates and routes. Use it to remove low-entailment rows before fine-tuning, not to patch what a generator wrote badly. For blacklisted reasoning starters such as questions that answer themselves, route those to a reject file by threshold tuning in a dry run first.</p>
+      <p class="section-lead">Synthetic reasoning data degrades when the chain of thought is fluent but disconnected from the conclusion. The <code>reasoning-math</code> preset evaluates chain-of-thought correctness and arithmetic soundness, and keeps steps that entail the answer. This is the preset the <a href="benchmarks.html">benchmarked</a> row payload could not fool: circular reasoning scores a Noul of 0.05, and the row still passes on reasoning depth when it is sound.</p>
+      <p class="section-lead">The preset never rewrites row text; it evaluates and routes. Use it to remove low-entailment rows before fine-tuning, not to patch what a generator wrote badly. For blacklisted reasoning starters such as questions that answer themselves, route those to a reject file by threshold tuning in a dry run first.</p>
     </section>
 
     <section class="why" id="code">
       <h2>Code data: pre-filter before the linter</h2>
       <p class="section-lead">Large code corpora are mostly fine and cheap to store, but training runs pay the cost of the bad rows in loss spikes. <code>code-correctness</code> scores programs on soundness before they enter a code-model mixture. Rows that fail correctness checks drop out at 0.042 USD per million input tokens, which is cheaper than a human triage pass and faster than waiting on a heavy eval sweep.</p>
-      <p class="section-lead">Because every row is evaluated with the same questions, the reject file doubles as an error-class report. Classify by the dominant failed check and you have a bug taxonomy for the generator, which is a second deliverable from the same run.</p>
     </section>
 
     <section class="presets">
@@ -137,7 +136,7 @@ output: clean.jsonl + rejected.jsonl</pre>
     </section>
 
     <section class="cta">
-      <h2>Your dataset, one command</h2>
+      <h2>Filter your dataset</h2>
       <div class="cta-actions">
         <a class="btn btn-primary" href="index.html#quickstart">Start sifting</a>
         <a class="btn btn-ghost" href="https://github.com/AkashPriyadarshii/jev-curate">Star the repo</a>

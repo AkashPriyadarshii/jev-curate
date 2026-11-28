@@ -152,18 +152,18 @@ answers:
           <tr><td>Noul</td><td>calibrated probability</td><td>odds of a property: circular logic, dishonesty, breakage</td></tr>
         </tbody>
       </table></div>
-      <p class="section-lead">Every preset in jev-curate is a bundle of such questions. The <code>reasoning-math</code> preset asks whether the chain of thought entails the answer and how deep the reasoning is. The <code>anti-sycophancy</code> preset asks rated honesty questions. The <code>code-correctness</code> preset asks whether the program is sound. None of them ask for an essay, because no preset needs one.</p>
+      <p class="section-lead">Every preset in jev-curate is a bundle of such questions. The <code>reasoning-math</code> preset asks whether the chain of thought entails the answer and how deep the reasoning is. The <code>anti-sycophancy</code> preset asks rated honesty questions. The <code>code-correctness</code> preset asks whether the program is sound.</p>
     </section>
 
     <section class="presets">
       <h2>Built for batch, priced for batch</h2>
-      <p class="section-lead">The model profile makes the batch economics clear. Input costs 0.042 USD per million tokens, output is unmetered, and TypeSafe's current org default is 80 requests/sec and 100,000 tokens/sec. TypeSafe's own workflow benchmarks claim 193.6x faster and 444.6x cheaper than chat-style judging on System One tasks. That is why jev-curate can afford to evaluate every row instead of a sample: the verdict is nearly free.</p>
+      <p class="section-lead">The model profile makes the batch economics clear. Input costs 0.042 USD per million tokens, output is unmetered, and TypeSafe's current org default is 80 requests/sec and 100,000 tokens/sec. TypeSafe's own workflow benchmarks claim 193.6x faster and 444.6x cheaper than chat-style judging on System One tasks. That is why jev-curate can afford to evaluate every row instead of a sample: the verdict costs $0.042 per million input tokens.</p>
       <p class="section-lead">The client respects those limits with a token bucket. Measured locally against a mock server, one node sustains 24.0 rows per second; the <a href="benchmarks.html">benchmark page</a> explains the number and the arithmetic behind scaling it to the 1,500 rows/sec cluster target.</p>
-      <p class="section-lead">If you came from a forum post asking "what is jev ai", the honest one-liner is: TypeSafe AI's model for typed decisions, and this site's tool is one consumer of it. The <a href="glossary.html">glossary</a> defines every term, and the <a href="use-cases.html">use case</a> pages show the workflows.</p>
+      <p class="section-lead">Jev is TypeSafe AI's model for typed decisions, and jev-curate is one client for it. The <a href="glossary.html">glossary</a> defines every term, and the <a href="use-cases.html">use case</a> pages show the workflows.</p>
     </section>
 
     <section class="cta">
-      <h2>Jev clear, meet the tool</h2>
+      <h2>Run jev-curate</h2>
       <div class="cta-actions">
         <a class="btn btn-primary" href="index.html#quickstart">Six step quickstart</a>
         <a class="btn btn-ghost" href="https://github.com/AkashPriyadarshii/jev-curate">Star the repo</a>

@@ -171,8 +171,8 @@
       <div class="hero-copy">
         <a class="ph-launch-banner" href="https://www.producthunt.com/products/jev-curate?launch=jev-curate" target="_blank" rel="noopener noreferrer">Launching on Product Hunt · Dec 1 — Notify Me →</a>
         <p class="eyebrow">Rust + TypeSafe Jev judgment · v0.3.0-beta.1</p>
-        <h1>Filter LLM training data with typed verdicts, not fragile prompts</h1>
-        <p class="lead">jev-curate streams Parquet and JSONL through a TypeSafe Jev (a typed-verdict AI judge) evaluation pipeline, keeps rows that pass your rubric, and writes 3 output files (<code>clean.jsonl</code>/<code>.parquet</code>, <code>rejected.jsonl</code>, <code>errors.jsonl</code>). Measured numbers in the <a href="benchmarks.html" class="lead-link">benchmarks</a>, no invented speeds.</p>
+        <h1>Filter LLM training data with typed verdicts</h1>
+        <p class="lead">jev-curate streams Parquet and JSONL through a TypeSafe Jev (a typed-verdict AI judge) evaluation pipeline, keeps rows that pass your rubric, and writes 3 output files (<code>clean.jsonl</code>/<code>.parquet</code>, <code>rejected.jsonl</code>, <code>errors.jsonl</code>). See <a href="benchmarks.html">benchmarks</a> for measured throughput.</p>
         <div class="hero-actions">
           <a class="btn btn-primary" href="#sandbox">Try 10s sandbox</a>
           <a class="btn btn-ghost" href="#quickstart">Quickstart</a>
@@ -267,10 +267,10 @@ print(stats["passed"], stats["rejected"])</code></pre>
 
     <section class="presets" id="presets">
       <h2>Rubrics you can point at a file</h2>
-      <p class="section-lead">Three presets ship with the binary. Each is a Jev evaluation template, not a regex or a rewriter.</p>
+      <p class="section-lead">Three presets ship with the binary. Each is a Jev evaluation template.</p>
       <div class="preset-row">
         <h3><code>reasoning-math</code></h3>
-        <p>Grades chain-of-thought correctness and arithmetic soundness. Keeps steps that actually entail the answer.</p>
+        <p>Grades chain-of-thought correctness and arithmetic soundness. Keeps steps that entail the answer.</p>
         <span class="check">keep</span>
       </div>
       <div class="preset-row">
@@ -344,7 +344,7 @@ $ jev-curate filter corpus.parquet --preset anti-sycophancy --format parquet --r
     </section>
 
     <section class="cta">
-      <h2>Ship better training data tonight</h2>
+      <h2>Start filtering</h2>
       <div class="cta-actions">
         <a class="btn btn-primary" href="https://github.com/AkashPriyadarshii/jev-curate">Star the repo</a>
         <a class="btn btn-ghost" href="https://crates.io/crates/jev-curate">crates.io</a>

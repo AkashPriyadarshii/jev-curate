@@ -78,8 +78,8 @@ stats = curator.filter_file("train.parquet", out="./curated")  # -> {passed, rej
 `jev-curate filter` streams input rows and writes three separated outputs in `--out` (default `./curated/`):
 
 - `clean.jsonl` (or `clean.parquet` with `--format parquet`, preserving the input Arrow schema)
-- `rejected.jsonl` — rows that failed host sanity checks, `secret_scan`, or Jev rubric thresholds, with rejection reasons
-- `errors.jsonl` — rows that hit transport/API errors after retries, kept separate so clean/rejected counts stay exact
+- `rejected.jsonl`: rows that failed host sanity checks, `secret_scan`, or Jev rubric thresholds, with rejection reasons
+- `errors.jsonl`: rows that hit transport/API errors after retries, kept separate so clean/rejected counts stay exact
 
 ---
 
@@ -242,19 +242,19 @@ All tests run against an in-process mock server with zero live API credits in CI
 
 ## Limits and non-goals
 
-- **Not a generative rewriter**: `jev-curate` never paraphrases or re-generates text. Data is kept 100% verbatim.
+- **No rewriting**: `jev-curate` emits passing rows verbatim without paraphrasing or editing.
 - **Not a local vector DB**: No embeddings, no vector indices, zero PyTorch/CUDA runtime requirements.
-- **Not a generic web scraper**: Tailored strictly for structured datasets (Parquet, Arrow, JSONL).
+- **Not a generic web scraper**: Built for structured datasets (Parquet, Arrow, JSONL).
 
 ---
 
 ## Ecosystem & Author
 
-- [`jev-seo`](https://github.com/AkashPriyadarshii/jev-seo) — Free Rust SEO & GEO CLI with 19-tool MCP server
-- [`jev-superpowers`](https://github.com/AkashPriyadarshii/jev-superpowers) — Jev-gated agent engineering workflows
-- [`jev-git`](https://github.com/AkashPriyadarshii/jev-git) — Jev reflex gates for git
-- [`tdlib-android`](https://github.com/AkashPriyadarshii/tdlib-android) — Precompiled TDLib binaries for four Android ABIs
-- [`kharcha`](https://github.com/AkashPriyadarshii/kharcha) — Offline-first UPI expense tracker for Android
+- [`jev-seo`](https://github.com/AkashPriyadarshii/jev-seo): Free Rust SEO & GEO CLI with 19-tool MCP server
+- [`jev-superpowers`](https://github.com/AkashPriyadarshii/jev-superpowers): Jev-gated agent engineering workflows
+- [`jev-git`](https://github.com/AkashPriyadarshii/jev-git): Jev reflex gates for git
+- [`tdlib-android`](https://github.com/AkashPriyadarshii/tdlib-android): Precompiled TDLib binaries for four Android ABIs
+- [`kharcha`](https://github.com/AkashPriyadarshii/kharcha): Offline-first UPI expense tracker for Android
 
 **Author:** **Akash Priyadarshi** (Patna, Bihar, India) · [GitHub](https://github.com/AkashPriyadarshii) · [Portfolio](https://akashpriyadarshi.is-a.dev) · [Project page](https://akashpriyadarshi.is-a.dev/projects/jev-curate/) · [LinkedIn](https://linkedin.com/in/akashpriyadarshii) · [Resume](https://akashpriyadarshii.github.io/Resume/) · [X](https://x.com/Akash__ydv001) · [Threads](https://www.threads.net/@akash.priyadarshii) · [Instagram](https://www.instagram.com/akash.priyadarshii/) · [Reddit](https://reddit.com/user/akashpriyadarshii)
 
