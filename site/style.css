@@ -219,19 +219,24 @@ h3[id] {
   font-weight: 500;
   text-decoration: none;
   cursor: pointer;
-  border: 2px solid var(--ink);
+  border: 1px solid rgba(0, 0, 0, 0.12);
   user-select: none;
   -webkit-user-select: none;
-  transition: transform 120ms var(--ease), box-shadow 200ms var(--ease), background-color 200ms var(--ease);
+  transition: transform 120ms var(--ease), box-shadow 200ms var(--ease), background-color 200ms var(--ease), border-color 200ms var(--ease);
 }
 
 .btn-primary {
-  background: var(--pink);
-  color: var(--ink);
-  box-shadow: var(--shadow);
+  background: var(--ink);
+  color: var(--substrate);
+  border-color: var(--ink);
+  box-shadow: none;
 }
 
-.btn-ghost { background: transparent; }
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
 
 .btn:not(:disabled):active {
   transform: scale(0.96);
@@ -274,11 +279,11 @@ h3[id] {
 
 .hero h1 {
   font-family: var(--display);
-  font-size: clamp(44px, 4.6vw, 66px);
-  font-weight: 500;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
-  margin-bottom: 20px;
+  font-size: clamp(2.1rem, 5vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  margin-bottom: 18px;
   text-wrap: balance;
 }
 
@@ -308,10 +313,12 @@ h3[id] {
 
 /* terminal & interactive tabs */
 .terminal {
-  background: var(--ink);
+  position: relative;
+  background: radial-gradient(120% 100% at 100% 0%, rgba(255, 137, 198, 0.08) 0%, rgba(17, 17, 17, 0) 60%), var(--ink);
   color: var(--substrate);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.06);
   overflow: hidden;
   max-width: 100%;
   min-width: 0;
@@ -373,13 +380,44 @@ h3[id] {
 
 .terminal pre {
   padding: 22px;
+  max-width: 100%;
   overflow-x: auto;
   line-height: 1.5;
   white-space: pre-wrap;
   overflow-wrap: break-word;
 }
 
+pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 .terminal code { color: var(--substrate); }
+
+.tok-prompt { color: #71717a; user-select: none; }
+.tok-cmd { color: #f4f4f5; font-weight: 600; }
+.tok-flag { color: #ff89c6; }
+.tok-str { color: #a5f3fc; }
+.tok-kw { color: #c4b5fd; }
+.tok-key { color: #93c5fd; }
+.tok-num { color: #fde68a; font-variant-numeric: tabular-nums; }
+
+.terminal-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+  padding: 12px 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.terminal-stat-label { color: #a1a1aa; }
+.terminal-stat-keep { color: #86efac; font-weight: 600; }
+.terminal-stat-dim { color: #a1a1aa; }
 
 /* sections */
 section {
@@ -1025,8 +1063,13 @@ h2 {
   .site-nav a:hover,
   .nav-links a:hover { border-bottom-color: var(--pink); }
   .btn-primary:hover {
-    transform: translate(1px, 1px);
-    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+    background: #27272a;
+    border-color: #27272a;
+    box-shadow: none;
+  }
+  .btn-ghost:hover {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.24);
   }
   .btn-ghost:hover { background: var(--grey-4); box-shadow: var(--shadow); }
   .hero-note a:hover,
