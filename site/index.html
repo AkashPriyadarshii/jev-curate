@@ -138,6 +138,7 @@
   <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
+  <div class="scroll-progress" aria-hidden="true"></div>
   <a class="skip-link" href="#main">Skip to main content</a>
   <header class="site-header">
     <a class="logo" href="index.html">jev-curate<sup>beta</sup></a>
@@ -237,7 +238,7 @@ stats = curator.filter_file(<span class="tok-str">"corpus.parquet"</span>, out=<
       </div>
       <div class="sandbox-grid">
         <div class="sandbox-pane">
-          <label class="sandbox-label" for="sandbox-input">Input rows (JSONL or plain text)</label>
+          <label class="sandbox-label" for="sandbox-input">Input rows (JSONL or plain text) <kbd class="kbd-hint" title="Press / to focus">/</kbd></label>
           <textarea id="sandbox-input" rows="7" spellcheck="false"></textarea>
         </div>
         <div class="sandbox-pane">
@@ -410,6 +411,7 @@ $ jev-curate filter corpus.parquet --preset anti-sycophancy --format parquet --r
     <p class="footer-ph"><a href="https://www.producthunt.com/products/jev-curate?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-jev-curate" target="_blank" rel="noopener noreferrer"><img loading="lazy" decoding="async" alt="jev-curate - Sift 1B-row datasets 444x cheaper with Jev | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1272040&theme=light&t=1791323078281"></a></p>
   </footer>
 
+  <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
   <script defer src="script.js"></script>
   <script defer src="sandbox.js"></script>
   <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=ce1c0ae3-34fa-4e5c-9716-6732d0401758" alt="" width="1" height="1" style="display:none" />

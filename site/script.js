@@ -9,6 +9,19 @@
     done();
   }
 
+  /* sonner: bottom-right copy feedback toast */
+  var toastRegion = document.getElementById('toast-region');
+  function showToast(msg) {
+    if (!toastRegion) return;
+    var el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = msg;
+    toastRegion.appendChild(el);
+    setTimeout(function () {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    }, 2000);
+  }
+
   /* copy button */
   var btn = document.querySelector('.copy-btn');
   var copyStatus = document.getElementById('copy-status');
@@ -21,6 +34,7 @@
         clearTimeout(copyTimer);
         btn.textContent = 'copied';
         if (copyStatus) copyStatus.textContent = 'Copied to clipboard';
+        showToast('Copied install command to clipboard');
         copyTimer = setTimeout(function () {
           btn.textContent = origLabel;
           if (copyStatus) copyStatus.textContent = '';
@@ -71,4 +85,43 @@
       }
     });
   }
+  /* hero copy button toast */
+  var heroCopyBtn = document.querySelector('.hero-copy-btn');
+  if (heroCopyBtn) {
+    heroCopyBtn.addEventListener('click', function () {
+      showToast('Copied snippet to clipboard');
+    });
+  }
+
+  /* radix-primitives: roving ArrowLeft/ArrowRight + Home/End on role="tablist" */
+  document.querySelectorAll('[role="tablist"]').forEach(function (tablist) {
+    tablist.addEventListener('keydown', function (e) {
+      var tabs = Array.prototype.slice.call(tablist.querySelectorAll('[role="tab"]'));
+      if (!tabs.length) return;
+      var idx = tabs.indexOf(document.activeElement);
+      if (idx === -1) return;
+      var nextIdx = null;
+      if (e.key === 'ArrowRight') nextIdx = (idx + 1) % tabs.length;
+      else if (e.key === 'ArrowLeft') nextIdx = (idx - 1 + tabs.length) % tabs.length;
+      else if (e.key === 'Home') nextIdx = 0;
+      else if (e.key === 'End') nextIdx = tabs.length - 1;
+      if (nextIdx !== null) {
+        e.preventDefault();
+        tabs[nextIdx].focus();
+        tabs[nextIdx].click();
+      }
+    });
+  });
+
+  /* cmdk + ui: global '/' shortcut to focus #sandbox-input */
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
+    var tag = e.target && e.target.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (e.target && e.target.isContentEditable)) return;
+    var sandboxInput = document.getElementById('sandbox-input');
+    if (sandboxInput) {
+      e.preventDefault();
+      sandboxInput.focus();
+    }
+  });
 })();

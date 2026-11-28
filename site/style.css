@@ -150,7 +150,11 @@ h3[id] {
 }
 
 /* mobile drawer & toggle — hidden on desktop */
-#mobile-nav { display: none !important; }
+#mobile-nav {
+  display: none !important;
+  transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform;
+}
 
 .nav-links {
   display: flex;
@@ -238,8 +242,12 @@ h3[id] {
   border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
-.btn:not(:disabled):active {
-  transform: scale(0.96);
+.btn:not(:disabled):active,
+.hero-tab:not(:disabled):active,
+.hero-copy-btn:not(:disabled):active,
+.copy-btn:not(:disabled):active,
+.sandbox-out-tab:not(:disabled):active {
+  transform: scale(0.97);
 }
 
 .ph-launch-banner {
@@ -552,6 +560,8 @@ h2 {
 }
 
 .sandbox-out-tab {
+  font-variant-numeric: tabular-nums;
+  transition: transform 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out;
   min-height: 44px;
   padding: 6px 12px;
   background: var(--substrate);
@@ -1196,5 +1206,128 @@ h2 {
 
 @media print {
   .ph-float,
-  .bmc-float { display: none; }
+  .bmc-float,
+  .scroll-progress,
+  .toast-region { display: none; }
+}
+
+/* motion-primitives: 2px top scroll-progress bar */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--pink);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  z-index: 100;
+  pointer-events: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .scroll-progress {
+      animation: scroll-progress-grow linear both;
+      animation-timeline: scroll();
+    }
+  }
+}
+
+@keyframes scroll-progress-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* magicui: pure-CSS shimmer on .ph-launch-banner & 1px mask-composite border beam on .terminal */
+@media (prefers-reduced-motion: no-preference) {
+  .ph-launch-banner {
+    position: relative;
+    overflow: hidden;
+  }
+  .ph-launch-banner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 25%, rgba(255, 255, 255, 0.55) 50%, transparent 75%);
+    transform: translateX(-100%);
+    animation: ph-shimmer 4.5s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .terminal::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: conic-gradient(from var(--beam-angle, 0deg), transparent 70%, rgba(255, 137, 198, 0.75) 88%, transparent 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: intersect;
+    pointer-events: none;
+    animation: border-beam-spin 8s linear infinite;
+  }
+}
+
+@property --beam-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes ph-shimmer {
+  0%, 60% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes border-beam-spin {
+  to { --beam-angle: 360deg; }
+}
+
+/* sonner: bottom-right copy feedback toast */
+.toast-region {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--ink);
+  color: var(--substrate);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: var(--mono);
+  font-size: 13px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+  animation: toast-in 200ms ease-out both;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* cmdk + ui: compact kbd hint pill */
+.kbd-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  margin-left: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1;
+  color: var(--grey-1);
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
 }
