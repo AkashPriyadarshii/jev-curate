@@ -177,7 +177,16 @@
           <a class="btn btn-primary" href="#sandbox">Try 10s sandbox</a>
           <a class="btn btn-ghost" href="#quickstart">Quickstart</a>
         </div>
+        <div class="install-bar" role="group" aria-label="Install command">
+          <div class="install-toggle" role="group" aria-label="Package manager">
+            <button type="button" class="install-pkg is-active" data-pkg="pip" data-cmd="pip install --pre jev-curate" aria-pressed="true">pip</button>
+            <button type="button" class="install-pkg" data-pkg="cargo" data-cmd="cargo install jev-curate --version 0.3.0-beta.1" aria-pressed="false">cargo</button>
+          </div>
+          <code class="install-cmd" id="hero-install-cmd">pip install --pre jev-curate</code>
+          <button type="button" class="install-copy" id="hero-install-copy" aria-label="Copy install command"><span class="copy-label">copy</span></button>
+        </div>
         <p class="hero-note">Output unmetered · <a href="https://docs.typesafe.ai/models.md">$0.042 / 1M input tokens</a> · MIT · 116 stars</p>
+        <p class="trust-line">Runs 100% local in <code>--dry-run</code> · <code>secret_scan</code> strips keys before API calls</p>
       </div>
       <div class="terminal" aria-label="Interactive hero terminal">
         <div class="terminal-bar">
@@ -238,7 +247,7 @@ stats = curator.filter_file(<span class="tok-str">"corpus.parquet"</span>, out=<
       </div>
       <div class="sandbox-grid">
         <div class="sandbox-pane">
-          <label class="sandbox-label" for="sandbox-input">Input rows (JSONL or plain text) <kbd class="kbd-hint" title="Press / to focus">/</kbd></label>
+          <label class="sandbox-label" for="sandbox-input">Input rows (JSONL or plain text) <kbd class="kbd-hint" data-tooltip="Press / to focus">/</kbd></label>
           <textarea id="sandbox-input" rows="7" spellcheck="false"></textarea>
         </div>
         <div class="sandbox-pane">
@@ -337,6 +346,24 @@ $ jev-curate filter corpus.parquet --preset anti-sycophancy --format parquet --r
         <div class="stat">
           <p class="stat-num">444x</p>
           <p class="stat-label">cheaper, TypeSafe System One workflow benchmark</p>
+        </div>
+      </div>
+      <div class="bench-compare" aria-label="Workflow comparison">
+        <div class="bench-card bench-before">
+          <p class="bench-eyebrow">Conventional · Sequential LLM judge</p>
+          <dl class="bench-metrics">
+            <div><dt>Execution</dt><dd>1 row / request <span class="bench-note">(sequential HTTP loop)</span></dd></div>
+            <div><dt>Output billing</dt><dd>Metered prose <span class="bench-note">(full JSON / CoT tokens)</span></dd></div>
+            <div><dt>Failure mode</dt><dd>Unparsed text <span class="bench-note">(manual retry / script abort)</span></dd></div>
+          </dl>
+        </div>
+        <div class="bench-card bench-after">
+          <p class="bench-eyebrow">jev-curate · Speculative fan-out</p>
+          <dl class="bench-metrics">
+            <div><dt>Throughput</dt><dd><strong>23.9 rows/sec</strong> <span class="bench-note">(local wiremock, 20 req/s cap · 1,500+ target)</span></dd></div>
+            <div><dt>Token cost</dt><dd><strong>$0.042 / 1M input</strong> <span class="bench-note">(444x TypeSafe System One · unmetered output)</span></dd></div>
+            <div><dt>Failure mode</dt><dd><strong>Typed verdicts</strong> <span class="bench-note">(Choice / Score / Noul · errors.jsonl)</span></dd></div>
+          </dl>
         </div>
       </div>
       <p class="cost-src">Rates from the <a href="https://typesafe.ai">TypeSafe AI</a> model docs; 444x figure is TypeSafe's own <a href="https://typesafe.ai">System One benchmark</a>. 1500+ is the project target, benchmark runs live in the repo.</p>

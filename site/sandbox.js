@@ -70,9 +70,13 @@
       var text = activePanel.textContent.trim();
       var done = function () {
         clearTimeout(heroCopyTimer);
+        heroCopyBtn.classList.remove('is-copied');
+        void heroCopyBtn.offsetWidth;
+        heroCopyBtn.classList.add('is-copied');
         heroCopyBtn.textContent = 'copied';
         if (copyStatus) copyStatus.textContent = 'Copied to clipboard';
         heroCopyTimer = setTimeout(function () {
+          heroCopyBtn.classList.remove('is-copied');
           heroCopyBtn.textContent = 'copy';
           if (copyStatus) copyStatus.textContent = '';
         }, 1600);
@@ -222,6 +226,21 @@
 
   if (!presetSelect || !inputArea || !cleanOut || !rejectedOut) return;
 
+  var lastCounts = null;
+  var flashTimer = null;
+  function flashOutputs() {
+    clearTimeout(flashTimer);
+    [cleanOut, rejectedOut].forEach(function (el) {
+      el.classList.remove('is-updated');
+      void el.offsetWidth;
+      el.classList.add('is-updated');
+    });
+    flashTimer = setTimeout(function () {
+      cleanOut.classList.remove('is-updated');
+      rejectedOut.classList.remove('is-updated');
+    }, 400);
+  }
+
   function runSandbox() {
     var presetName = presetSelect.value;
     var lines = inputArea.value.split('\n').filter(function (l) { return l.trim().length > 0; });
@@ -260,6 +279,11 @@
     rejectedOut.textContent = rejectedLines.length ? rejectedLines.join('\n') : '// 0 rejected rows';
     if (cleanCount) cleanCount.textContent = String(cleanLines.length);
     if (rejectedCount) rejectedCount.textContent = String(rejectedLines.length);
+    var nextCounts = cleanLines.length + ':' + rejectedLines.length;
+    if (lastCounts !== null && lastCounts !== nextCounts) {
+      flashOutputs();
+    }
+    lastCounts = nextCounts;
     if (secretBadge) {
       secretBadge.textContent = secretHits > 0
         ? 'secret_scan: ' + secretHits + ' blocked'

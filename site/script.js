@@ -9,7 +9,7 @@
     done();
   }
 
-  /* sonner: bottom-right copy feedback toast */
+  /* sonner: bottom-right copy feedback toast (@starting-style + .is-leaving) */
   var toastRegion = document.getElementById('toast-region');
   function showToast(msg) {
     if (!toastRegion) return;
@@ -18,35 +18,86 @@
     el.textContent = msg;
     toastRegion.appendChild(el);
     setTimeout(function () {
-      if (el.parentNode) el.parentNode.removeChild(el);
-    }, 2000);
+      el.classList.add('is-leaving');
+      setTimeout(function () {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      }, 220);
+    }, 1800);
+  }
+
+  function copyWithFeedback(text, onDone) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(onDone).catch(function () {
+        fallbackCopy(text, onDone);
+      });
+    } else {
+      fallbackCopy(text, onDone);
+    }
+  }
+
+  /* hero 1-click install bar (pip / cargo toggle) */
+  var installCmdEl = document.getElementById('hero-install-cmd');
+  var installCopyBtn = document.getElementById('hero-install-copy');
+  var installPkgBtns = document.querySelectorAll('.install-pkg[data-cmd]');
+  var copyStatus = document.getElementById('copy-status');
+
+  if (installCmdEl && installPkgBtns.length) {
+    installPkgBtns.forEach(function (pkgBtn) {
+      pkgBtn.addEventListener('click', function () {
+        installPkgBtns.forEach(function (b) {
+          var active = b === pkgBtn;
+          b.classList.toggle('is-active', active);
+          b.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        installCmdEl.textContent = pkgBtn.getAttribute('data-cmd');
+      });
+    });
+  }
+
+  if (installCopyBtn && installCmdEl) {
+    var installLabel = installCopyBtn.querySelector('.copy-label') || installCopyBtn;
+    var installOrig = installLabel.textContent;
+    var installTimer = null;
+    installCopyBtn.addEventListener('click', function () {
+      var text = installCmdEl.textContent.trim();
+      copyWithFeedback(text, function () {
+        clearTimeout(installTimer);
+        installCopyBtn.classList.remove('is-copied');
+        void installCopyBtn.offsetWidth;
+        installCopyBtn.classList.add('is-copied');
+        installLabel.textContent = 'copied';
+        if (copyStatus) copyStatus.textContent = 'Copied to clipboard';
+        showToast('Copied install command to clipboard');
+        installTimer = setTimeout(function () {
+          installCopyBtn.classList.remove('is-copied');
+          installLabel.textContent = installOrig;
+          if (copyStatus) copyStatus.textContent = '';
+        }, 1600);
+      });
+    });
   }
 
   /* copy button */
   var btn = document.querySelector('.copy-btn');
-  var copyStatus = document.getElementById('copy-status');
   if (btn) {
     var origLabel = btn.textContent;
     var copyTimer = null;
     btn.addEventListener('click', function () {
       var text = btn.getAttribute('data-copy');
-      var done = function () {
+      copyWithFeedback(text, function () {
         clearTimeout(copyTimer);
+        btn.classList.remove('is-copied');
+        void btn.offsetWidth;
+        btn.classList.add('is-copied');
         btn.textContent = 'copied';
         if (copyStatus) copyStatus.textContent = 'Copied to clipboard';
         showToast('Copied install command to clipboard');
         copyTimer = setTimeout(function () {
+          btn.classList.remove('is-copied');
           btn.textContent = origLabel;
           if (copyStatus) copyStatus.textContent = '';
         }, 1600);
-      };
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(done).catch(function () {
-          fallbackCopy(text, done);
-        });
-      } else {
-        fallbackCopy(text, done);
-      }
+      });
     });
   }
 
