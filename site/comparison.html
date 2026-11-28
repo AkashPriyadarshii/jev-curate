@@ -32,27 +32,88 @@ Keywords: jev-curate comparison, dataset judging vs chat, GPT judge alternative,
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "@id": "https://jev-curate.vercel.app/#software",
+      "name": "jev-curate",
+      "url": "https://jev-curate.vercel.app/",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Linux, macOS, Windows",
+      "author": {
+        "@id": "https://jev-curate.vercel.app/#person"
+      },
+      "codeRepository": "https://github.com/AkashPriyadarshii/jev-curate",
+      "sameAs": [
+        "https://github.com/AkashPriyadarshii/jev-curate",
+        "https://pypi.org/project/jev-curate/",
+        "https://crates.io/crates/jev-curate",
+        "https://www.producthunt.com/products/jev-curate"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://jev-curate.vercel.app/#website",
+      "name": "jev-curate",
+      "url": "https://jev-curate.vercel.app/",
+      "inLanguage": "en",
+      "publisher": {
+        "@id": "https://jev-curate.vercel.app/#person"
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://jev-curate.vercel.app/#person",
+      "name": "Akash Priyadarshi",
+      "url": "https://github.com/AkashPriyadarshii"
+    },
+    {
+      "@type": "ItemList",
+      "@id": "https://jev-curate.vercel.app/comparison.html#comparison-matrix",
+      "name": "Dataset curation and LLM judging tools compared",
+      "numberOfItems": 4,
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "jev-curate",
+          "description": "Rust streaming CLI (optional PyO3 bindings) using TypeSafe Jev System One typed verdicts (Choice, Score, Noul) via speculative fan-out; streams Parquet/JSONL to clean, rejected, and errors files without rewriting verbatim text; $0.042 / 1M input tokens (unmetered output) with 20 req/s token-bucket limiter and --dry-run."
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "NeMo Curator",
+          "description": "Python + Dask/RAPIDS GPU ecosystem for large-scale pretraining deduplication, heuristic filtering, classifier scoring, and PII redaction across sharded Parquet/JSONL datasets on self-hosted CPU/GPU clusters."
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "HuggingFace Datatrove",
+          "description": "Python multiprocessing, Slurm, and Ray pipeline library for deterministic heuristic filters, MinHash deduplication, and fsspec-backed Parquet/JSONL shard processing on self-hosted CPU workers."
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "Custom LLM-as-a-judge scripts",
+          "description": "Ad-hoc Python or async scripts calling chat-completion endpoints per row with free-text or JSON-mode prompts, paying metered input and metered output tokens with custom parsing and retry logic."
+        }
+      ]
+    },
+    {
       "@type": "FAQPage",
       "mainEntity": [
         {
-          "@context": "https://schema.org",
           "@type": "Question",
           "name": "Is jev-curate a replacement for judging data in a chat window?",
           "acceptedAnswer": {
-            "@context": "https://schema.org",
             "@type": "Answer",
             "text": "It replaces the manual loop for bulk work. Chat judging suits one-off eyeballing of a few rows. jev-curate applies the same model to every row, writes keep and reject files, and never rewrites the verbatim data text."
           }
         },
         {
-          "@context": "https://schema.org",
           "@type": "Question",
           "name": "What does jev-curate cost compared to chat-based judging?",
           "acceptedAnswer": {
-            "@context": "https://schema.org",
             "@type": "Answer",
-            "text": "Jev input costs 0.042 USD per million tokens and output is unmetered. A chat session pays for generated prose on every turn; jev-curate pays for the row once, with batched fan-out questions."
+            "text": "Jev input costs $0.042 / 1M input tokens and output is unmetered. A chat session pays for generated prose on every turn; jev-curate pays for the row once, with batched fan-out questions."
           }
         }
       ]
@@ -115,8 +176,62 @@ curate:  {"has_circular_reasoning": noul 0.05,
       </div>
     </section>
 
+    <section class="why" id="matrix">
+      <h2>How does jev-curate compare to NeMo Curator, Datatrove, and custom judge scripts?</h2>
+      <p class="section-lead">jev-curate is a Rust streaming sifter built around typed Jev System One verdicts (<code>Choice</code>, <code>Score</code>, <code>Noul</code>), whereas NeMo Curator and HuggingFace Datatrove focus on self-hosted CPU/GPU deduplication and heuristic pipelines, and custom judge scripts parse metered chat-completion prose.</p>
+      <div class="table-wrap"><table class="bench-table" aria-label="Dataset curation tools comparison matrix">
+        <thead>
+          <tr>
+            <th>Axis</th>
+            <th>jev-curate</th>
+            <th>NeMo Curator</th>
+            <th>HuggingFace Datatrove</th>
+            <th>Custom LLM-as-a-judge scripts</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Runtime &amp; language</td>
+            <td>Rust binary (optional PyO3 Python bindings)</td>
+            <td>Python + Dask / RAPIDS GPU ecosystem</td>
+            <td>Python (multiprocessing, Slurm, Ray)</td>
+            <td>Ad-hoc Python / async HTTP scripts</td>
+          </tr>
+          <tr>
+            <td>Judging mechanism</td>
+            <td>Typed Jev System One verdicts (<code>Choice</code>, <code>Score</code>, <code>Noul</code>) via speculative fan-out</td>
+            <td>Heuristic filters, classifiers, and GPU fuzzy/semantic deduplication</td>
+            <td>Deterministic pipeline steps, heuristic filters, and MinHash deduplication</td>
+            <td>Free-text or JSON-mode chat-completion prompts parsed per row</td>
+          </tr>
+          <tr>
+            <td>Output &amp; verbatim data</td>
+            <td>Streams Parquet/JSONL to <code>clean</code>, <code>rejected</code>, and <code>errors</code> without rewriting text</td>
+            <td>Sharded Parquet/JSONL partitions with filtered or redacted records</td>
+            <td>Parquet/JSONL shards via <code>fsspec</code> (local, S3, HF Hub)</td>
+            <td>Custom script outputs; requires hand-rolled retry and schema parsing</td>
+          </tr>
+          <tr>
+            <td>Cost &amp; rate control</td>
+            <td><code>$0.042 / 1M input tokens</code>, unmetered output; 20 req/s token-bucket limiter &amp; <code>--dry-run</code></td>
+            <td>Self-hosted CPU/GPU cluster compute; no per-token API fee</td>
+            <td>Self-hosted CPU workers; no per-token API fee</td>
+            <td>Metered input + metered prose/JSON output tokens per call</td>
+          </tr>
+          <tr>
+            <td>Best fit</td>
+            <td>High-throughput typed rubric filtering of synthetic and pretraining rows</td>
+            <td>Large-scale pretraining dedup, PII redaction, and GPU-cluster curation</td>
+            <td>Rule-based web-crawl filtering and multi-node CPU deduplication</td>
+            <td>One-off exploratory grading or custom multi-turn rubrics</td>
+          </tr>
+        </tbody>
+      </table></div>
+    </section>
+
     <section class="why">
-      <h2>Side by side</h2>
+      <h2>Side-by-side: jev-curate vs judging in a chat window</h2>
+      <p class="section-lead">Chat judging is built for inspecting a handful of rows interactively, while jev-curate turns the same grading rubric into a repeatable streaming pipeline. The table below contrasts the two workflows across verdict shape, cost, and repeatability.</p>
       <div class="table-wrap"><table class="bench-table" aria-label="Comparison table">
         <thead>
           <tr><th>Axis</th><th>Prompt in a chat window</th><th>jev-curate</th></tr>
@@ -126,7 +241,7 @@ curate:  {"has_circular_reasoning": noul 0.05,
           <tr><td>Row coverage</td><td>What you have patience for</td><td>Every row, streaming</td></tr>
           <tr><td>Verbatim data</td><td>Copied, pasted, often rewritten</td><td>Passed as state, never rewritten</td></tr>
           <tr><td>Output</td><td>Chat log</td><td>clean.jsonl and rejected.jsonl</td></tr>
-          <tr><td>Cost shape</td><td>Prose billed per token</td><td>0.042 USD per million input, output unmetered</td></tr>
+          <tr><td>Cost shape</td><td>Prose billed per token</td><td>$0.042 / 1M input tokens, output unmetered</td></tr>
           <tr><td>Repeats</td><td>Same prompt retyped per row</td><td>Preset rubrics, same questions each row</td></tr>
           <tr><td>Check before spending</td><td>None</td><td>--dry-run reports keep and reject counts</td></tr>
         </tbody>
@@ -135,11 +250,12 @@ curate:  {"has_circular_reasoning": noul 0.05,
     </section>
 
     <section class="presets">
-      <h2>The shorter path is the pipeline</h2>
-      <p class="section-lead">A chat judgment is an event. jev-curate makes the judgment a table: same rubric per row, same questions, typed answers written next to a keep or reject decision. When a reviewer asks why a row was dropped, the answer is an object in <code>rejected.jsonl</code>, not a scrollback.</p>
+      <h2>Why does a typed pipeline beat chat-window judging?</h2>
+      <p class="section-lead">A typed pipeline enforces the exact same rubric on every row and records structured keep or reject reasons in <code>rejected.jsonl</code> without rewriting source text. Reviewers can audit why any row was dropped without scrolling through chat transcripts.</p>
       <p class="section-lead">That also makes the tool auditable. The three presets map to three evaluation templates, and each template asks Jev only what that job needs: math presets check entailment, anti-sycophancy checks rated honesty, code presets check correctness. No generic grade, no rewriter, no taxonomy drift between rows.</p>
 
-      <h2 class="steps-heading">When to keep using chat</h2>
+      <h2 class="steps-heading">When should you keep using chat-window judging?</h2>
+      <p class="section-lead">Keep using chat-window judging when exploring an unfamiliar dataset for the first time, asking ad-hoc questions that change every row, or writing prose feedback as the deliverable.</p>
       <ul class="glossary-list">
         <li>Exploring an unfamiliar dataset for the first time. Look at twenty rows by eye before you set a rubric.</li>
         <li>Ad hoc questions that change every row. Presets assume a stable rubric across a batch.</li>
@@ -148,7 +264,8 @@ curate:  {"has_circular_reasoning": noul 0.05,
     </section>
 
     <section class="presets">
-      <h2>When the pipeline pays for itself</h2>
+      <h2>When does jev-curate pay for itself over manual judging?</h2>
+      <p class="section-lead">jev-curate pays for itself as soon as you evaluate the same rubric repeatedly across a batch, because it removes per-row prompt authoring, prose output billing, and threshold drift. Once checked in, a preset and <code>--dry-run</code> command reproduce the exact same filter on future batches.</p>
       <p class="section-lead">The crossover is not about model quality. It is about repetition. A chat grader re-reads the prompt on every row and re-emits the justification on every row, and the grader's attention is the same scarce resource each time. jev-curate evaluates the rubric once as questions, then replays it across the batch with zero per-row prompt authoring and zero prose output to eyeball.</p>
       <p class="section-lead">Teams that keep chat judging past that crossover are usually not paying in tokens, they are paying in drift: the prompt changes slightly between rows, the keep threshold shifts mid-batch, and nobody can rerun yesterday's filter. Presets and <code>--dry-run</code> make the filter a checked-in artifact. The same command that filtered the training set filters next month's batch.</p>
       <p class="section-lead">None of this argues that chat judging is useless. It argues that it is a different tool, for inspection before you commit to a rubric. The rows you save as a rubric example in a chat thread become the rows you route with a preset.</p>

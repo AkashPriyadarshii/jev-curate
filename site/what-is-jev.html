@@ -32,45 +32,70 @@ Keywords: what is jev, what is jev ai, who is jev, TypeSafe Jev System One, Jev 
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "@id": "https://jev-curate.vercel.app/#software",
+      "name": "jev-curate",
+      "url": "https://jev-curate.vercel.app/",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Linux, macOS, Windows",
+      "author": {
+        "@id": "https://jev-curate.vercel.app/#person"
+      },
+      "codeRepository": "https://github.com/AkashPriyadarshii/jev-curate",
+      "sameAs": [
+        "https://github.com/AkashPriyadarshii/jev-curate",
+        "https://pypi.org/project/jev-curate/",
+        "https://crates.io/crates/jev-curate",
+        "https://www.producthunt.com/products/jev-curate"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://jev-curate.vercel.app/#website",
+      "name": "jev-curate",
+      "url": "https://jev-curate.vercel.app/",
+      "inLanguage": "en",
+      "publisher": {
+        "@id": "https://jev-curate.vercel.app/#person"
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://jev-curate.vercel.app/#person",
+      "name": "Akash Priyadarshi",
+      "url": "https://github.com/AkashPriyadarshii"
+    },
+    {
       "@type": "FAQPage",
       "mainEntity": [
         {
-          "@context": "https://schema.org",
           "@type": "Question",
           "name": "What is Jev AI?",
           "acceptedAnswer": {
-            "@context": "https://schema.org",
             "@type": "Answer",
             "text": "Jev AI is TypeSafe AI's System One decision model. It answers typed questions with Choice, Score or Noul outputs instead of free text, and is served from the api.typesafe.ai/v1/systemone endpoint. Names that bounce around the ecosystem, such as jev-latest, identify the model version."
           }
         },
         {
-          "@context": "https://schema.org",
           "@type": "Question",
           "name": "Who is Jev?",
           "acceptedAnswer": {
-            "@context": "https://schema.org",
             "@type": "Answer",
             "text": "Jev is not a person. It is the name of a large decision model made by TypeSafe AI for agents: System One judgment, typed answers, no chatbot prose."
           }
         },
         {
-          "@context": "https://schema.org",
           "@type": "Question",
           "name": "What is jev short for?",
           "acceptedAnswer": {
-            "@context": "https://schema.org",
             "@type": "Answer",
             "text": "Jev stands for nothing in the project docs; it is the product name of TypeSafe AI's System One decision model. Nearby spellings like jev-latest name the model version."
           }
         },
         {
-          "@context": "https://schema.org",
           "@type": "Question",
           "name": "How does Jev relate to jev-curate?",
           "acceptedAnswer": {
-            "@context": "https://schema.org",
             "@type": "Answer",
             "text": "jev-curate is an open source Rust sifter that sends each dataset row to Jev as structured state, reads the typed verdict back (Choice, Score, Noul), and routes the row to clean.jsonl or rejected.jsonl."
           }
@@ -124,7 +149,7 @@ Keywords: what is jev, what is jev ai, who is jev, TypeSafe Jev System One, Jev 
           <a class="btn btn-primary" href="#answers">The three answer types</a>
           <a class="btn btn-ghost" href="https://docs.typesafe.ai">TypeSafe docs</a>
         </div>
-        <p class="hero-note">Pricing: <code>0.042 USD per million input tokens</code>, output unmetered. Endpoint <code>https://api.typesafe.ai/v1/systemone</code>.</p>
+        <p class="hero-note">Pricing: <code>$0.042 / 1M input tokens</code>, output unmetered. Endpoint <code>https://api.typesafe.ai/v1/systemone</code>.</p>
       </div>
       <div class="terminal" aria-label="A Jev request and typed response">
         <div class="terminal-bar"><span class="t-dot"></span><span>POST /v1/systemone - model jev-latest</span></div>
@@ -157,8 +182,8 @@ answers:
 
     <section class="presets">
       <h2>Built for batch, priced for batch</h2>
-      <p class="section-lead">The model profile makes the batch economics clear. Input costs 0.042 USD per million tokens, output is unmetered, and TypeSafe's current org default is 80 requests/sec and 100,000 tokens/sec. TypeSafe's own workflow benchmarks claim 193.6x faster and 444.6x cheaper than chat-style judging on System One tasks. That is why jev-curate can afford to evaluate every row instead of a sample: the verdict costs $0.042 per million input tokens.</p>
-      <p class="section-lead">The client respects those limits with a token bucket. Measured locally against a mock server, one node sustains 24.0 rows per second; the <a href="benchmarks.html">benchmark page</a> explains the number and the arithmetic behind scaling it to the 1,500 rows/sec cluster target.</p>
+      <p class="section-lead">The model profile makes the batch economics clear. Input costs $0.042 / 1M input tokens, output is unmetered, and TypeSafe's current org default is 80 requests/sec and 100,000 tokens/sec. TypeSafe's own workflow benchmarks claim 193.6x faster and 444.6x cheaper than chat-style judging on System One tasks. That is why jev-curate can afford to evaluate every row instead of a sample: the verdict costs $0.042 / 1M input tokens.</p>
+      <p class="section-lead">The client respects those limits with a token bucket. Measured locally against a wiremock server with the 20 req/s limiter, one node sustains 23.9 rows/sec; the <a href="benchmarks.html">benchmark page</a> explains the number and the arithmetic behind scaling it to the 1,500+ rows/sec cluster target on 63 nodes.</p>
       <p class="section-lead">Jev is TypeSafe AI's model for typed decisions, and jev-curate is one client for it. The <a href="glossary.html">glossary</a> defines every term, and the <a href="use-cases.html">use case</a> pages show the workflows.</p>
     </section>
 

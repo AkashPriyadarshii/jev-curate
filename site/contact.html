@@ -30,15 +30,50 @@ Keywords: jev-curate contact, report bug jev-curate, maintainer contact, dataset
   <link rel="stylesheet" href="style.css">
   <script type="application/ld+json">{
   "@context": "https://schema.org",
-  "@type": "ContactPage",
-  "name": "Contact",
-  "url": "https://jev-curate.vercel.app/contact.html",
-  "about": {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "jev-curate",
-    "url": "https://github.com/AkashPriyadarshii/jev-curate"
-  }
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://jev-curate.vercel.app/#software",
+      "name": "jev-curate",
+      "url": "https://jev-curate.vercel.app/",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Linux, macOS, Windows",
+      "author": {
+        "@id": "https://jev-curate.vercel.app/#person"
+      },
+      "codeRepository": "https://github.com/AkashPriyadarshii/jev-curate",
+      "sameAs": [
+        "https://github.com/AkashPriyadarshii/jev-curate",
+        "https://pypi.org/project/jev-curate/",
+        "https://crates.io/crates/jev-curate",
+        "https://www.producthunt.com/products/jev-curate"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://jev-curate.vercel.app/#website",
+      "name": "jev-curate",
+      "url": "https://jev-curate.vercel.app/",
+      "inLanguage": "en",
+      "publisher": {
+        "@id": "https://jev-curate.vercel.app/#person"
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://jev-curate.vercel.app/#person",
+      "name": "Akash Priyadarshi",
+      "url": "https://github.com/AkashPriyadarshii"
+    },
+    {
+      "@type": "ContactPage",
+      "name": "Contact",
+      "url": "https://jev-curate.vercel.app/contact.html",
+      "about": {
+        "@id": "https://jev-curate.vercel.app/#software"
+      }
+    }
+  ]
 }</script>
   <script defer src="/_vercel/insights/script.js"></script>
 </head>

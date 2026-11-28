@@ -1,0 +1,167 @@
+# jev-curate — Full Reference (`llms-full.txt`)
+
+> High-throughput synthetic and pretraining dataset sifter powered by TypeSafe AI's Jev System One model (`jev-latest`).
+
+`jev-curate` streams `.parquet` and `.jsonl` datasets through host pre-filters (`secret_scan` and `pre_filter_sanity`) and typed Jev System One judgments (`Choice`, `Score`, `Noul`) via speculative fan-out batching. It never rewrites verbatim row text and writes `clean.jsonl` (or `clean.parquet`), `rejected.jsonl`, and `errors.jsonl`.
+
+## Key Metrics & Pricing
+- **Measured single-node throughput:** `23.9 rows/sec` against a local wiremock server (bound by the built-in `20 req/s` / `1,200 req/min` token-bucket rate limiter).
+- **Cluster target:** `1,500+ rows/sec` on `63` worker nodes (horizontal scaling; rows are independent).
+- **Pricing:** `$0.042 / 1M input tokens`, output tokens unmetered (~250k tokens/sec).
+- **API Endpoint:** `https://api.typesafe.ai/v1/systemone` (default model: `jev-latest`).
+- **Source & Packages:**
+  - GitHub: `https://github.com/AkashPriyadarshii/jev-curate`
+  - PyPI: `https://pypi.org/project/jev-curate/` (`pip install --pre jev-curate`)
+  - crates.io: `https://crates.io/crates/jev-curate` (`cargo install jev-curate --version 0.3.0-beta.1`)
+  - Site: `https://jev-curate.vercel.app/`
+
+---
+
+## CLI Reference (`jev-curate filter`)
+
+```text
+jev-curate filter <INPUT> [OPTIONS]
+```
+
+### Positional Argument
+- `<INPUT>`: Path to `.parquet` or `.jsonl` dataset, `-` for stdin, `hf://datasets/<org>/<repo>/<path>`, or `https://...` URL.
+
+### Flags & Defaults (verified from `src/main.rs`)
+| Flag | Short | Default | Description |
+| --- | --- | --- | --- |
+| `--preset` | `-p` | `reasoning-math` | Built-in preset (`reasoning-math`, `anti-sycophancy`, `code-correctness`) or path to custom `.yaml`/`.yml`/`.json` rubric |
+| `--out` | `-o` | `./curated/` | Output directory for clean, rejected, and error files |
+| `--concurrency` | `-c` | `32` | Parallel worker count |
+| `--dry-run` | — | `false` | Host pre-filters only (`secret_scan` + `pre_filter_sanity`), zero API calls, no API key required |
+| `--model` | — | `jev-latest` | Model name (overrides `JEV_MODEL` env var) |
+| `--endpoint` | — | `https://api.typesafe.ai/v1/systemone` | Custom API endpoint URL (HTTPS, or `localhost` / `127.0.0.1` / `[::1]` for offline mock testing; overrides `TYPESAFE_ENDPOINT`) |
+| `--format` | — | `jsonl` | Output format: `jsonl` or `parquet` (`--format parquet` requires a `.parquet` input) |
+| `--resume` | — | `false` | Resume from existing `clean`/`rejected`/`errors.jsonl` without truncating |
+| `--stdout` | — | `false` | Emit clean rows to stdout for Unix pipe streaming (only supported with `--format jsonl`) |
+| `--column` | — | `None` | Column name(s) to extract text from (single or comma-separated) |
+
+### Environment Variables
+- `TYPESAFE_API_KEY`: Required unless `--dry-run` or `--endpoint` / `TYPESAFE_ENDPOINT` is set.
+- `TYPESAFE_ENDPOINT`: Optional custom endpoint URL.
+- `JEV_MODEL`: Optional default model override (falls back to `jev-latest`).
+
+### Output Files
+- `clean.jsonl` (or `clean.parquet` when `--format parquet` is used): Accepted rows, verbatim.
+- `rejected.jsonl`: Rejected rows with rejection reasons attached.
+- `errors.jsonl`: Rows where Jev evaluation failed (`Jev evaluation failed: ...`).
+
+---
+
+## Python SDK (`PyJevCurator`, verified from `src/lib.rs`)
+
+Module: `jev_curate` (built with `pyo3`).
+
+```python
+from jev_curate import PyJevCurator
+
+curator = PyJevCurator(
+    api_key="ts_...",
+    preset="reasoning-math",   # "reasoning-math", "anti-sycophancy", or "code-correctness"
+    model=None,                # optional str, defaults to "jev-latest"
+    endpoint=None,             # optional str, overrides endpoint URL
+)
+```
+
+### Constructor Signature
+- `PyJevCurator(api_key: str, preset: str, model: Optional[str] = None, endpoint: Optional[str] = None)`
+  - Raises `ValueError` for unknown preset names.
+
+### Methods
+1. `filter_text(text: str) -> dict`
+   - Evaluates a single string synchronously (releases Python GIL via `py.detach`).
+   - Returns:
+     ```python
+     {
+         "passed": bool,
+         "rejection_reasons": list[str],
+         "scores": dict[str, float],
+         "nouls": dict[str, float],
+     }
+     ```
+2. `filter_file(input: str, out: str = "./curated", dry_run: bool = False) -> dict`
+   - Streams `input` (`.parquet` or `.jsonl`), writes `clean`, `rejected`, and `errors` files into `out`.
+   - Returns:
+     ```python
+     {
+         "passed": int,
+         "rejected": int,
+         "errors": int,
+         "total": int,
+     }
+     ```
+
+---
+
+## Built-in Presets & Thresholds (verified from `src/presets.rs`)
+
+All three built-in presets use `min_confidence: 0.5` and `policy: "all"`.
+
+### 1. `reasoning-math`
+- Description: Filters mathematical and logical reasoning traces for circularity and rigor.
+- Questions:
+  - `has_circular_reasoning` (`type: "noul"`): Reject if probability `>= 0.70` (`reject_nouls`).
+  - `reasoning_depth` (`type: "score"`, 0–4 scale): Reject if score `< 2.0` (`min_scores`).
+
+### 2. `anti-sycophancy`
+- Description: Filters out robotic AI disclaimers, flattery, and conversational filler.
+- Questions:
+  - `is_sycophantic` (`type: "noul"`): Reject if probability `>= 0.65` (`reject_nouls`).
+  - `has_ai_disclaimer` (`type: "noul"`): Reject if probability `>= 0.80` (`reject_nouls`).
+
+### 3. `code-correctness`
+- Description: Drops lazy code stubs, unclosed blocks, and unrunnable pseudo-code.
+- Questions:
+  - `has_stub_placeholders` (`type: "noul"`): Reject if probability `>= 0.75` (`reject_nouls`).
+  - `code_quality` (`type: "score"`, 0–4 scale): Reject if score `< 2.0` (`min_scores`).
+
+### Custom Rubric Schema (`PresetConfig`)
+Custom `.yaml`/`.yml`/`.json` files deserialize into `PresetConfig`:
+- `name`: `string`
+- `description`: `string`
+- `questions`: `map<string, JevQuestionConfig>` where each entry has `type` (`"noul"`, `"score"`, or `"choice"`), `instructions` (`string`), and optional `criteria` (JSON value).
+- `min_scores`: `map<string, f64>`
+- `reject_nouls`: `map<string, f64>` (reject if Noul probability `>= threshold`)
+- `min_confidence`: `f64` (fail-closed for `score`/`choice` answers missing confidence or below floor)
+- `allowed_choices`: `map<string, list<string>>` (optional; empty list allows any)
+- `policy`: `"all"` (default; all gates must pass) or `"any"` (passes if any Noul/Score/Choice gate passes; `min_confidence` is still enforced)
+
+---
+
+## Host Pre-Filters (verified from `src/filter.rs`)
+
+Executed locally before any API request:
+1. `secret_scan(text)`: Rejects rows containing `sk-` tokens (`>= 16` chars after optional `proj-`/`live-`/`test-` prefix), `ghp_`, `gho_`, `aws_access_key`, `typesafe_api_key`, or `AKIA`.
+2. `pre_filter_sanity(text)`:
+   - Rejects empty/whitespace-only records and records `< 10` trimmed characters.
+   - Rejects symbol floods (0 alphanumeric chars, or `len > 100` with `< 20%` alphanumeric ratio).
+   - Strips blank/padding lines and trailing whitespace while preserving leading indentation.
+   - Truncates at `32,000` bytes (`~8,000` tokens) on a valid UTF-8 char boundary.
+
+---
+
+## Verdict JSON Schema (`CurateVerdict`, verified from `src/filter.rs`)
+
+```json
+{
+  "passed": true,
+  "rejection_reasons": [],
+  "scores": {
+    "reasoning_depth": 3.2
+  },
+  "nouls": {
+    "has_circular_reasoning": 0.12
+  },
+  "input_tokens": 148
+}
+```
+
+- `passed` (`bool`): Final keep/reject decision.
+- `rejection_reasons` (`string[]`): Empty when `passed` is `true`; otherwise lists host sanity, secret scan, threshold, missing-answer, confidence, or Jev evaluation failures.
+- `scores` (`map<string, f64>`): Returned `Score` values keyed by question name.
+- `nouls` (`map<string, f64>`): Returned `Noul` probabilities keyed by question name.
+- `input_tokens` (`u64`): Input tokens billed for the record (`0` on host pre-filter rejections or `--dry-run`).

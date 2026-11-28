@@ -32,13 +32,40 @@ Keywords: about jev-curate, jev-curate project, Akash Priyadarshi, Jev ecosystem
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "@id": "https://jev-curate.vercel.app/#software",
+      "name": "jev-curate",
+      "url": "https://jev-curate.vercel.app/",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Linux, macOS, Windows",
+      "author": {
+        "@id": "https://jev-curate.vercel.app/#person"
+      },
+      "codeRepository": "https://github.com/AkashPriyadarshii/jev-curate",
+      "sameAs": [
+        "https://github.com/AkashPriyadarshii/jev-curate",
+        "https://pypi.org/project/jev-curate/",
+        "https://crates.io/crates/jev-curate",
+        "https://www.producthunt.com/products/jev-curate"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://jev-curate.vercel.app/#website",
+      "name": "jev-curate",
+      "url": "https://jev-curate.vercel.app/",
+      "inLanguage": "en",
+      "publisher": {
+        "@id": "https://jev-curate.vercel.app/#person"
+      }
+    },
+    {
       "@type": "Person",
+      "@id": "https://jev-curate.vercel.app/#person",
       "name": "Akash Priyadarshi",
       "url": "https://github.com/AkashPriyadarshii",
       "jobTitle": "Software engineer",
       "address": {
-        "@context": "https://schema.org",
         "@type": "PostalAddress",
         "addressLocality": "Patna",
         "addressRegion": "Bihar",
@@ -104,8 +131,8 @@ Keywords: about jev-curate, jev-curate project, Akash Priyadarshi, Jev ecosystem
   "language": "Rust",
   "io": ["parquet", "jsonl"],
   "engine": "TypeSafe Jev (jev-latest)",
-  "measured": "24.0 rows/sec, mock bench",
-  "target": "1,500+ rows/sec, cluster" }</pre>
+  "measured": "23.9 rows/sec, local wiremock (20 req/s limiter)",
+  "target": "1,500+ rows/sec, 63-node cluster" }</pre>
       </div>
     </section>
 

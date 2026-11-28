@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   Title: jev-curate | high-throughput dataset sifter by TypeSafe Jev
-  Description: Curate synthetic and pretraining datasets at 1,500+ rows/sec. Rust CLI with TypeSafe Jev judgment, Parquet and JSONL, 3c per million tokens input.
+  Description: Curate synthetic and pretraining datasets at 1,500+ rows/sec cluster target (23.9 rows/sec per node measured on local wiremock). Rust CLI with TypeSafe Jev judgment, Parquet and JSONL, $0.042 / 1M input tokens.
   Keywords: dataset curation, synthetic data sifting, pretraining data, Jev evaluator, Rust dataset tool, parquet jsonl, data quality filter
 -->
 <html lang="en">
@@ -34,8 +34,8 @@
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@context": "https://schema.org",
       "@type": "SoftwareApplication",
+      "@id": "https://jev-curate.vercel.app/#software",
       "name": "jev-curate",
       "url": "https://jev-curate.vercel.app/",
       "description": "High-throughput dataset sifter for synthetic and pretraining datasets. Rust CLI with TypeSafe Jev judgment, Parquet and JSONL I/O, speculative fan-out batching.",
@@ -43,35 +43,39 @@
       "operatingSystem": "Linux, macOS, Windows",
       "softwareVersion": "0.3.0-beta.1",
       "offers": {
-        "@context": "https://schema.org",
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD"
       },
       "author": {
-        "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "Akash Priyadarshi",
-        "url": "https://github.com/AkashPriyadarshii"
+        "@id": "https://jev-curate.vercel.app/#person"
       },
       "codeRepository": "https://github.com/AkashPriyadarshii/jev-curate",
-      "featureList": "1,500+ rows/sec target; TypeSafe Jev evaluation; Parquet and JSONL I/O; presets: reasoning-math, anti-sycophancy, code-correctness; speculative fan-out batching; token bucket rate limiting"
+      "sameAs": [
+        "https://github.com/AkashPriyadarshii/jev-curate",
+        "https://pypi.org/project/jev-curate/",
+        "https://crates.io/crates/jev-curate",
+        "https://www.producthunt.com/products/jev-curate"
+      ],
+      "featureList": "23.9 rows/sec measured per node (local wiremock, 20 req/s limiter); 1,500+ rows/sec cluster target on 63 nodes; TypeSafe Jev evaluation; Parquet and JSONL I/O; presets: reasoning-math, anti-sycophancy, code-correctness; speculative fan-out batching; token bucket rate limiting"
     },
     {
-      "@context": "https://schema.org",
       "@type": "WebSite",
+      "@id": "https://jev-curate.vercel.app/#website",
       "name": "jev-curate",
       "url": "https://jev-curate.vercel.app/",
-      "inLanguage": "en"
+      "inLanguage": "en",
+      "publisher": {
+        "@id": "https://jev-curate.vercel.app/#person"
+      }
     },
     {
-      "@context": "https://schema.org",
       "@type": "Person",
+      "@id": "https://jev-curate.vercel.app/#person",
       "name": "Akash Priyadarshi",
       "url": "https://github.com/AkashPriyadarshii",
       "jobTitle": "Software Engineer",
       "address": {
-        "@context": "https://schema.org",
         "@type": "PostalAddress",
         "addressLocality": "Patna, Bihar",
         "addressCountry": "IN"
@@ -84,21 +88,17 @@
   "@type": "FAQPage",
   "mainEntity": [
     {
-      "@context": "https://schema.org",
       "@type": "Question",
       "name": "What is TypeSafe Jev?",
       "acceptedAnswer": {
-        "@context": "https://schema.org",
         "@type": "Answer",
         "text": "TypeSafe Jev is a System One decision model for AI agents. It returns typed answers: Choice options, 0-to-4 Score ratings, and Noul calibrated probabilities, instead of free text. jev-curate feeds each dataset row to Jev as structured state and reads the typed verdict back."
       }
     },
     {
-      "@context": "https://schema.org",
       "@type": "Question",
       "name": "What is jev-curate?",
       "acceptedAnswer": {
-        "@context": "https://schema.org",
         "@type": "Answer",
         "text": "A Rust CLI that sifts synthetic and pretraining datasets with TypeSafe Jev judgment. It reads Parquet and JSONL, evaluates every row against a preset rubric, and writes accepted and rejected rows to separate files."
       }
@@ -108,27 +108,22 @@
       "@type": "Question",
       "name": "How fast is dataset curation with jev-curate?",
       "acceptedAnswer": {
-        "@context": "https://schema.org",
         "@type": "Answer",
-        "text": "jev-curate has a 63-node cluster target (24/s single node) using multi-threaded streaming with speculative fan-out batching, which batches independent judgement questions for each row into a single API request."
+        "text": "jev-curate measures 23.9 rows/sec per node against a local wiremock with its 20 req/s token-bucket limiter, and has a 1,500+ rows/sec cluster target on 63 nodes using multi-threaded streaming with speculative fan-out batching."
       }
     },
     {
-      "@context": "https://schema.org",
       "@type": "Question",
       "name": "What does jev-curate cost to run?",
       "acceptedAnswer": {
-        "@context": "https://schema.org",
         "@type": "Answer",
-        "text": "TypeSafe Jev input tokens cost about $0.042 per million, about 4 dollars per 100 million, and output tokens are unmetered. TypeSafe reports System One workflows 444x cheaper and 193.6x faster than the baseline."
+        "text": "TypeSafe Jev input tokens cost $0.042 / 1M input tokens, and output tokens are unmetered. TypeSafe reports System One workflows 444x cheaper and 193.6x faster than the baseline."
       }
     },
     {
-      "@context": "https://schema.org",
       "@type": "Question",
       "name": "Which presets does jev-curate ship?",
       "acceptedAnswer": {
-        "@context": "https://schema.org",
         "@type": "Answer",
         "text": "Three presets: reasoning-math for chain-of-thought correctness, anti-sycophancy for flattery that tracks the user, and code-correctness for syntax and logic errors. You can also run a dry run with no API key."
       }
@@ -185,7 +180,7 @@
           <code class="install-cmd" id="hero-install-cmd">pip install --pre jev-curate</code>
           <button type="button" class="install-copy" id="hero-install-copy" aria-label="Copy install command"><span class="copy-label">copy</span></button>
         </div>
-        <p class="hero-note">Output unmetered · <a href="https://docs.typesafe.ai/models.md">$0.042 / 1M input tokens</a> · MIT · 116 stars</p>
+        <p class="hero-note">Output unmetered · <a href="https://docs.typesafe.ai/models.md">$0.042 / 1M input tokens</a> · MIT · 116 stars (Nov 2026)</p>
         <p class="trust-line">Runs 100% local in <code>--dry-run</code> · <code>secret_scan</code> strips keys before API calls</p>
       </div>
       <div class="terminal" aria-label="Interactive hero terminal">
@@ -262,8 +257,8 @@ stats = curator.filter_file(<span class="tok-str">"corpus.parquet"</span>, out=<
     </section>
 
     <section class="why" id="why">
-      <h2>LLM judges are an API call with a prompt bolted on</h2>
-      <p class="section-lead">You paste a csv into a chat window and get grades back in prose. jev-curate treats judging as a pipeline: predefined rubrics, batched questions, typed answers, 3 output files ready for training (<code>clean.jsonl</code>/<code>.parquet</code>, <code>rejected.jsonl</code>, <code>errors.jsonl</code>).</p>
+      <h2>Why use jev-curate instead of chat-window LLM judges?</h2>
+      <p class="section-lead">Chat-window judges return unstructured prose that you have to parse and retry per row, whereas jev-curate streams Parquet and JSONL through typed Jev rubrics into three deterministic output files (<code>clean.jsonl</code>/<code>.parquet</code>, <code>rejected.jsonl</code>, <code>errors.jsonl</code>). Every row is evaluated with speculative fan-out in one request without rewriting verbatim text.</p>
       <ul class="reason-list">
         <li><strong>Judgment by <a href="https://typesafe.ai">TypeSafe Jev</a>.</strong> Machine-native Choice, Score and Noul questions. One state per record, all questions fanned into one request.</li>
         <li><strong>No token waste.</strong> Blank and padding lines drop in Rust before the API. 8k token ceiling per row.</li>
@@ -274,8 +269,8 @@ stats = curator.filter_file(<span class="tok-str">"corpus.parquet"</span>, out=<
     </section>
 
     <section class="presets" id="presets">
-      <h2>Rubrics you can point at a file</h2>
-      <p class="section-lead">Three presets ship with the binary. Each is a Jev evaluation template.</p>
+      <h2>Which built-in rubrics does jev-curate ship?</h2>
+      <p class="section-lead">jev-curate ships three built-in presets—<code>reasoning-math</code>, <code>anti-sycophancy</code>, and <code>code-correctness</code>—and also accepts custom YAML or JSON rubrics. Each preset bundles typed Noul and Score questions with explicit acceptance thresholds.</p>
       <div class="preset-row">
         <h3><code>reasoning-math</code></h3>
         <p>Grades chain-of-thought correctness and arithmetic soundness. Keeps steps that entail the answer.</p>
@@ -294,7 +289,8 @@ stats = curator.filter_file(<span class="tok-str">"corpus.parquet"</span>, out=<
     </section>
 
     <section class="quickstart" id="quickstart">
-      <h2>One command in, three files out</h2>
+      <h2>How do you run jev-curate from CLI or Python?</h2>
+      <p class="section-lead">Install with <code>pip install --pre jev-curate</code> or <code>cargo install jev-curate --version 0.3.0-beta.1</code>, then run <code>jev-curate filter &lt;INPUT&gt;</code> to write <code>clean.jsonl</code>/<code>.parquet</code>, <code>rejected.jsonl</code>, and <code>errors.jsonl</code>. Use <code>--dry-run</code> first to verify keep and reject counts locally with no API key.</p>
       <div class="code-block">
         <button class="copy-btn" data-copy="pip install --pre jev-curate">copy install</button>
         <span id="copy-status" class="sr-only" aria-live="polite"></span>
@@ -329,7 +325,8 @@ $ jev-curate filter corpus.parquet --preset anti-sycophancy --format parquet --r
     </section>
 
     <section class="cost" id="cost">
-      <h2>Judgment at pipeline cost</h2>
+      <h2>How fast and expensive is jev-curate?</h2>
+      <p class="section-lead">jev-curate measures 23.9 rows/sec per node on a local wiremock (20 req/s limiter), scales to a 1,500+ rows/sec project target on 63 nodes, and costs $0.042 / 1M input tokens with unmetered output. TypeSafe reports System One workflows 444x cheaper than chat-style judging.</p>
       <div class="stat-row">
         <div class="stat">
           <p class="stat-num">23.9</p>
@@ -360,13 +357,13 @@ $ jev-curate filter corpus.parquet --preset anti-sycophancy --format parquet --r
         <div class="bench-card bench-after">
           <p class="bench-eyebrow">jev-curate · Speculative fan-out</p>
           <dl class="bench-metrics">
-            <div><dt>Throughput</dt><dd><strong>23.9 rows/sec</strong> <span class="bench-note">(local wiremock, 20 req/s cap · 1,500+ target)</span></dd></div>
+            <div><dt>Throughput</dt><dd><strong>23.9 rows/sec</strong> <span class="bench-note">(local wiremock, 20 req/s limiter · 1,500+ target on 63 nodes)</span></dd></div>
             <div><dt>Token cost</dt><dd><strong>$0.042 / 1M input</strong> <span class="bench-note">(444x TypeSafe System One · unmetered output)</span></dd></div>
             <div><dt>Failure mode</dt><dd><strong>Typed verdicts</strong> <span class="bench-note">(Choice / Score / Noul · errors.jsonl)</span></dd></div>
           </dl>
         </div>
       </div>
-      <p class="cost-src">Rates from the <a href="https://typesafe.ai">TypeSafe AI</a> model docs; 444x figure is TypeSafe's own <a href="https://typesafe.ai">System One benchmark</a>. 1500+ is the project target, benchmark runs live in the repo.</p>
+      <p class="cost-src">Rates from the <a href="https://typesafe.ai">TypeSafe AI</a> model docs ($0.042 / 1M input tokens); 444x figure is TypeSafe's own <a href="https://typesafe.ai">System One benchmark</a>. 23.9 rows/sec is measured per node on local wiremock (20 req/s limiter); 1,500+ rows/sec is the 63-node cluster target, and benchmark runs live in the repo.</p>
     </section>
 
     <section class="cta">

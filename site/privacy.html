@@ -30,10 +30,51 @@ Keywords: jev-curate privacy, dataset sifter privacy, Jev endpoint data, no anal
   <link rel="stylesheet" href="style.css">
   <script type="application/ld+json">{
   "@context": "https://schema.org",
-  "@type": "WebPage",
-  "name": "Privacy",
-  "url": "https://jev-curate.vercel.app/privacy.html",
-  "dateModified": "2026-09-21"
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://jev-curate.vercel.app/#software",
+      "name": "jev-curate",
+      "url": "https://jev-curate.vercel.app/",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Linux, macOS, Windows",
+      "author": {
+        "@id": "https://jev-curate.vercel.app/#person"
+      },
+      "codeRepository": "https://github.com/AkashPriyadarshii/jev-curate",
+      "sameAs": [
+        "https://github.com/AkashPriyadarshii/jev-curate",
+        "https://pypi.org/project/jev-curate/",
+        "https://crates.io/crates/jev-curate",
+        "https://www.producthunt.com/products/jev-curate"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://jev-curate.vercel.app/#website",
+      "name": "jev-curate",
+      "url": "https://jev-curate.vercel.app/",
+      "inLanguage": "en",
+      "publisher": {
+        "@id": "https://jev-curate.vercel.app/#person"
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://jev-curate.vercel.app/#person",
+      "name": "Akash Priyadarshi",
+      "url": "https://github.com/AkashPriyadarshii"
+    },
+    {
+      "@type": "WebPage",
+      "name": "Privacy",
+      "url": "https://jev-curate.vercel.app/privacy.html",
+      "dateModified": "2026-09-21",
+      "isPartOf": {
+        "@id": "https://jev-curate.vercel.app/#website"
+      }
+    }
+  ]
 }</script>
   <script defer src="/_vercel/insights/script.js"></script>
 </head>

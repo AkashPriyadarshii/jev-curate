@@ -32,26 +32,44 @@ Keywords: jev-curate use cases, RLHF data filtering, anti-sycophancy preset, rea
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@context": "https://schema.org",
       "@type": "SoftwareApplication",
+      "@id": "https://jev-curate.vercel.app/#software",
       "name": "jev-curate",
       "operatingSystem": "Linux, macOS, Windows",
       "applicationCategory": "DeveloperApplication",
       "offers": {
-        "@context": "https://schema.org",
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD"
       },
       "description": "Streaming dataset sifter for RLHF, reasoning and code datasets, powered by TypeSafe Jev typed judgments.",
-      "url": "https://jev-curate.vercel.app/use-cases.html",
+      "url": "https://jev-curate.vercel.app/",
       "codeRepository": "https://github.com/AkashPriyadarshii/jev-curate",
+      "sameAs": [
+        "https://github.com/AkashPriyadarshii/jev-curate",
+        "https://pypi.org/project/jev-curate/",
+        "https://crates.io/crates/jev-curate",
+        "https://www.producthunt.com/products/jev-curate"
+      ],
       "author": {
-        "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "Akash Priyadarshi",
-        "url": "https://github.com/AkashPriyadarshii"
+        "@id": "https://jev-curate.vercel.app/#person"
       }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://jev-curate.vercel.app/#website",
+      "name": "jev-curate",
+      "url": "https://jev-curate.vercel.app/",
+      "inLanguage": "en",
+      "publisher": {
+        "@id": "https://jev-curate.vercel.app/#person"
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://jev-curate.vercel.app/#person",
+      "name": "Akash Priyadarshi",
+      "url": "https://github.com/AkashPriyadarshii"
     }
   ]
 }</script>
@@ -126,12 +144,12 @@ output: clean.jsonl + rejected.jsonl</pre>
 
     <section class="why" id="code">
       <h2>Code data: pre-filter before the linter</h2>
-      <p class="section-lead">Large code corpora are mostly fine and cheap to store, but training runs pay the cost of the bad rows in loss spikes. <code>code-correctness</code> scores programs on soundness before they enter a code-model mixture. Rows that fail correctness checks drop out at 0.042 USD per million input tokens, which is cheaper than a human triage pass and faster than waiting on a heavy eval sweep.</p>
+      <p class="section-lead">Large code corpora are mostly fine and cheap to store, but training runs pay the cost of the bad rows in loss spikes. <code>code-correctness</code> scores programs on soundness before they enter a code-model mixture. Rows that fail correctness checks drop out at $0.042 / 1M input tokens, which is cheaper than a human triage pass and faster than waiting on a heavy eval sweep.</p>
     </section>
 
     <section class="presets">
       <h2>Threshold tuning, in four passes</h2>
-      <p class="section-lead">Every job here follows the same four pass loop. Pass one: <code>--dry-run</code> with the preset defaults, read the reject rate. Pass two: raise or lower the Noul or Score threshold until the reject rate matches your audit sample. Pass three: inspect a slice of <code>rejected.jsonl</code> to confirm the drops are the drops you wanted, not typos or schema drift. Pass four: run the real batch. Cost shape stays flat because dry runs never touch the API and the real run pays the same 0.042 USD per million input tokens regardless of how you tune.</p>
+      <p class="section-lead">Every job here follows the same four pass loop. Pass one: <code>--dry-run</code> with the preset defaults, read the reject rate. Pass two: raise or lower the Noul or Score threshold until the reject rate matches your audit sample. Pass three: inspect a slice of <code>rejected.jsonl</code> to confirm the drops are the drops you wanted, not typos or schema drift. Pass four: run the real batch. Cost shape stays flat because dry runs never touch the API and the real run pays the same $0.042 / 1M input tokens regardless of how you tune.</p>
       <p class="section-lead">The reject file is also a report. Group <code>rejected.jsonl</code> by the dominant failed question and you get a defect taxonomy for the generator or the miner, which is the second deliverable of the job.</p>
     </section>
 

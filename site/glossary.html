@@ -32,25 +32,54 @@ Keywords: what is jev-curate, what is TypeSafe Jev, Jev System One, Choice Score
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "@id": "https://jev-curate.vercel.app/#software",
+      "name": "jev-curate",
+      "url": "https://jev-curate.vercel.app/",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Linux, macOS, Windows",
+      "author": {
+        "@id": "https://jev-curate.vercel.app/#person"
+      },
+      "codeRepository": "https://github.com/AkashPriyadarshii/jev-curate",
+      "sameAs": [
+        "https://github.com/AkashPriyadarshii/jev-curate",
+        "https://pypi.org/project/jev-curate/",
+        "https://crates.io/crates/jev-curate",
+        "https://www.producthunt.com/products/jev-curate"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://jev-curate.vercel.app/#website",
+      "name": "jev-curate",
+      "url": "https://jev-curate.vercel.app/",
+      "inLanguage": "en",
+      "publisher": {
+        "@id": "https://jev-curate.vercel.app/#person"
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://jev-curate.vercel.app/#person",
+      "name": "Akash Priyadarshi",
+      "url": "https://github.com/AkashPriyadarshii"
+    },
+    {
       "@type": "FAQPage",
       "mainEntity": [
         {
-          "@context": "https://schema.org",
           "@type": "Question",
           "name": "What is TypeSafe Jev?",
           "acceptedAnswer": {
-            "@context": "https://schema.org",
             "@type": "Answer",
             "text": "TypeSafe Jev is a System One decision model for AI agents. It answers typed questions with Choice, Score or Noul outputs instead of free text, and runs on the https://api.typesafe.ai/v1/systemone endpoint."
           }
         },
         {
-          "@context": "https://schema.org",
           "@type": "Question",
           "name": "What is a dataset sifter?",
           "acceptedAnswer": {
-            "@context": "https://schema.org",
             "@type": "Answer",
             "text": "A dataset sifter streams rows from an input file, scores each row against a rubric, and writes accepted rows and rejected rows to separate output files. jev-curate is the Rust sifter for the Jev ecosystem."
           }
@@ -123,7 +152,7 @@ Keywords: what is jev-curate, what is TypeSafe Jev, Jev System One, Choice Score
         <dd>An open source Rust binary that streams dataset rows from Parquet or JSONL, scores each row with Jev, and writes accepted and rejected rows to 5 output files (clean, rejected, errors.jsonl, audit.jsonl, manifest.json). Repo: <a href="https://github.com/AkashPriyadarshii/jev-curate">AkashPriyadarshii/jev-curate</a>.</dd>
 
         <dt>TypeSafe Jev</dt>
-        <dd>The System One decision model behind the tool, served at <code>https://api.typesafe.ai/v1/systemone</code>. "System One" means the model answers typed questions fast and cheaply rather than generating prose. Pricing: <code>0.042 USD per million input tokens</code>, output unmetered, roughly 250k tokens per second.</dd>
+        <dd>The System One decision model behind the tool, served at <code>https://api.typesafe.ai/v1/systemone</code>. "System One" means the model answers typed questions fast and cheaply rather than generating prose. Pricing: <code>$0.042 / 1M input tokens</code>, output unmetered, roughly 250k tokens per second.</dd>
 
         <dt>Noul</dt>
         <dd>Jev's calibrated probability answer. A Noul of 0.05 for "has_circular_reasoning" reads as a 5% chance the row contains circular logic. Presets set thresholds on these values to decide keep or reject.</dd>

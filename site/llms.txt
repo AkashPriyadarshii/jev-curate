@@ -15,6 +15,7 @@ jev-curate streams Parquet and JSONL rows through typed Jev judgments (Choice, S
 - [CLI reference](https://jev-curate.vercel.app/docs/cli-reference): Commands, flags, presets, and output files
 - [Python SDK](https://jev-curate.vercel.app/docs/python-sdk): Python bindings and programmatic usage
 - [Homepage + quickstart](https://jev-curate.vercel.app/): Overview and quickstart guide
+- [Full LLM reference](https://jev-curate.vercel.app/llms-full.txt): Complete CLI flags, Python SDK, preset thresholds, and verdict JSON schema
 - [Real measured benchmark](https://jev-curate.vercel.app/benchmarks.html): Throughput and latency benchmarks
 - [What is Jev](https://jev-curate.vercel.app/what-is-jev.html): Model explainer for TypeSafe Jev System One
 - [Glossary](https://jev-curate.vercel.app/glossary.html): Definitions for jev-curate and TypeSafe Jev
@@ -26,9 +27,9 @@ jev-curate streams Parquet and JSONL rows through typed Jev judgments (Choice, S
 
 ## Key facts
 - Pipeline: Rust streaming core, speculative fan-out batching, token-bucket rate limiter.
-- Pricing: 0.042 USD per million input tokens, output unmetered, ~250k tokens/sec.
+- Pricing: $0.042 / 1M input tokens, output unmetered, ~250k tokens/sec.
 - Endpoint: `https://api.typesafe.ai/v1/systemone`; model `jev-latest`.
-- Measured single node: 24.0 rows/sec against a local mock (rate-limit bound).
+- Measured single node: 23.9 rows/sec against a local wiremock (20 req/s limiter); 1,500+ rows/sec cluster target on 63 nodes.
 - [About](https://jev-curate.vercel.app/about.html): Project background and maintainer
 - [Contact](https://jev-curate.vercel.app/contact.html): Issues, discussions, and maintainer channels
 - [Privacy](https://jev-curate.vercel.app/privacy.html): Privacy policy

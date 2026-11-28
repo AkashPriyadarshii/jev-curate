@@ -8,7 +8,7 @@ Keywords: jev-curate benchmark, jev rows per second, TypeSafe Jev throughput, da
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>jev-curate benchmark: 24.0 rows/sec measured</title>
+  <title>jev-curate benchmark: 23.9 rows/sec measured</title>
   <meta name="description" content="Measured throughput for jev-curate, the TypeSafe Jev dataset sifter. Real numbers from a reproducible mock-server benchmark, not claims.">
   <meta property="og:title" content="jev-curate benchmarks - measured, not claimed">
   <meta property="og:description" content="Real rows/sec numbers from a reproducible mock-server benchmark of the jev-curate Rust pipeline.">
@@ -32,26 +32,44 @@ Keywords: jev-curate benchmark, jev rows per second, TypeSafe Jev throughput, da
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@context": "https://schema.org",
       "@type": "SoftwareApplication",
+      "@id": "https://jev-curate.vercel.app/#software",
       "name": "jev-curate",
       "operatingSystem": "Linux, macOS, Windows",
       "applicationCategory": "DeveloperApplication",
       "offers": {
-        "@context": "https://schema.org",
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD"
       },
-      "description": "Streaming dataset sifter powered by TypeSafe Jev. Measures 24.0 rows/sec in an in-process mock benchmark on a 4-core machine.",
-      "url": "https://jev-curate.vercel.app/benchmarks.html",
+      "description": "Streaming dataset sifter powered by TypeSafe Jev. Measures 23.9 rows/sec per node on a local wiremock benchmark (20 req/s limiter); 1,500+ rows/sec cluster target on 63 nodes.",
+      "url": "https://jev-curate.vercel.app/",
       "codeRepository": "https://github.com/AkashPriyadarshii/jev-curate",
+      "sameAs": [
+        "https://github.com/AkashPriyadarshii/jev-curate",
+        "https://pypi.org/project/jev-curate/",
+        "https://crates.io/crates/jev-curate",
+        "https://www.producthunt.com/products/jev-curate"
+      ],
       "author": {
-        "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "Akash Priyadarshi",
-        "url": "https://github.com/AkashPriyadarshii"
+        "@id": "https://jev-curate.vercel.app/#person"
       }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://jev-curate.vercel.app/#website",
+      "name": "jev-curate",
+      "url": "https://jev-curate.vercel.app/",
+      "inLanguage": "en",
+      "publisher": {
+        "@id": "https://jev-curate.vercel.app/#person"
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://jev-curate.vercel.app/#person",
+      "name": "Akash Priyadarshi",
+      "url": "https://github.com/AkashPriyadarshii"
     }
   ]
 }</script>
@@ -94,7 +112,7 @@ Keywords: jev-curate benchmark, jev rows per second, TypeSafe Jev throughput, da
     <section class="hero">
       <div class="hero-copy">
         <p class="eyebrow">Instrument, not marketing</p>
-        <h1>jev-curate benchmark: 24.0 rows/sec measured</h1>
+        <h1>jev-curate benchmark: 23.9 rows/sec measured</h1>
         <p class="lead">This page reports the numbers the repository actually measures. Run the same benchmark yourself with <code>cargo run --release --example bench_mock</code>. No network, no TypeSafe credits, nothing hidden.</p>
         <div class="hero-actions">
           <a class="btn btn-primary" href="https://github.com/AkashPriyadarshii/jev-curate">Run it yourself</a>
@@ -106,8 +124,8 @@ Keywords: jev-curate benchmark, jev rows per second, TypeSafe Jev throughput, da
         <pre>jev-curate benchmark (mock server, no network)
 machine cores: 4
 rows: 120, concurrency 1 and 32
-sequential:    24.0 rows/sec (42 ms/row)
-concurrent 32: 24.0 rows/sec (42 ms/row)
+sequential:    23.9 rows/sec (42 ms/row)
+concurrent 32: 23.9 rows/sec (42 ms/row)
 note: jev-curate's built-in limiter defaults to 20 req/sec
       (TypeSafe current org default: 80 req/s, 100k tok/s)</pre>
       </div>
@@ -121,8 +139,8 @@ note: jev-curate's built-in limiter defaults to 20 req/sec
           <tr><th>Run</th><th>Rows</th><th>Concurrency</th><th>Rows/sec</th><th>ms/row</th></tr>
         </thead>
         <tbody>
-          <tr><td>Sequential</td><td>120</td><td>1</td><td>24.0</td><td>42</td></tr>
-          <tr><td>Concurrent</td><td>120</td><td>32</td><td>24.0</td><td>42</td></tr>
+          <tr><td>Sequential</td><td>120</td><td>1</td><td>23.9</td><td>42</td></tr>
+          <tr><td>Concurrent</td><td>120</td><td>32</td><td>23.9</td><td>42</td></tr>
         </tbody>
       </table></div>
       <p class="section-lead">Sequential and concurrent land on the same number. That is the finding, not a rounding accident: throughput is bound by the rate limiter, not by CPU or IO.</p>
@@ -131,7 +149,7 @@ note: jev-curate's built-in limiter defaults to 20 req/sec
     <section class="presets">
       <h2>Why the ceiling is there</h2>
       <p class="section-lead"><code>jev-curate</code> sends one fan-out request per row. In <code>v0.3.0-beta.1</code>, the client's built-in token bucket defaults to 20 tokens per second (TypeSafe's current org default is 80 req/s and 100,000 tok/s). One row per token means a client-side ceiling near 20 rows per second on a single worker, with short bursts above it. Measured: 23.9 rows/sec, matching a 20-token burst plus the steady refill.</p>
-      <p class="section-lead">Raising that ceiling is a batching problem, not a compute problem. Rows are independent, so the pipeline scales horizontally: at 24 rows/sec per node, the 1,500 rows/sec figure in the project target is reachable with roughly 63 worker nodes. The target did not misreport a single-node speed; this page exists so nobody has to guess which one is true.</p>
+      <p class="section-lead">Raising that ceiling is a batching problem, not a compute problem. Rows are independent, so the pipeline scales horizontally: at 23.9 rows/sec per node, the 1,500+ rows/sec project target is reachable with 63 worker nodes. The target did not misreport a single-node speed; this page exists so nobody has to guess which one is true.</p>
     </section>
 
     <section class="presets">
@@ -142,19 +160,19 @@ note: jev-curate's built-in limiter defaults to 20 req/sec
 
     <section class="why">
       <h2>Scaling, in round numbers</h2>
-      <p class="section-lead">Rows are independent, so the pipeline scales by worker count. The table is arithmetic on the measured 24.0 rows/sec per node, not a promise.</p>
+      <p class="section-lead">Rows are independent, so the pipeline scales by worker count. The table is arithmetic on the measured 23.9 rows/sec per node, not a promise.</p>
       <div class="table-wrap"><table class="bench-table" aria-label="Scaling arithmetic">
         <thead>
           <tr><th>Nodes</th><th>Expected rows/sec</th><th>Rough daily volume</th></tr>
         </thead>
         <tbody>
-          <tr><td>1</td><td>24</td><td>2.1M</td></tr>
+          <tr><td>1</td><td>23.9</td><td>2.1M</td></tr>
           <tr><td>4</td><td>96</td><td>8.3M</td></tr>
-          <tr><td>16</td><td>384</td><td>33.2M</td></tr>
-          <tr><td>63</td><td>1,512</td><td>130M</td></tr>
+          <tr><td>16</td><td>382</td><td>33.0M</td></tr>
+          <tr><td>63</td><td>1,506</td><td>130M</td></tr>
         </tbody>
       </table></div>
-      <p class="section-lead">1,500 rows/sec is a cluster target and this page says so. When a single node in a real deployment lands a different number, the right move is to publish that number next to this one, not to adjust the table.</p>
+      <p class="section-lead">1,500+ rows/sec on 63 nodes is a cluster target and this page says so. When a single node in a real deployment lands a different number, the right move is to publish that number next to this one, not to adjust the table.</p>
     </section>
 
     <section class="cta">
