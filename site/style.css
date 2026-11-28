@@ -265,7 +265,8 @@ h3[id] {
   color: var(--grey-1); /* #1e1e1e — passes AA */
 }
 .breadcrumb a { color: var(--grey-1); text-decoration: none; }
-.breadcrumb span { color: var(--grey-3); } /* decorative separator */
+.breadcrumb span[aria-hidden="true"] { color: var(--grey-3); } /* decorative separator */
+.breadcrumb span:not([aria-hidden="true"]) { color: var(--grey-1); }
 
 /* buttons */
 .btn {
